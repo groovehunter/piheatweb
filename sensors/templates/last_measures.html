@@ -1,0 +1,9 @@
+{% if last_measures %}
+    <ul>
+    {% for m in last_measures %}
+        <li><a href="/sensors/{{ sensor.id }}/">{{ m.value }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No measures are available.</p>
+{% endif %}
