@@ -31,7 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'piheatweb.apps.PiheatwebConfig',
     'sensors.apps.SensorsConfig',
+    'motors.apps.MotorsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,7 +57,7 @@ ROOT_URLCONF = 'piheatweb.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        #'DIRS': ['piheatweb/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

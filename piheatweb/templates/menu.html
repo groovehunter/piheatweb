@@ -1,0 +1,13 @@
+
+
+<ul id="top">
+   <li><a class="{% block home %}{% endblock %}" href="/">Home</a></li>
+   <li><a class="{% block sensors %}{% endblock %}" href="/sensors">Sensoren</a></li>
+   <li><a class="{% block motors %}{% endblock %}" href="/motors">Motoren</a></li>
+   <li><a class="{% block measurements %}{% endblock %}" href="/measurements">Messungen</a></li>
+   <li><a class="{% block myaccount %}{% endblock %}" href="/profile/">My Account</a></li>
+   {% if perms.staffing.add_staffrequest %}
+    <li><a class="{% block createsr %}{% endblock %}" 
+     href="/create/staffrequest/">Staff Request</a></li>
+   {% endif %}
+</ul>

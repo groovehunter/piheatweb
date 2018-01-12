@@ -22,5 +22,6 @@ urlpatterns = [
     path('', views.index, name='index'),
 
     path('admin/', admin.site.urls),
-    path('sensors/', include('sensors.urls'))
+    path('sensors/', include('sensors.urls')),
+    path('motors/', include('motors.urls')),
 ]

@@ -1,10 +1,16 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.template.loader import get_template
 
 from .models import Sensor, Measurement
 
+
 def index(request):
-    return HttpResponse("Hello, world. You're at the sensors index.")
+#    t = get_template('index.html')
+    #return HttpResponse("Hello, world. You're at the sensors index.")
+
+    sensors = Sensor.objects.all()
+    return render(request, 'index.html')
 
 
 

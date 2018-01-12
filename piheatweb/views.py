@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from django.template.loader import get_template
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the MAIN index.")
+    #t = get_template('base.html')
+    return render(request, 'index.html')
 
 
