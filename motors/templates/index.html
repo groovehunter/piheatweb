@@ -1,0 +1,21 @@
+{% extends "base.html" %} 
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+
+
+
+{% block content %}
+
+{% block title %}Motoren{% endblock %}
+
+{% for entry in sensors %}
+    <h2>{{ entry.name }}</h2>
+    <p>{{ entry.descr }}</p>
+    <p>{{ entry.unit }}</p>
+    <p>{{ entry.pin_bcm }}</p>
+{% endfor %}
+
+{% endblock %}
