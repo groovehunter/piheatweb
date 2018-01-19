@@ -1,0 +1,18 @@
+# conf for piheat
+
+sensors:
+  2: false
+  3: kessel
+
+
+modes:
+  - ww
+
+
+
+ww:
+
+threshhold_max: 50.0
+threshhold_min: 35.0
+
+fac_temp: 4

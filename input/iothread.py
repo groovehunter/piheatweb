@@ -5,17 +5,11 @@ import conf
 from sensors.models import *
 from datetime import datetime
 import RPi.GPIO as GPIO, time
+import threading
 
 # Broadcom GPIO references
 GPIO.setmode(GPIO.BCM)
 
-pins = [2,3,4,5]
-sensor_map = {
-        3 : 'kessel',
-        2 : '',
-        4 : '',
-        5 : '',
-        }
 
 
 # Define function to measure charge time
@@ -26,19 +20,15 @@ def RCtime (PiPin):
     GPIO.output(PiPin, GPIO.LOW)
     time.sleep(0.2)
 
-    t_beg = datetime.now()
     GPIO.setup(PiPin, GPIO.IN)
     # Count loops until voltage across
     # capacitor reads high on GPIO
     while (GPIO.input(PiPin) == GPIO.LOW):
         measurement += 1
 
-    t_end = datetime.now()
-    dur = t_end - t_beg
-    print(dur)
     return measurement
 
-sensors_wanted = [3]
+sensors_wanted = [5]
 sensors=[]
 print("loading sensors")
 for i in range(1,5):
@@ -49,8 +39,23 @@ for i in range(1,5):
 
 
 # Main program loop
+now = datetime.now()
+s = sensors[0]
+
+mainTh = threading.Thread(target=None, name='main')
+mainTh.daemon = True
+mainTh.start()
+
+sensTh = threading.Thread(target=RCtime, name='rc', args=(s.pin_bcm,))
+
+
 while True:
-    now = datetime.now()
+    
+    sensTh.start()
+
+    #sensTh.join()
+
+"""
     for s in sensors:
         res = RCtime(s.pin_bcm)
         m = Measurement(resistance=res, temperature=0, dtime=now)
@@ -59,5 +64,5 @@ while True:
         print(res)
     print()
     time.sleep(1)
-
+"""
 
