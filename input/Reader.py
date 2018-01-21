@@ -4,6 +4,8 @@ import conf
 from sensors.models import *
 from datetime import datetime
 import RPi.GPIO as GPIO, time
+import sched, time
+import threading
 
 
 class Reader:
@@ -16,8 +18,28 @@ class Reader:
     def __init__(self):
         self.sensors = []
         GPIO.setmode(GPIO.BCM)
+        self.current = {}
         self.last = []
+        self.init_sensors()
 
+#        self.sched = sched.scheduler(time.time, time.sleep)
+#        self.sched.enter(10, 1, self.readall)
+#        self.sched.run()
+
+
+    def init_sensors(self):
+        sensors_wanted = [3]
+        sensors=[]
+        print("loading sensors")
+        for i in range(1,5):
+            sensor = Sensor.objects.get(pk=i)
+            if sensor.pin_bcm in sensors_wanted:
+                print('Loaded sensor on pin ', sensor.pin_bcm),
+        sensors.append(sensor)
+        self.sensors = sensors
+
+
+    # XXX weg
     def sensors_loadall(self):
         for s in self.sensors:
             res = RCtime(s.pin_bcm)
@@ -26,13 +48,29 @@ class Reader:
             m.save()
             print(res)
 
+
     def readall(self):
-        for s in sensors:
-            res = RCtime(s.pin_bcm)
+        #self.sched.enter(10, 1, self.readall, )
+        threading.Timer(10.0, self.readall).start()
+        print(time.time())
+        for s in self.sensors:
+            res = self.RCtime(s.pin_bcm)
+            now = datetime.now()
             m = Measurement(resistance=res, temperature=0, dtime=now)
             m.sensor = s
+            m.temperature = self.res_to_temp(res)
             m.save()
-            print(res)
+            print(res, m.temperature, s.pin_bcm)
+            self.current[s.pin_bcm] = m.temperature
+
+
+    def from_db(self):
+        sens = {}
+        for s in self.sensors:
+            s.val = Measurement.objects.latest('dtime').s
+            print(s.val)
+            sens[s.name] = s
+        return sens
 
 
     def get_approx(self, pin):
@@ -43,8 +81,20 @@ class Reader:
             self.last.pop()
         print(self.last)
         avg = round(sum(self.last) / len(self.last), 2)
-
         return avg
+
+    def res_to_temp(self, res):
+        """ calc temp from resistance """
+        fac_temp = self.cfg['fac_temp'] 
+        return round(res / fac_temp, 2)
+
+
+    def get_res_temp(self, pin):
+        GPIO.setup(pin, GPIO.IN)
+        t = self.RCtime(pin)
+        fac_temp = self.cfg['fac_temp'] 
+        temp = round(t / fac_temp, 2)
+        return t, temp
 
 
     def read(self, pin):

@@ -10,6 +10,8 @@ sys.path.append(cwd+'/output')
 from Reader import Reader
 from Engine import Engine
 import time
+from datetime import datetime
+import threading
 
 
 HOME='/home/pi/piheat/piheatweb/'
@@ -23,26 +25,46 @@ class App:
 
 
     def load_conf(self):
+        """ load cfg file and set reader+engine cfg """
+        # XXX replace HOME with cwd
         fn = HOME + 'conf.yml'
         self.cfg = yaml.load(open(fn,'r'))
         self.reader.cfg = self.cfg
 
         #cfg = self.cfg
-        
+
+    def start(self):
+        self.reader.readall()
+        self.check_constraints()
+
+
+    def check_constraints(self):
+        """ check if all obey the rule """
+        threading.Timer(20.0, self.check_constraints).start()
+        now = datetime.now()
+        print("checking constraints...", now)
+        #sens = self.from_db()
+        # kessel temp - warmwater between 35 and 55
+        self.regulate_ww()
+
 
     def set_mode(self, mode):
         self.mode = mode
 
 
+    def from_db(self):
+        sens = self.reader.from_db()
+
+
     def regulate_ww(self):
+        """ regulate warmwater templ """
+        temp = self.reader.current[2]
         self.set_mode('ww')
         threshhold_max = self.cfg['threshhold_max']
         threshhold_min = self.cfg['threshhold_min']
-        temp = self.reader.get_approx(3)
-        print(temp)
         state = self.engine.get_state('ww')
         map_activity = {0:'active', 1:'DEACTIVE'}
-        print(map_activity[state])
+        print(temp, map_activity[state])
 
         if temp > threshhold_max:
             print('temp in kessel >> threshold')
@@ -74,6 +96,6 @@ class App:
 
 app = App()
 #app.regulate_ww()
-app.loop()
-
+app.start()
+#app.loop()
 
