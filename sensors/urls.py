@@ -8,3 +8,6 @@ urlpatterns = [
 
     path('<int:sensor_id>/last_measures/', views.last_measures, name='last measures'),
 ]
+
+
+

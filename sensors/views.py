@@ -10,7 +10,7 @@ def index(request):
     #return HttpResponse("Hello, world. You're at the sensors index.")
 
     sensors = Sensor.objects.all()
-    return render(request, 'index.html')
+    return render(request, 'sensors/index.html')
 
 
 
