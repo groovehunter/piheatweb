@@ -51,7 +51,7 @@ class Reader:
 
     def readall(self):
         #self.sched.enter(10, 1, self.readall, )
-        threading.Timer(10.0, self.readall).start()
+        threading.Timer(60.0, self.readall).start()
         print(time.time())
         for s in self.sensors:
             res = self.RCtime(s.pin_bcm)

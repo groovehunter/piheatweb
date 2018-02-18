@@ -7,7 +7,7 @@ cwd = os.getcwd()
 sys.path.append(cwd+'/input')
 sys.path.append(cwd+'/output')
 
-from Reader import Reader
+from AnalogReader import AnalogReader
 from Engine import Engine
 import time
 from datetime import datetime
@@ -19,7 +19,7 @@ HOME='/home/pi/piheat/piheatweb/'
 class App:
 
     def __init__(self):
-        self.reader = Reader()
+        self.reader = AnalogReader()
         self.engine = Engine()
         self.load_conf()
 
@@ -40,7 +40,7 @@ class App:
 
     def check_constraints(self):
         """ check if all obey the rule """
-        threading.Timer(20.0, self.check_constraints).start()
+        threading.Timer(60.0, self.check_constraints).start()
         now = datetime.now()
         print("checking constraints...", now)
         #sens = self.from_db()
