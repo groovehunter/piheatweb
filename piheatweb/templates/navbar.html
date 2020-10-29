@@ -1,0 +1,26 @@
+{% load static %}
+
+<div class="flex items-center justify-between px-4 py-3">
+  <div class="">
+    <a href="/">
+      <img class="h-8" src="{% static "img/Om-25.png" %}" alt="logo OM" />
+    </a>
+  </div>
+  <div class="text-lg text-semibold">
+    <h3>Anthro Sharing</h3>
+  </div>
+  <div>
+    <button id="menubut" type="button" class="text-gray-500">
+      <img class="h-8" src="{% static "img/icons8-menü.svg" %}" alt="Menu" />
+    </button>
+  </div>
+</div>
+
+<div id="dropdown" style="display:none" class="px-2 py-3 pt-2 pb-4">
+  {% for section in menudata %}
+    <a href="/{{section.href}}" class="mt-1 block font-semibold px-4 rounded hover:bg-gray-500">{{section.name}}</a>
+  {% endfor %}
+</div>
+
+{% comment %}
+{% endcomment %}

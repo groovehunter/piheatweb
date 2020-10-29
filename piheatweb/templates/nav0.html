@@ -1,0 +1,27 @@
+<div class=" w-full rounded-b-lg rounded-t border-red-400">
+
+  <div class="px-6 py-4 mb-2 mt-4 mb-8">
+    {% for section in menudata %}
+
+    <div class="uppercase text-left mt-4 hover:bg-gray-300">
+      <a href="/{{section.href}}">{{section.name}}</a>
+    </div>
+      {% for item in section.links%}
+        <div class="flex px-2 py-1 text-grey-darkest border-t-2 text-sm hover:bg-gray-300">
+          <div class="pl-1">
+            <a href="{{prefix}}{{item.href}}">{{item.name}}</a>
+          </div>
+        </div>
+      {% endfor %}
+      <div class="mb-4 shadow-md">
+      </div>
+
+    {% endfor %}
+  </div>
+
+</div>
+
+
+{% comment %}
+<div class="overflow-hidden">
+{% endcomment %}

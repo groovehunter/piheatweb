@@ -1,0 +1,31 @@
+
+<div class="box" id="loginbox">
+<b>Login</b><br>
+<form action="/users/login" method="POST">
+{% csrf_token %}
+<table>
+<tr width="50">
+    <td align="left">
+	<span class="label"> Benutzername </span>
+    </td>
+</tr>
+<tr>
+    <td>
+	<input name="username" type="text" size="15" />
+    </td>
+</tr>
+<tr>
+    <td align="left">
+	<span class="label"> Passwort </span>
+    </td>
+</tr>
+<tr>
+    <td>
+	<input name="password" type="password" size="15" />
+    </td>
+</tr>
+</table>
+<br />
+<input name="login" type="submit" value="Anmelden" />
+</form>
+</div>
