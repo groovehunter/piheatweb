@@ -11,10 +11,10 @@ GPIO.setmode(GPIO.BCM)
 
 pins = [2,3,4,5]
 sensor_map = {
-        3 : 'kessel',
-        2 : '',
-        4 : '',
-        5 : '',
+        3 : 'Aussenfühler',
+        2 : 'Vorlauf',
+        4 : 'Kessel',
+        5 : 'Rücklauf',
         }
 
 
