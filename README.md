@@ -35,3 +35,24 @@ writing changes of motor states to DB
 deamon thread checking for threshold lightweight.
 
 
+
+WEB django gui
+
+TODO
+
+* sensoren in einzelne tabellen
+* aktoren table: toggles, mit grund (bedingungen von regelung: 'name')
+
+
+
+
+
+
+### Regeln, beispiele, unvollständig
+
+* halte warmwasser auf profil winter = 40-55 grad
+    profil sommer = 30-45 grad. 
+
+* stelle rücklauf ventil offenheit so, dass reücklauf-temperatur zwischen 25-35 grad ist.
+
+

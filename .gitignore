@@ -40,4 +40,8 @@ docs/_build/
 venv/
 ENV/
 
+# mypy
+.mypy_cache/
 
+#### byflo
+node_modules/

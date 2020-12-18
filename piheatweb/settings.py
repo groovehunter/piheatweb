@@ -9,6 +9,7 @@ SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
 DEBUG = True
 
+
 ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev']
 
 # Application definition
@@ -69,7 +70,6 @@ DATABASES = {
     }
 }
 
-
 """
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -89,7 +89,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Berlin'
-
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -97,3 +96,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+
