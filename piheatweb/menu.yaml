@@ -12,7 +12,7 @@
 - sensors:
     id:     sensors
     name:   Sensoren
-    href:   /sensors
+    href:   sensors/
     links:
       - name:   Sensoren-Liste
         href:   /sensors/
@@ -25,3 +25,10 @@
       - name:    Regel-Liste
         href:    /rules/
 
+- profile:
+    id:     profile
+    name: profil
+    href: profile/
+    links:
+      - name:   Profil editierem
+        href: profile/edit
