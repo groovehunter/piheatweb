@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="">Sensor {{ object.name }}</h2>
+    <p>{{ object.descr }}</p>
+    <p>{{ object.unit }}</p>
+    <p>{{ object.pin_bcm }}</p>
+
+{% endblock %}
