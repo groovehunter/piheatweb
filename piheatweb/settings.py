@@ -1,15 +1,16 @@
 
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TMPPATH = BASE_DIR + '/'
+DEBUG2=False
 
 SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'flowpad']
 
+ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev']
 
 # Application definition
 
@@ -17,6 +18,7 @@ INSTALLED_APPS = [
     'piheatweb.apps.PiheatwebConfig',
     'sensors.apps.SensorsConfig',
     'motors.apps.MotorsConfig',
+    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,7 +37,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'piheatweb.urls'
+ROOT_URLCONF  = 'piheatweb.urls'
+MENU_CONF     = 'piheatweb/menu.yaml'
 
 TEMPLATES = [
     {
@@ -55,6 +58,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'piheatweb.wsgi.application'
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -62,7 +66,7 @@ DATABASES = {
         'USER': 'piheat',
         'PASSWORD': 'ppp',
         'HOST': '127.0.0.1',
-        'PORT': '3306'                                                            
+        'PORT': '3306'
     }
 }
 
@@ -82,7 +86,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 """
-
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Berlin'

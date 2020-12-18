@@ -1,0 +1,27 @@
+# used for init. of menu
+# and permission system
+
+- actors:
+    id:     actors
+    name:   Aktoren
+    href:   actors/
+    links:
+      - name:   Aktoren-Übersicht
+        href:   /actors/
+
+- sensors:
+    id:     sensors
+    name:   Sensoren
+    href:   /sensors
+    links:
+      - name:   Sensoren-Liste
+        href:   /sensors/
+
+- rules:
+    id:     rules
+    name:   Regeln
+    href:   rules/
+    links:
+      - name:    Regel-Liste
+        href:    /rules/
+

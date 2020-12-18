@@ -1,18 +1,65 @@
+<html>
+<head>
 {% load static %}
-
-<link rel="stylesheet" href="{% static "piheatweb/style.css" %}" />
-
-<script src="{% static "piheatweb/js/jquery.js" %}"></script>
+<title>PiHeat </title>
 
 
-<h3>PI heating system</h3>
+<link rel="stylesheet" href="{% static "css/index.css" %}" />
+<link rel="stylesheet" href="{% static "css/style.css" %}" />
+<link rel="stylesheet" href="{% static "css/common.css" %}" />
+<link rel="stylesheet" href="{% static "css/main.css" %}" />
+
+<script src="{% static "js/jquery.js" %}"></script>
+</head>
+{% comment %}
+{% endcomment %}
+<body>
+
+<header class="bg-gray-200">
+    {% include "navbar.html" %}
+</header>
+
 
 {% block menu %}
    {% include "menu.html" %}
 {% endblock %}
 
+<div class="flex md:flex-row-reverse flex-wrap">
+  <div class="w-full md:w-3/4 p-4">
+    {% block content %}
+  		<!-- main content area -->
+  	{% endblock %}
 
+    {% if debug2 %}
+      <pre class="text-gray-900">{% debug %}</pre>
+    {% endif %}
+  </div>
 
-{% block content %}
-base template content
-{% endblock %}
+  <div class="w-full md:w-1/4 bg-gray-100 p-4 text-gray-700">
+    {% if user.is_authenticated %}
+      <div class="ml-8 bg-gray-200 rounded-l-full">
+        {% if user.is_staff %}
+          <a href="/admin">Administration</a>
+        {% else %}
+          Hi {{ user.username }}!
+        {% endif %}
+      </div>
+
+      {% include "nav0.html" %}
+
+      <div class="ml-8 bg-gray-200 rounded-l-full">
+        <a href="/users/logout">Abmelden </a>
+      </div>
+
+    {% else %}
+      <div class="bg-gray-200">
+        <p>You are not logged in</p>
+        {% include "loginbox.html" %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+
+</html>

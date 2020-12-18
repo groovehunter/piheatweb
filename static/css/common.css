@@ -1,0 +1,38 @@
+html {
+	font-family: Verdana, Helvetica, SunSans-Regular, Sans-Serif; }
+}
+
+img { border: none; }
+
+.debug { color: #aaa; }
+.debug a { color: #aaa; }
+
+.msg {
+    color: #666;
+    font-weight: bold;
+    font-size: 110%;
+    margin: 5px;
+}
+
+.odd { background: #e6e6e6; }
+.even { background: #ffffff; }
+.high { background: #3ff; }
+
+.small	{
+    color: #000000;
+    font-weight: normal;
+    font-size: 10pt;
+}
+
+.box {
+	margin: 6px;
+	padding: 8px;
+	max-width: 800px;
+	background: #ddd;
+	text-align: left;
+	color: #000;
+}
+
+.nodispl {
+	display: none;
+}
