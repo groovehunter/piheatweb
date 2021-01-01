@@ -1,20 +1,13 @@
 from piheatweb.FlowBaseTable import FlowBaseTable
-from .models import SensorData_01
-from .models import SensorInfo
+from .models import Motor
 import django_tables2 as tables
 
 
-class SensorDetailTable(FlowBaseTable):
+
+class MotorListTable(FlowBaseTable):
     name = tables.Column(linkify=True)
     class Meta:
-        model = SensorInfo
-        exclude = ['id']
-
-
-class SensorListTable(FlowBaseTable):
-    name = tables.Column(linkify=True)
-    class Meta:
-        model = SensorInfo
+        model = Motor
         exclude = ['id']
 
 

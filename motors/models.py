@@ -26,18 +26,18 @@ class RuleHistory(models.Model):
 
 
 class Motor(models.Model):
-    
+
     name    = models.CharField(max_length=16)
     descr   = models.CharField(max_length=255)
     last_toggle = models.CharField(max_length=16)
-    
+
+    def get_absolute_url(self):
+      return self.id
 
 
 class Toggle(models.Model):
-        
+
     toggle = models.ForeignKey(Motor, on_delete=models.CASCADE, default=DEFAULT_MOTOR)
     dtime   = models.DateTimeField('date published')
     state   = models.BooleanField('Status')
     rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-
-

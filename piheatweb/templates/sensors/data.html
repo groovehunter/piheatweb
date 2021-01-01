@@ -4,8 +4,10 @@
    {% include "menu.html" %}
 {% endblock %}
 
-
 {% block content %}
-Index of piheat - Steuere Deine Fernwärme-Heizung übers Web mittels raspberrypi und arduino.
+
+<h3>sensor DATA {{sensorinfo.name}}</h3>
+
+{% include "table_generic.html" %}
 
 {% endblock %}

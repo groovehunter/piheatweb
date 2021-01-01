@@ -1,0 +1,16 @@
+
+
+hauptventil:
+  name: Hauptventiltrieb
+  descr: main stuff...
+
+
+umwaelzpumpe:
+  name: Heizungspumpe
+  descr: Pumpe des Hauptkreises
+
+brauchwasserpumpe:
+  name: Warmwasserpumpe
+  descr: Pumpe für Erhitzung des Brauchwassers
+
+

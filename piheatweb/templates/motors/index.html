@@ -4,13 +4,13 @@
    {% include "menu.html" %}
 {% endblock %}
 
+
 {% block content %}
 
-<h3>sensor data</h3>
+{% block title %}<h3 class="text">Motoren</h3>{% endblock %}
 
 {% load render_table from django_tables2 %}
 
 {% render_table table %}
-
 
 {% endblock %}

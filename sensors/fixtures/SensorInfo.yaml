@@ -1,0 +1,17 @@
+zulauf:
+  name: Zulauf
+  descr: Fernwärme
+
+rücklauf:
+  name: Rücklauf Heizkreis
+  descr: Temperatur bevor das Heizwasser erneut in den Wärmetauscher eintritt
+
+kessel:
+  name: Kessel-Temperatur
+  descr: Temperatur des Brauchwassers
+
+aussen:
+  name: Aussenfühler
+  descr: Fühler Aussen-Temperatur Ostseite
+
+

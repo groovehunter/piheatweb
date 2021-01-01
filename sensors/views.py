@@ -3,17 +3,18 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 
 from django.views.generic import ListView, DetailView, CreateView
-from .models import SensorData_01
-from .tables import SensorTable
+from .models import SensorData_01, SensorData_02, SensorData_03, SensorData_04
+from .models import SensorInfo
+from .tables import SensorDetailTable, SensorListTable
 from piheatweb.ViewController import ViewControllerSupport
+from piheatweb.Controller import Controller
 
 
 
 class SensorListView(ListView, ViewControllerSupport):
+    model = SensorInfo
 
     def get_context_data(self, **kwargs):
-        sid = 1
-        self.model = SensorData+'0'+str(sid)
         context = super().get_context_data(**kwargs)
         c = self.listview_helper()
         context.update(c)
@@ -22,16 +23,20 @@ class SensorListView(ListView, ViewControllerSupport):
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         self.fields_noshow = []
+        table = SensorListTable(self.object_list)
         self.init_ctrl()
-        table = SensorTable(self.object_list)
         self.context['table'] = table
-        self.template_name = 'index.html'
+        self.template_name = 'sensors/index.html'
         self.context.update(self.get_context_data())
         return self.render()
 
 
 class SensorDetailView(DetailView, ViewControllerSupport):
-    model = SensorData_01
+    """ show info of sensor
+
+        maybe only in header and recent measurements in table below
+    """
+    model = SensorInfo
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -49,8 +54,28 @@ class SensorDetailView(DetailView, ViewControllerSupport):
         return self.render()
 
 
-def last_measures(request, sensor_id):
-    resp = "You're looking at sensor %s." % sensor_id
-    #m = Measurement.objects.filter(order_by(dtime))[:20]
-    #sensor = Sensor.m
-    return HttpResponse(resp)
+class SensorDataView(Controller):
+    """ data of sensor 01 only """
+    # generalize later
+    def __init__(self, request):
+        Controller.__init__(self, request)
+
+    def list(self, sid):
+        sensorinfo = SensorInfo.objects.get(pk=sid)
+        self.context['sensorinfo'] = sensorinfo
+        modelname = eval('SensorData_'+'0'+str(sid))
+        self.init_ctrl()
+        object_list = eval('modelname.objects.order_by("-dtime")[:100]')
+#        self.lg.debug(len(object_list))
+
+        self.template = 'sensors/data.html'
+        self.context['object_list'] = object_list
+        self.context['data'] = object_list
+        keys = ['dtime', 'temp', 'resistance']
+        self.context['keys'] = keys
+        return self.render()
+
+
+def data(request, sid, action):
+  ctrl = SensorDataView(request)
+  return eval('ctrl.'+action+'('+str(sid)+')')

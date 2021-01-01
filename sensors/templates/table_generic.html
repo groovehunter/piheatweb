@@ -1,0 +1,28 @@
+
+<table summary="{{summary}}" class="sortable">
+<thead style="font-weight:bold">
+<tr>
+    {% for fn in keys %}
+	    <th class="sortable">
+	       {{fn}}
+	    </th>
+    {% endfor %}
+    <th>Detail</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for item in data %}
+
+<tr class="{% cycle 'odd' 'even' %}">
+      <td>{{item.dtime}}</td>
+      <td>{{item.temp}}</td>
+      <td>{{item.resistance}}</td>
+    <td><a href="{{url}}/{{item.id}}">X{{item.name}}</a></td>
+</tr>
+
+{% endfor %}
+</tbody>
+
+</table>

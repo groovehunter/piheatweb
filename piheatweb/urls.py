@@ -10,6 +10,6 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('sensors/', include('sensors.urls')),
-    path('motors/', include('motors.urls')),
+    path('actors/', include('motors.urls')),
     path('users/', include('users.urls')),
 ]

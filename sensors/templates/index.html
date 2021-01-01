@@ -5,11 +5,15 @@
 {% endblock %}
 
 
-
-
 {% block content %}
-
+SENSORS
 {% block title %}Sensoren{% endblock %}
+{% for entry in objects %}
+    <h2>{{ entry.name }}</h2>
+    <p>{{ entry.descr }}</p>
+    <p>{{ entry.unit }}</p>
+    <p>{{ entry.pin_bcm }}</p>
+{% endfor %}
 
 {% for entry in sensors %}
     <h2>{{ entry.name }}</h2>

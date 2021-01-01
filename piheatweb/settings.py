@@ -9,7 +9,7 @@ SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
 DEBUG = True
 AUTH_USER_MODEL = "users.CustomUser"
-
+TAILWIND_APP_NAME = 'theme'
 
 ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev']
 
@@ -26,6 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tables2',
+    'tailwind',
+    'theme',
+    'py_yaml_fixtures',
 ]
 
 MIDDLEWARE = [
