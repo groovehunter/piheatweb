@@ -1,22 +1,21 @@
 .swp
 .swo
 static/admin/
+static/js/flot
+static/js/jquery*
+
 node_modules/
 package-lock.json
-
-
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
 
 # Distribution / packaging
 .Python
 env/
 build/
 var/
-
 
 # Installer logs
 pip-log.txt
@@ -25,9 +24,8 @@ pip-log.txt
 # Django stuff:
 *.log
 local_settings.py
-
-# Sphinx documentation
-docs/_build/
+migrations/
+migrations/*
 
 # pyenv
 .python-version
