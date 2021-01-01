@@ -1,18 +1,18 @@
 from piheatweb.FlowBaseTable import FlowBaseTable
-from .models import Sensor, Measurement
+from .models import SensorData_01
 import django_tables2 as tables
 
 
 class SensorTable(FlowBaseTable):
     name = tables.Column(linkify=True)
     class Meta:
-        model = Sensor
+        model = SensorData_01
         exclude = ['id']
 
 
 class SensorListTable(FlowBaseTable):
     class Meta:
-        model = Sensor
+        model = SensorData_01
         exclude = ['id']
 
 

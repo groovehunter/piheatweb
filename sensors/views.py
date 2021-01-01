@@ -3,16 +3,17 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 
 from django.views.generic import ListView, DetailView, CreateView
-from .models import Sensor, Measurement
+from .models import SensorData_01
 from .tables import SensorTable
 from piheatweb.ViewController import ViewControllerSupport
 
 
 
 class SensorListView(ListView, ViewControllerSupport):
-    model = Sensor
 
     def get_context_data(self, **kwargs):
+        sid = 1
+        self.model = SensorData+'0'+str(sid)
         context = super().get_context_data(**kwargs)
         c = self.listview_helper()
         context.update(c)
@@ -30,7 +31,7 @@ class SensorListView(ListView, ViewControllerSupport):
 
 
 class SensorDetailView(DetailView, ViewControllerSupport):
-    model = Sensor
+    model = SensorData_01
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -50,6 +51,6 @@ class SensorDetailView(DetailView, ViewControllerSupport):
 
 def last_measures(request, sensor_id):
     resp = "You're looking at sensor %s." % sensor_id
-    m = Measurement.objects.filter(order_by(dtime))[:20]
-    sensor = Sensor.m
+    #m = Measurement.objects.filter(order_by(dtime))[:20]
+    #sensor = Sensor.m
     return HttpResponse(resp)
