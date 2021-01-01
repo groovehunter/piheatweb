@@ -8,7 +8,7 @@ DEBUG2=False
 SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
 DEBUG = True
-AUTH_USER_MODEL = "users.CustomUser" 
+AUTH_USER_MODEL = "users.CustomUser"
 
 
 ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev']
@@ -96,6 +96,5 @@ USE_TZ = True
 
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
+#STATIC_ROOT = os.path.join(BASE_DIR, "static")
