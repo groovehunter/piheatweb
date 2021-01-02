@@ -18,6 +18,13 @@ class SensorListTable(FlowBaseTable):
         model = SensorInfo
         exclude = ['id']
 
+class SensorDataTable(FlowBaseTable):
+    #name = tables.Column()
+    #link = tables.Column()
+    class Meta:
+        model = SensorData_01
+        exclude = ['id']
+
 
 
     def render_labelterm(self, value):

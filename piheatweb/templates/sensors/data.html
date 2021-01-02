@@ -8,6 +8,10 @@
 
 <h3>sensor DATA {{sensorinfo.name}}</h3>
 
+{% load render_table from django_tables2 %}
+
+{% render_table table %}
+
 {% include "table_generic.html" %}
 
 {% endblock %}

@@ -5,11 +5,11 @@ from django.template.loader import get_template
 from django.views.generic import ListView, DetailView, CreateView
 from .models import SensorData_01, SensorData_02, SensorData_03, SensorData_04
 from .models import SensorInfo
-from .tables import SensorDetailTable, SensorListTable
+from .tables import SensorDetailTable, SensorListTable, SensorDataTable
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
-
+import datetime
 
 class SensorListView(ListView, ViewControllerSupport):
     model = SensorInfo
@@ -61,13 +61,26 @@ class SensorDataView(Controller):
     def __init__(self, request):
         Controller.__init__(self, request)
 
+    def daterange(self):
+      start_date = datetime.date(2021, 1, 1)
+      end_date = datetime.date(2021, 1, 2)
+      return SensorData_01.objects.filter(dtime__range=(start_date, end_date))
+
+
     def list(self, sid):
         sensorinfo = SensorInfo.objects.get(pk=sid)
         self.context['sensorinfo'] = sensorinfo
         modelname = eval('SensorData_'+'0'+str(sid))
         self.init_ctrl()
-        object_list = eval('modelname.objects.order_by("-dtime")[:100]')
-#        self.lg.debug(len(object_list))
+        object_list = eval('modelname.objects.filter(dtime__minute=0).order_by("-dtime")')
+        #object_list = SensorData_01.objects.filter(dtime__minute=0).order_by("-dtime")
+#        object_list = SensorData_01.objects.filter(resistance__gt=6500).order_by("-dtime")
+#        object_list = SensorData_01.objects.dates('dtime', 'day')
+        self.lg.debug(len(object_list))
+        #object_list = self.daterange()
+        table = SensorDataTable(object_list)
+#        table.Meta.model = SensorData_01
+        self.context['table'] = table
 
         self.template = 'sensors/data.html'
         self.context['object_list'] = object_list
