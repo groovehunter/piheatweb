@@ -13,7 +13,6 @@ class SensorInfo(models.Model):
     name    = models.CharField(max_length=40)
     descr   = models.CharField(max_length=255)
     unit    = models.CharField(max_length=16)
-    pin_bcm = models.IntegerField(null=True)
 
     def get_absolute_url(self):
       return self.id

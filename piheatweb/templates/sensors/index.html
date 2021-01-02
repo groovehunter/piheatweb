@@ -12,5 +12,15 @@
 
 {% render_table table %}
 
+<hr>
+
+<h3>Daten links</h3>
+{% for entry in object_list %}
+    <h2>
+        <a href="/sensors/{{entry.id}}/data/list">{{ entry.name }} - Data</a>
+    </h2>
+{% endfor %}
+
+
 
 {% endblock %}
