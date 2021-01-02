@@ -6,11 +6,18 @@
 
 {% block content %}
 
-<h3>sensor data</h3>
+<h3>sensor data NEW</h3>
 
 {% load render_table from django_tables2 %}
 
 {% render_table table %}
 
+links
+{% for entry in object_list %}
+    <h2>{{ entry.name }}</h2>
+    <p>{{ entry.descr }}</p>
+    <p>{{ entry.unit }}</p>
+{% endfor %}
+helper
 
 {% endblock %}

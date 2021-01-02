@@ -13,6 +13,7 @@ class SensorDetailTable(FlowBaseTable):
 
 class SensorListTable(FlowBaseTable):
     name = tables.Column(linkify=True)
+    #link = tables.Column()
     class Meta:
         model = SensorInfo
         exclude = ['id']

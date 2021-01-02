@@ -26,6 +26,7 @@ class SensorListView(ListView, ViewControllerSupport):
         table = SensorListTable(self.object_list)
         self.init_ctrl()
         self.context['table'] = table
+        self.context['object_list'] = self.object_list
         self.template_name = 'sensors/index.html'
         self.context.update(self.get_context_data())
         return self.render()
