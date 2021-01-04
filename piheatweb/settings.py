@@ -11,7 +11,7 @@ DEBUG = True
 AUTH_USER_MODEL = "users.CustomUser"
 TAILWIND_APP_NAME = 'theme'
 
-ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev']
+ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev', 'groove.selfhost.eu']
 
 # Application definition
 
