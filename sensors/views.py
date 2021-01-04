@@ -61,6 +61,26 @@ class SensorDataView(Controller):
     def __init__(self, request):
         Controller.__init__(self, request)
 
+    def all_sensors(self, sid):
+#      SensorData_01.obj
+      start_date = datetime.date(2021, 1, 2)
+      end_date = datetime.date(2021, 1, 3)
+      object_list = SensorData_01.objects.filter(dtime__minute=0, dtime__hour=0, dtime__range=(start_date, end_date))
+#      objs02 = SensorData_02.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
+#      objs03 = SensorData_03.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
+#      objs04 = SensorData_04.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
+
+      table = SensorDataTable(object_list)
+      self.context['table'] = table
+
+      self.template = 'sensors/data.html'
+      #self.context['object_list'] = object_list
+      #self.context['data'] = object_list
+      keys = ['dtime', 'temp', 'resistance']
+      self.context['keys'] = keys
+      return self.render()
+
+
     def daterange(self):
       start_date = datetime.date(2021, 1, 1)
       end_date = datetime.date(2021, 1, 2)
