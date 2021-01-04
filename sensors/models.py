@@ -8,8 +8,8 @@ UNIT_AVAIL = (
 )
 
 class SensorBase:
-  def adc_out_to_resistance(self, adc_out):
-    vsense = 3.3 / 65536 * adc_out
+  def adc_out_to_resistance(self):
+    vsense = 3.3 / 65536 * self.adc_out
     r = vsense / ((3.3 - vsense) / 18000 )
     return r
 
@@ -26,19 +26,24 @@ class SensorData_01(models.Model, SensorBase):
     dtime   = models.DateTimeField('datetime of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
-    adc_out = models.IntegerField()
+    adc_out = models.IntegerField(null=True)
 
 class SensorData_02(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
+    adc_out = models.IntegerField(null=True)
 
 class SensorData_03(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
+    adc_out = models.IntegerField(null=True)
 
 class SensorData_04(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
+    adc_out = models.IntegerField(null=True)
+
+
