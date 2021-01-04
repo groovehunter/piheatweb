@@ -71,8 +71,9 @@ class Thermistor:
   def resistance_to_temp(self, r):
     a,b,c = self.steinh
     kelvin = 1 / (a + b*log10(r) + c*(log10(r)**3))
-    print(kelvin, "KELVIN")
-    print(k2c(kelvin), "Celsius")
+    #print(kelvin, "KELVIN")
+    celsius = k2c(kelvin)
+    return celsius
 
 
 
