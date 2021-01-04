@@ -47,3 +47,9 @@ class SensorData_04(models.Model, SensorBase):
     adc_out = models.IntegerField(null=True)
 
 
+class ReadingEvent(models.Model):
+  dtime   = models.DateTimeField('date of measurement')
+  sid01 = models.ForeignKey(SensorData_01, on_delete=models.CASCADE, default=1)
+  sid02 = models.ForeignKey(SensorData_02, on_delete=models.CASCADE, default=1)
+  sid03 = models.ForeignKey(SensorData_03, on_delete=models.CASCADE, default=1)
+  sid04 = models.ForeignKey(SensorData_04, on_delete=models.CASCADE, default=1)
