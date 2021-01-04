@@ -1,12 +1,17 @@
 from django.db import models
 
 
-class SensorBase: pass
 
 UNIT_AVAIL = (
     (u'\xb0C',  'degree Celsius'),
     ('F',       'Fahrenheit'),
 )
+
+class SensorBase:
+  def adc_out_to_resistance(self, adc_out):
+    vsense = 3.3 / 65536 * adc_out
+    r = vsense / ((3.3 - vsense) / 18000 )
+    return r
 
 
 class SensorInfo(models.Model):
@@ -18,9 +23,10 @@ class SensorInfo(models.Model):
       return self.id
 
 class SensorData_01(models.Model, SensorBase):
-    dtime   = models.DateTimeField('date of measurement')
+    dtime   = models.DateTimeField('datetime of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
+    adc_out = models.IntegerField()
 
 class SensorData_02(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')

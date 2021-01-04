@@ -72,8 +72,8 @@ class SensorDataView(Controller):
         self.context['sensorinfo'] = sensorinfo
         modelname = eval('SensorData_'+'0'+str(sid))
         self.init_ctrl()
-        start_date = datetime.date(2021, 1, 2)
-        end_date = datetime.date(2021, 1, 5)
+        start_date = datetime.date(2021, 1, 1)
+        end_date = datetime.date(2021, 1, 3)
         #object_list = eval('modelname.objects.filter(dtime__minute=0).order_by("-dtime")')
         object_list = SensorData_01.objects.filter(dtime__minute=0)
         object_list = object_list.filter(dtime__range=(start_date, end_date))
