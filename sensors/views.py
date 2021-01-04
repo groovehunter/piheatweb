@@ -95,14 +95,16 @@ class SensorDataView(Controller):
         start_date = datetime.date(2021, 1, 1)
         end_date = datetime.date(2021, 1, 3)
         #object_list = eval('modelname.objects.filter(dtime__minute=0).order_by("-dtime")')
-        object_list = SensorData_01.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
+        object_list = SensorData_01.objects.filter(dtime__minute=0)
+        object_list = object_list.filter(dtime__range=(start_date, end_date))
+        object_list = object_list.order_by('-dtime')
 
 #        object_list = SensorData_01.objects.filter(resistance__gt=6500).order_by("-dtime")
 #        object_list = SensorData_01.objects.dates('dtime', 'day')
         self.lg.debug(len(object_list))
         #object_list = self.daterange()
+
         table = SensorDataTable(object_list)
-#        table.Meta.model = SensorData_01
         self.context['table'] = table
 
         self.template = 'sensors/data.html'
