@@ -3,9 +3,11 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 
 from django.views.generic import ListView, DetailView, CreateView
-from .models import SensorData_01, SensorData_02, SensorData_03, SensorData_04
-from .models import SensorInfo
-from .tables import SensorDetailTable, SensorListTable, SensorDataTable
+from .models import SensorData_01, SensorData_02, \
+SensorData_03, SensorData_04
+from .models import SensorInfo, ReadingEvent
+from .tables import SensorDetailTable, SensorListTable, \
+SensorDataTable, AllSensorTable
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
@@ -61,18 +63,31 @@ class SensorDataView(Controller):
     def __init__(self, request):
         Controller.__init__(self, request)
 
-    def all_sensors(self, sid):
+    def all_sensors(self, *args):
+      """ all sensors temp next to each other
+          parameter daterange
+      """
 #      SensorData_01.obj
       start_date = datetime.date(2021, 1, 2)
-      end_date = datetime.date(2021, 1, 3)
-      object_list = SensorData_01.objects.filter(dtime__minute=0, dtime__hour=0, dtime__range=(start_date, end_date))
-#      objs02 = SensorData_02.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
-#      objs03 = SensorData_03.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
-#      objs04 = SensorData_04.objects.filter(dtime__minute=0).filter(dtime__range=(start_date, end_date))
+      end_date = datetime.date(2021, 1, 5)
+      revents = ReadingEvent.objects.filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
+      #while re = revents.iter():
+      object_list = []
+      self.lg.debug(len(revents))
+      line = []
+      for obj in revents:
+        d = {
+          'dtime':obj.dtime,
+          'sid01':obj.sid01.temperature,
+          'sid02':obj.sid02.temperature,
+          'sid03':obj.sid03.temperature,
+          'sid04':obj.sid04.temperature,
+              }
+        line.append(d)
+      object_list = line
 
-      table = SensorDataTable(object_list)
+      table = AllSensorTable(object_list)
       self.context['table'] = table
-
       self.template = 'sensors/data.html'
       #self.context['object_list'] = object_list
       #self.context['data'] = object_list
@@ -118,3 +133,7 @@ class SensorDataView(Controller):
 def data(request, sid, action):
   ctrl = SensorDataView(request)
   return eval('ctrl.'+action+'('+str(sid)+')')
+
+def data2(request, action):
+    ctrl = SensorDataView(request)
+    return eval('ctrl.'+action+'()')

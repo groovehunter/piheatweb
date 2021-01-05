@@ -18,7 +18,7 @@ class SensorInfo(models.Model):
     name    = models.CharField(max_length=40)
     descr   = models.CharField(max_length=255)
     unit    = models.CharField(max_length=16)
-
+    thermistor = models.CharField(max_length=32, null=True)
     def get_absolute_url(self):
       return self.id
 

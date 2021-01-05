@@ -25,7 +25,15 @@ class SensorDataTable(FlowBaseTable):
         model = SensorData_01
         exclude = ['id']
 
+class AllSensorTable(FlowBaseTable):
+   dtime = tables.DateTimeColumn()
+   sid01 = tables.Column()
+   sid02 = tables.Column()
+   sid03 = tables.Column()
+   sid04 = tables.Column()
 
 
-    def render_labelterm(self, value):
-        return format_html('<a class="text-blue-700 underline" href="/video/topic/%s">%s</a>' %(value,value))
+
+## methode eines tables gewesen??
+def render_labelterm(self, value):
+    return format_html('<a class="text-blue-700 underline" href="/video/topic/%s">%s</a>' %(value,value))
