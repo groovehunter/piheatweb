@@ -17,9 +17,16 @@ import time
 
 class Welldone:
 
-  def loop(self):
-    # XXX choose sensor table here
-    object_list = SensorData_04.objects.all() #filter(temperature=0).order_by('-dtime')
+  def loop(self, sid):
+    # choose sensor table here
+    sstr = '0'+str(sid)
+    evalstr = 'SensorData_'+sstr+'.objects.'
+    if 0:
+      evalstr += 'filter(temperature__gt=80)'
+    else:
+      evalstr += 'all()'
+    evalstr += '.order_by("-dtime")'
+    object_list = eval(evalstr)
     count = 0
     print("Anzahl Datensaetze: ", len(object_list))
     time.sleep(2)
@@ -36,13 +43,14 @@ class Welldone:
 
 
 if __name__ == '__main__':
-
+  si = SensorInfo.objects.all()
   updater =  Welldone()
-  # XXX Change thermistor type here
-  #updater.thermistor = ThermistorVF20()
-  updater.thermistor = ThermistorNT10()
-  updater.thermistor.set_RTvalues()
-  updater.thermistor.prep_abc()
-  updater.loop()
+  for s in si:
+    print(s.name)
+    evalstr = 'Thermistor'+s.thermistor+'()'
+    updater.thermistor = eval(evalstr)
+    updater.thermistor.set_RTvalues()
+    updater.thermistor.prep_abc()
+    updater.loop(s.id)
 
 
