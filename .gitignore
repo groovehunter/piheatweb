@@ -1,5 +1,5 @@
-.swp
-.swo
+*.swp
+*.swo
 static/admin/
 static/js/flot
 static/js/jquery*
