@@ -44,3 +44,4 @@ ENV/
 
 #### byflo
 node_modules/
+nohup.out
