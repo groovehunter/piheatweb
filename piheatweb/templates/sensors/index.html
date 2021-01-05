@@ -12,19 +12,18 @@
 
 {% render_table table %}
 
-<<<<<<< HEAD
-links
-{% for entry in object_list %}
-    <h2>{{ entry.name }}</h2>
-{% endfor %}
 <hr>
-
+{%comment%}
+{%endcomment%}
 <h3>Daten links</h3>
-{% for entry in object_list %}
-    <h2>
-        <a href="/sensors/{{entry.id}}/data/list">{{ entry.name }} - Data</a>
-    </h2>
+<table>
+  {% for entry in object_list %}
+  <tr>
+    <td><a href="/sensors/{{entry.id}}">{{ entry.name }}</a></td>
+    <td><a href="/sensors/{{entry.id}}/data/list">Data</a></td>
+  </tr>
 {% endfor %}
+</table>
 
 
 {% endblock %}

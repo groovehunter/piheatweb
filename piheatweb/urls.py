@@ -11,5 +11,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('sensors/', include('sensors.urls')),
     path('actors/', include('motors.urls')),
+#    path('rules/', include('rules.urls')),
     path('users/', include('users.urls')),
 ]

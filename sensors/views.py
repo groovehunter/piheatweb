@@ -12,6 +12,9 @@ from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
 import datetime
+from plotly.offline import plot
+#import plotly.graph_objs as go
+from plotly.graph_objs import Scatter
 
 class SensorListView(ListView, ViewControllerSupport):
     model = SensorInfo
@@ -73,7 +76,7 @@ class SensorDataView(Controller):
       revents = ReadingEvent.objects.filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
       #while re = revents.iter():
       object_list = []
-      self.lg.debug(len(revents))
+      #self.lg.debug(len(revents))
       line = []
       for obj in revents:
         d = {
@@ -93,6 +96,35 @@ class SensorDataView(Controller):
       #self.context['data'] = object_list
       keys = ['dtime', 'temp', 'resistance']
       self.context['keys'] = keys
+      return self.render()
+
+    def graph(self):
+      revents = ReadingEvent.objects.all() #filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
+      self.lg.debug(len(revents))
+      tempdict = {}
+      timedict = {}
+      c=0
+      for i in range(4):
+        tempdict[i] = []
+        timedict[i] = []
+      for obj in revents:
+        time = obj.dtime
+        for i in range(4):
+          sstr = '0'+str(i+1)
+          temp = eval('obj.sid'+sstr+'.temperature')
+          tempdict[i].append(temp)
+          timedict[i].append(time) #obj.dtime)
+        #c+=1
+      sc = {}
+      col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
+      for i in range(4):
+        sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
+                        mode='lines', name='All sensors', \
+                        opacity=0.8, marker_color=col[i])
+      plt_div = plot([sc[0], sc[1], sc[2], sc[3]], output_type='div')
+      self.context['plt_div'] = plt_div
+      #self.lg.debug(plt_div)
+      self.template = 'sensors/graph.html'
       return self.render()
 
 

@@ -6,9 +6,11 @@
 
 {% block content %}
 
-<h3>sensor DATA {{sensorinfo.name}}</h3>
-<hr>
+<h3>ALL sensor DATA</h3>
 
 {% load render_table from django_tables2 %}
 
 {% render_table table %}
+
+
+{% endblock %}

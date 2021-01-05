@@ -1,0 +1,15 @@
+{% extends "base-mini.html" %}
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+{% block content %}
+
+
+{% autoescape off %}
+  {{ plt_div }}
+{% endautoescape %}
+
+
+{% endblock %}
