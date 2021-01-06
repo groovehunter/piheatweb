@@ -41,3 +41,25 @@ class Toggle(models.Model):
     dtime   = models.DateTimeField('date published')
     state   = models.BooleanField('Status')
     rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+
+
+from django.utils.translation import gettext_lazy as _
+class ChangeDirection(models.TextChoices):
+  OPEN  = 'Open', _('Open')
+  CLOSE = 'Close', _('Close')
+  NONE  = 'No change', _('No change')
+
+
+#class MainValve(models.Model):
+#  opening_degree = models.IntegerField(null=True)
+
+class MainValveHistory(models.Model):
+  dtime         = models.DateTimeField('datetime of change')
+  change_amount = models.IntegerField(null=True)
+  change_dir    = models.CharField(
+    max_length=12,
+    choices=ChangeDirection.choices,
+    default=ChangeDirection.NONE,
+  )
+  result_openingdegree = models.IntegerField(null=True)
+  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
