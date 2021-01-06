@@ -1,0 +1,5 @@
+dummy:
+  name: Dummy-Rule
+  descr: Dummy rule which does nothing
+  logic: None
+  count: 0

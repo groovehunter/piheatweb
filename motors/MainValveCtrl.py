@@ -5,11 +5,10 @@ import sys
 
 
 
-
 class MainValveCtrl(object):
 
     def __init__(self):
-        pass
+        self.count = 0
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)
