@@ -7,7 +7,7 @@ DEFAULT_TOGGLE_RULE = 2
 
 
 class Rule(models.Model):
-
+    """ Regel in der Gesamtlogik des Regelunssystems """
     name = models.CharField(max_length=32)
     descr= models.CharField(max_length=255)
     logic= models.CharField(max_length=255)
@@ -15,7 +15,8 @@ class Rule(models.Model):
 
 
 class RuleHistory(models.Model):
-
+    """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
+    # XXX dtime !!? 
     rule_id = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
     name = models.CharField(max_length=32)
     descr= models.CharField(max_length=255)
@@ -23,8 +24,9 @@ class RuleHistory(models.Model):
     count= models.PositiveIntegerField()
 
 
+# XXX rename to AktorInfo ?
 class Motor(models.Model):
-
+    """ Übersicht aller Aktoren (Motoren, Pumpen, Ventilstrg """
     name    = models.CharField(max_length=16)
     descr   = models.CharField(max_length=255)
     last_toggle = models.CharField(max_length=16)
@@ -32,7 +34,7 @@ class Motor(models.Model):
     def get_absolute_url(self):
       return self.id
 
-
+# wie anpassen? XXX
 class Toggle(models.Model):
 
     toggle = models.ForeignKey(Motor, on_delete=models.CASCADE, default=DEFAULT_MOTOR)

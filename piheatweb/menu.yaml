@@ -8,6 +8,8 @@
     links:
       - name:   Aktoren-Übersicht
         href:   /actors/
+      - name:   Hauptventil
+        href:   /actors/mainvalve
 
 - sensors:
     id:     sensors

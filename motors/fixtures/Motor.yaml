@@ -1,16 +1,14 @@
+mainvalve:
+  name: Hauptventil
+  descr: Fernwärme-Hauptventiltrieb
 
+warmwasserpumpe:
+  name: warmwasserpumpe
+  descr: Brauchwasser erwärmen im Kessel
 
-hauptventil:
-  name: Hauptventiltrieb
-  descr: main stuff...
-
-
-umwaelzpumpe:
+heizungspumpe: 
   name: Heizungspumpe
-  descr: Pumpe des Hauptkreises
+  descr: Haupt-Umwälzpumpe für den Heizkreislauf
 
-brauchwasserpumpe:
-  name: Warmwasserpumpe
-  descr: Pumpe für Erhitzung des Brauchwassers
 
 
