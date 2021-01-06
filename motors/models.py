@@ -45,9 +45,9 @@ class Toggle(models.Model):
 
 from django.utils.translation import gettext_lazy as _
 class ChangeDirection(models.TextChoices):
-  OPEN  = 'Open', _('Open')
-  CLOSE = 'Close', _('Close')
-  NONE  = 'No change', _('No change')
+  OPENING   = 'Opening', _('Opening')
+  CLOSING   = 'Closing', _('Closing')
+  NO_CHANGE  = 'No change', _('No change')
 
 
 #class MainValve(models.Model):
@@ -59,7 +59,7 @@ class MainValveHistory(models.Model):
   change_dir    = models.CharField(
     max_length=12,
     choices=ChangeDirection.choices,
-    default=ChangeDirection.NONE,
+    default=ChangeDirection.NO_CHANGE,
   )
   result_openingdegree = models.IntegerField(null=True)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
