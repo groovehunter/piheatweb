@@ -87,9 +87,15 @@ class ThermistorNT10(Thermistor):
 
 class ThermistorVF20(Thermistor):
   measured = [
+    [0, 71120],
+    [32, 14491],
+    [60, 4473.9],
+  ]
+  """ ALT
+  measured = [
     [-20.0, 220000],
     [25.0, 20000],
     [100.0, 1100],
   ]
-
+  """
 

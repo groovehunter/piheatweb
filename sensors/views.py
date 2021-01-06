@@ -120,7 +120,7 @@ class SensorDataView(Controller):
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
       for i in range(4):
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
-                        mode='lines', name=sinfo.name, \
+                        mode='lines', name=sinfo[i].name, \
                         opacity=0.8, marker_color=col[i])
       plt_div = plot([sc[0], sc[1], sc[2], sc[3]], output_type='div')
       self.context['plt_div'] = plt_div
