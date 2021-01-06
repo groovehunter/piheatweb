@@ -23,8 +23,6 @@ class RuleHistory(models.Model):
     count= models.PositiveIntegerField()
 
 
-
-
 class Motor(models.Model):
 
     name    = models.CharField(max_length=16)
