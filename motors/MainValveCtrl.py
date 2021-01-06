@@ -5,6 +5,7 @@ import sys
 
 
 
+
 class MainValveCtrl(object):
 
     def __init__(self):
@@ -54,7 +55,7 @@ class MainValveCtrl(object):
             time.sleep(sl)
 
 
-    def release_motor(self).
+    def release_motor(self):
         ENA_Released = GPIO.HIGH
         GPIO.output(self.pins['ENA'], ENA_Released)
 

@@ -10,6 +10,8 @@
         href:   /actors/
       - name:   Hauptventil
         href:   /actors/mainvalve
+      - name:   Hauptventil steuern
+        href:   /actors/mainvalve/control
 
 - sensors:
     id:     sensors
