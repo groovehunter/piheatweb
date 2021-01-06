@@ -16,16 +16,18 @@ from MainValveController import change2db
 if __name__=='__main__':
     print(sys.argv)
     direction   = sys.argv[1]
-    amount      = sys.argv[2]   
+    amount      = int(sys.argv[2])   
     speed = 50
     vt = MainValveCtrl()
     vt.setup()
     vt.speed = int(speed)
+    ### WORK
     vt.work(direction, amount)
+
     # Motor freigeben
     vt.release_motor()
     cur = MainValveHistory.objects.latest('dtime')
 
-    change2db(amount, direction, cur)
+    change2db(direction, amount, cur)
 
 

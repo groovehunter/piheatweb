@@ -1,9 +1,11 @@
 from piheatweb.Controller import Controller
 from datetime import datetime
-from motors.models import Rule
+from motors.models import MainValveHistory
 
 
 def change2db(direction, amount, cur):
+  from motors.models import Rule
+  from motors.models import DEFAULT_RULE
   # Save change to history table
   latest_degree = cur.result_openingdegree
   if direction == 'Open':
@@ -44,7 +46,6 @@ class MainValveController(Controller):
               from motors.MainValveCtrl import MainValveCtrl
               mvc = MainValveCtrl()
             else:
-              from motors.models import DEFAULT_RULE
               from motors.MainValveCtrlDummy import MainValveCtrlDummy
               mvc = MainValveCtrlDummy()
 
