@@ -28,10 +28,12 @@
 - rules:
     id:     rules
     name:   Regeln
-    href:   rules/
+    href:   /motors/rules/
     links:
-      - name:    Regel-Liste
-        href:    /rules/
+      - name:   Regel-Liste
+        href:   /motors/rules/list
+      - name:   Regeln prüfen
+        href:   /motors/rules/check
 
 - profile:
     id:     profile
