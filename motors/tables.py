@@ -1,5 +1,5 @@
 from piheatweb.FlowBaseTable import FlowBaseTable
-from .models import Motor, MainValveHistory
+from .models import Motor, MainValveHistory, Rule, RuleHistory
 
 import django_tables2 as tables
 
@@ -21,3 +21,7 @@ class MainValveListTable(FlowBaseTable):
   class Meta:
     model = MainValveHistory
 
+
+class RulesListTable(FlowBaseTable):
+  class Meta:
+    model = Rule

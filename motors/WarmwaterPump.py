@@ -5,7 +5,7 @@ import sys
 
 
 
-class WarmwaterPumCtrl(object):
+class WarmwaterPumpCtrl(object):
 
     def __init__(self):
         self.count = 0
@@ -33,6 +33,4 @@ class WarmwaterPumCtrl(object):
 
 
     def cleanup(self):
-        pass 
-
-
+        pass

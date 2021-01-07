@@ -2,7 +2,7 @@ from django.urls import path
 
 from . import views
 from .views import MotorListView, MotorDetailView, MainValveHistoryView
-from .views import control
+from .views import control, rules_check, rules_list
 
 
 urlpatterns = [
@@ -11,5 +11,7 @@ urlpatterns = [
     path('', MotorListView.as_view(), name='index'),
     path('<int:pk>', MotorDetailView.as_view(), name='detail'),
     path('mainvalve', MainValveHistoryView.as_view(), name='mainvalve'),
-    path('mainvalve/control', control,)
+    path('mainvalve/control', control,),
+    path('rules/check', rules_check),
+    path('rules/list', rules_list),
 ]

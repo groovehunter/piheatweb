@@ -10,7 +10,7 @@ from piheatweb.Controller import Controller
 from .models import Motor, Rule, RuleHistory, MainValveHistory
 from .tables import MotorListTable, MainValveListTable
 from motors.MainValveController import MainValveController
-
+from motors.RulesController import RulesController
 
 from datetime import datetime
 
@@ -64,7 +64,7 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
+        self.object_list = MainValveHistory.objects.order_by('dtime')
         self.init_ctrl()
         self.fields_noshow = []
         table = MainValveListTable(self.object_list)
@@ -77,3 +77,11 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
 def control(request):
   ctrl = MainValveController(request)
   return ctrl.control_input()
+
+def rules_check(request):
+  ctrl = RulesController(request)
+  return ctrl.rules_check()
+
+def rules_list(request):
+  ctrl = RulesController(request)
+  return ctrl.rules_list()

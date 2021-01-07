@@ -13,7 +13,7 @@ from motors.rules import *
   
 
 if __name__=='__main__':
-    print(sys.argv)
-    ### WORK
-
+  print(sys.argv)
+  ### WORK
+  # ctrl = 
 
