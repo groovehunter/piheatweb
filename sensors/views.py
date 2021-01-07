@@ -65,6 +65,7 @@ class SensorDataView(Controller):
     # generalize later
     def __init__(self, request):
         Controller.__init__(self, request)
+        self.now = datetime.datetime.now()
 
     def all_sensors(self, *args):
       """ all sensors temp next to each other
@@ -74,7 +75,6 @@ class SensorDataView(Controller):
       start_date = datetime.date(2021, 1, 2)
       end_date = datetime.date(2021, 1, 5)
       revents = ReadingEvent.objects.filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
-      #while re = revents.iter():
       object_list = []
       #self.lg.debug(len(revents))
       line = []
@@ -99,7 +99,8 @@ class SensorDataView(Controller):
       return self.render()
 
     def graph(self):
-      revents = ReadingEvent.objects.all() #filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
+      start_date = self.now - datetime.timedelta(hours=24)
+      revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
       sinfo = SensorInfo.objects.order_by('id').all()
       self.lg.debug(len(revents))
       tempdict = {}
