@@ -1,15 +1,16 @@
 from django.shortcuts import render
 from django.template import RequestContext
-from django import forms
+#from django import forms
 from django.http import HttpResponseRedirect
-
-from .models import Motor, Rule, RuleHistory, MainValveHistory
-
-from .tables import MotorListTable, MainValveListTable
 
 from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
+
+from .models import Motor, Rule, RuleHistory, MainValveHistory
+from .tables import MotorListTable, MainValveListTable
+from motors.MainValveController import MainValveController
+
 
 from datetime import datetime
 
@@ -71,26 +72,6 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         self.context.update(self.get_context_data())
         self.template_name = 'motors/index.html'
         return self.render()
-
-
-
-amountlist = (
-  (200, 200),
-  (300, 300),
-  (400, 400),
-  (500, 500),
-  (800, 800),
-  (1000, 1000),
-)
-class MVControlForm(forms.Form):
-  amount    = forms.ChoiceField(label='Amount',
-    choices = amountlist
-    )
-  direction = forms.ChoiceField(label='Direction',
-    choices = (('Open', 'up'), ('Close', 'dn'))
-    )
-
-
 
 
 def control(request):

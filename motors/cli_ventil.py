@@ -26,7 +26,7 @@ if __name__=='__main__':
 
     # Motor freigeben
     vt.release_motor()
-    cur = MainValveHistory.objects.latest('dtime')
+    cur = MainValveHistory.objects.latest('id')
 
     change2db(direction, amount, cur)
 

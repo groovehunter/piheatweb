@@ -29,13 +29,16 @@ class MainValveCtrl(object):
 
 
     def work(self, direction, amount):
+        if not direction in ('dn', 'up'):
+          print("wrong direction: use dn/up")
+          return
         DIR_Left = GPIO.HIGH
         DIR_Right = GPIO.LOW
         PUL = self.pins['PUL']
         DIR = self.pins['DIR']
         steps = int(amount)*100
 
-        if direction=='up':
+        if direction == 'up':
             print('waermer')
             GPIO.output(DIR, DIR_Right)
             self.count += steps

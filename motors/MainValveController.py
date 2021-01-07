@@ -1,6 +1,8 @@
+from django.shortcuts import render
 from piheatweb.Controller import Controller
 from datetime import datetime
 from motors.models import MainValveHistory
+from motors.forms import MVControlForm
 
 
 def change2db(direction, amount, cur):
@@ -8,17 +10,21 @@ def change2db(direction, amount, cur):
   from motors.models import DEFAULT_RULE
   # Save change to history table
   latest_degree = cur.result_openingdegree
-  if direction == 'Open':
+  if direction == 'up':
     result_openingdegree = latest_degree + amount
-  if direction == 'Close':
+  if direction == 'dn':
     result_openingdegree = latest_degree - amount
 
   now = datetime.now()
   rule = Rule.objects.get(pk=DEFAULT_RULE)
+  db_dir = {
+    'dn': 'Close',
+    'up': 'Open',
+  }
   entry = MainValveHistory(
       dtime = now,
       change_amount = amount,
-      change_dir = direction,
+      change_dir = db_dir[direction],
       result_openingdegree = result_openingdegree,
       rule = rule
   )
