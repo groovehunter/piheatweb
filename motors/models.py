@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 # default Rule
 DEFAULT_RULE = 1
@@ -16,7 +17,7 @@ class Rule(models.Model):
 
 class RuleHistory(models.Model):
     """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
-    # XXX dtime !!? 
+    # XXX dtime !!?
     rule_id = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
     name = models.CharField(max_length=32)
     descr= models.CharField(max_length=255)
@@ -34,6 +35,21 @@ class Motor(models.Model):
     def get_absolute_url(self):
       return self.id
 
+class PumpStatus(models.TextChoices):
+  RUNNING   = 'Running', _('Running')
+  Off       = 'Off', _('Off')
+  UNDEFINED = 'Undefined', _('undefined')
+
+class WarmwaterPumpHistory(models.Model):
+  dtime         = models.DateTimeField('datetime of change')
+  change_status = models.CharField(null=True, max_length=40,
+    choices=PumpStatus.choices,
+    default=PumpStatus.UNDEFINED,
+    )
+  change_descr  = models.CharField(max_length=255)
+  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+    
+
 # wie anpassen? XXX
 class Toggle(models.Model):
 
@@ -43,7 +59,6 @@ class Toggle(models.Model):
     rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
 
-from django.utils.translation import gettext_lazy as _
 class ChangeDirection(models.TextChoices):
   OPENING   = 'Opening', _('Opening')
   CLOSING   = 'Closing', _('Closing')
