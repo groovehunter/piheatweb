@@ -9,7 +9,8 @@ Ist Sensor-Temperatur > threshhold_upper-limit => steuere Ventiltrieb 1000 punkt
 
 
 
-### 
+### TODO mixed
+* remove microsecond and milliseconds precision in all datetime fields
 
 
 
@@ -29,7 +30,6 @@ Regelmäßiges: Per cron oder als python dev
   
 
 App thread, watching configurated profiles and triggering possible necessary action to handlers;
-writing changes of motor states to DB
 
 
 deamon thread checking for threshold lightweight.
@@ -56,5 +56,28 @@ Graphen anzeigen; js lib?
 * Nachtabsenkung
 * meherer Modi: Low, Full, zeitgesteuert Tag/Nacht; ua.
 
+#### regelungs-vorgänge
+alle 5 min durchgehen der regeln; Oder besser nur der Regeln die gültigkeit haben im aktuellen zeitpunkt - dh. die regeln haben gültigkeits-ranges.
+
+ständig geltendes, wie zb absolute limits für diverse temperaturen.
+
+programmiertechnisch, könnte jede regel eine klasse sein. Alle klassen sind registriert in file bzw directory und der reihe nach wird eine bestimmte methode von ihnen ("check") ausgeführt. 
+
+
+### Aktoren
+
+* Ventiltrieb: öffnungsgrad
+	DB table changes history: dtime, changelevel, changedirection, key2rule, resulting-amount
+
+* heizungspumpe: Leistungsstufe 1...10 
+* Warmwasserpumpe: An / Aus, Stufe?
+
+### toggles, changes
+writing changes of motor states to DB
+properties:
+- From state
+- To state
+- dtime
+- rule
 
 
