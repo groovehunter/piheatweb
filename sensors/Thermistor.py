@@ -6,7 +6,6 @@ def k2c(k): return k-273
 
 
 
-
 class Thermistor:
 
   def __init__(self):
@@ -25,7 +24,7 @@ class Thermistor:
 
     for i in range(num):
       ind = i
-      print(ind, measured[ind])
+      #print(ind, measured[ind])
       TCvalues[i] = measured[ind][0]
       TKvalues[i] = c2k(TCvalues[i])
       Rvalues[i]  = measured[ind][1]
@@ -64,7 +63,7 @@ class Thermistor:
     b = gam2 - c * (L1**2 + L1*L2 + L2**2)
     a = y1 - (b + L1**2*c) * L1
 
-    print(a, b, c)
+    #print(a, b, c)
     self.steinh = (a,b,c)
 
 

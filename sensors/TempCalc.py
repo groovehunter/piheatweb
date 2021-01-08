@@ -17,7 +17,7 @@ class TempCalc:
     evalstr += '.order_by("-dtime")'
     object_list = eval(evalstr)
     count = 0
-    print("Anzahl Datensaetze: ", len(object_list))
+    #print("Anzahl Datensaetze: ", len(object_list))
     time.sleep(2)
 
     for obj in object_list:
@@ -28,5 +28,5 @@ class TempCalc:
       obj.resistance = r
       obj.temperature = temp
       obj.save()
-      print(count, r, temp)
+      #print(count, r, temp)
 
