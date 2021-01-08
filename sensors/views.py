@@ -74,7 +74,7 @@ class SensorDataView(Controller):
 #      SensorData_01.obj
       start_date = datetime.date(2021, 1, 2)
       end_date = datetime.date(2021, 1, 5)
-      revents = ReadingEvent.objects.filter(dtime__minute=0) #, dtime__range=(start_date, end_date))
+      revents = ReadingEvent.objects.filter(dtime__minute=0).order_by('-id')  #, dtime__range=(start_date, end_date))
       object_list = []
       #self.lg.debug(len(revents))
       line = []
@@ -99,8 +99,14 @@ class SensorDataView(Controller):
       return self.render()
 
     def graph(self):
-      start_date = self.now - datetime.timedelta(hours=24)
-      revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+      GET = self.request.GET
+      sincehours = int(GET.get('sincehours', default=12))
+      start_date = self.now - datetime.timedelta(hours=sincehours)
+      if GET.get('resolution'):
+        revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+      else:
+        revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
+
       sinfo = SensorInfo.objects.order_by('id').all()
       self.lg.debug(len(revents))
       tempdict = {}

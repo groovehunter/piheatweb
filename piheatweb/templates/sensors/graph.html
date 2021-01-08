@@ -5,7 +5,20 @@
 {% endblock %}
 
 {% block content %}
-
+<form action="/sensors/view/graph" method="get">
+  <label>Zeitraum</label>
+  <select name="sincehours">
+    <option value="48">48</option>
+    <option value="24">24</option>
+    <option value="12" selected="selected">12</option>
+    <option value="6">6</option>
+    <option value="3">3</option>
+  </select>
+  <label>Auflösung: minütlich?</label>
+  <input type="radio" name="resolution" value="hourly" />
+  <p />
+  <input type="submit" name="go" value="Update graph" />
+</form>
 
 {% autoescape off %}
   {{ plt_div }}
