@@ -6,10 +6,10 @@ UNIT_AVAIL = (
     (u'\xb0C',  'degree Celsius'),
     ('F',       'Fahrenheit'),
 )
-
+STEPS332 = 26560
 class SensorBase:
   def adc_out_to_resistance(self):
-    vsense = (3.3 * self.adc_out) / 26110
+    vsense = (3.3 * self.adc_out) / STEPS332
     r = vsense / ((3.3 - vsense) / 18000 )
     return r
 
