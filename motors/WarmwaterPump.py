@@ -5,8 +5,8 @@ import sys
 
 
 status_map = {
-  1 : GPIO.HIGH,
-  2 : GPIO.LOW,
+  'ON' : GPIO.HIGH,
+  'OFF' : GPIO.LOW,
 }
 
 class WarmwaterPumpCtrl(object):

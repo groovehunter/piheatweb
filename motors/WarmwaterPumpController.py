@@ -51,7 +51,7 @@ class WarmwaterPumpController(Controller):
             change2db(status, cur)
 
             # redirect to a new URL:
-            return HttpResponseRedirect('/actors/')
+            return HttpResponseRedirect('/actors/ww')
 
     # if a GET (or any other method) we'll create a blank form
     else:
