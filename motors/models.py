@@ -64,7 +64,6 @@ class HeatPumpHistory(models.Model):
   change_descr  = models.CharField(max_length=255)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
-
 # wie anpassen? XXX
 class Toggle(models.Model):
 
@@ -93,3 +92,5 @@ class MainValveHistory(models.Model):
   )
   result_openingdegree = models.IntegerField(null=True)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+
+
