@@ -17,8 +17,8 @@ class TempCalc:
     evalstr += '.order_by("-dtime")'
     object_list = eval(evalstr)
     count = 0
-    #print("Anzahl Datensaetze: ", len(object_list))
-    time.sleep(2)
+    print("Anzahl Datensaetze: ", len(object_list))
+    time.sleep(1)
 
     for obj in object_list:
       count +=1 

@@ -3,6 +3,7 @@ from piheatweb.Controller import Controller
 from datetime import datetime
 from motors.models import MainValveHistory
 from motors.forms import MVControlForm
+from django.utils.timezone import now
 
 
 def change2db(direction, amount, cur):
@@ -15,14 +16,14 @@ def change2db(direction, amount, cur):
   if direction == 'dn':
     result_openingdegree = latest_degree - amount
 
-  now = datetime.now()
+  #now = datetime.now()  # non tz aware!
   rule = Rule.objects.get(pk=DEFAULT_RULE)
   db_dir = {
     'dn': 'Close',
     'up': 'Open',
   }
   entry = MainValveHistory(
-      dtime = now,
+      dtime = now(),
       change_amount = amount,
       change_dir = db_dir[direction],
       result_openingdegree = result_openingdegree,

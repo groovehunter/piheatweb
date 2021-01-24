@@ -23,7 +23,7 @@
       - name:   Sensoren parallel
         href:   /sensors/view/all_sensors
       - name:   Graph
-        href:   /sensors/view/graph
+        href:   /sensors/view/graph/
 
 - rules:
     id:     rules

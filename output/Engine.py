@@ -13,14 +13,11 @@ class Engine:
 
     def __init__(self):
         self.pins_pumps = {
-            ''      : 26,
-            'heat'  : 20,
-            'ww'    : 21,
+            'ww'    : 5,
+            'xy'    : 6,
+            'free'  : 13,
+            'heat'  : 19,
         }
-        # CH1 = TODO # 
-        # CH2 = Punpe Heizkreis
-        # CH3 = Punpe Warmwasser
-        
 
     def load_pumps(self):
         pass

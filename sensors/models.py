@@ -9,7 +9,7 @@ UNIT_AVAIL = (
 
 class SensorBase:
   def adc_out_to_resistance(self):
-    vsense = (3.3 * self.adc_out) / 26110
+    vsense = (3.3 * self.adc_out) / 26560
     r = vsense / ((3.3 - vsense) / 18000 )
     return r
 

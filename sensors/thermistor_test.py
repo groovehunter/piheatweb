@@ -12,8 +12,8 @@ measured = [
 if __name__ == '__main__':
 
   # one time   
-  #thermi = ThermistorNT10()
-  thermi = ThermistorVF20()
+  thermi = ThermistorNT10()
+  #thermi = ThermistorVF20()
   thermi.set_RTvalues() 
   thermi.prep_abc()
   

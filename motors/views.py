@@ -64,7 +64,7 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object_list = MainValveHistory.objects.order_by('dtime')
+        self.object_list = MainValveHistory.objects.order_by('-id')
         self.init_ctrl()
         self.fields_noshow = []
         table = MainValveListTable(self.object_list)
