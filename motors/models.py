@@ -31,7 +31,7 @@ class Motor(models.Model):
     name    = models.CharField(max_length=16)
     descr   = models.CharField(max_length=255)
     last_toggle = models.CharField(max_length=16)
-    pin     = models.IntegerField()
+    pin     = models.PositiveIntegerField(null=True)
 
     def get_absolute_url(self):
       return self.id
@@ -59,7 +59,11 @@ class HeatPumpHistory(models.Model):
     )
   change_descr  = models.CharField(max_length=255)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+<<<<<<< HEAD
+
+=======
   
+>>>>>>> 1d5c75e4788a780cdbde3165e6250d86036d1222
 
 # wie anpassen? XXX
 class Toggle(models.Model):

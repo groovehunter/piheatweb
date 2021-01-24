@@ -26,12 +26,13 @@ class Thermistor:
       ind = i
       #print(ind, measured[ind])
       TCvalues[i] = measured[ind][0]
-      TKvalues[i] = c2k(TCvalues[i])
       Rvalues[i]  = measured[ind][1]
+
+      TKvalues[i] = c2k(TCvalues[i])
 
     self.TKvalues = TKvalues
     self.Rvalues = Rvalues
-    
+
     self.num = num
     #self.steinh = self.prep_abc()
 
@@ -103,4 +104,3 @@ class ThermistorVF20(Thermistor):
     [100.0, 1100],
   ]
   """
-

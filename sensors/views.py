@@ -15,6 +15,8 @@ import datetime
 from plotly.offline import plot
 #import plotly.graph_objs as go
 from plotly.graph_objs import Scatter
+import plotly.express as px
+
 
 class SensorListView(ListView, ViewControllerSupport):
     model = SensorInfo
@@ -125,11 +127,19 @@ class SensorDataView(Controller):
         #c+=1
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
+
+
+
+
+
       for i in range(4):
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
                         mode='lines', name=sinfo[i].name, \
                         opacity=0.8, marker_color=col[i])
+#        sc[i].update_yaxes(range=[40, 80])
+
       plt_div = plot([sc[0], sc[1], sc[2], sc[3]], output_type='div')
+      #plt_div = plot(sc, output_type='div')
       self.context['plt_div'] = plt_div
       #self.lg.debug(plt_div)
       self.template = 'sensors/graph.html'
