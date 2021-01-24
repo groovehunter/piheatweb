@@ -31,9 +31,11 @@ class Motor(models.Model):
     name    = models.CharField(max_length=16)
     descr   = models.CharField(max_length=255)
     last_toggle = models.CharField(max_length=16)
+    pin     = models.IntegerField()
 
     def get_absolute_url(self):
       return self.id
+
 
 class PumpStatus(models.TextChoices):
   RUNNING   = 'Running', _('Running')
@@ -48,7 +50,16 @@ class WarmwaterPumpHistory(models.Model):
     )
   change_descr  = models.CharField(max_length=255)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-    
+
+class HeatPumpHistory(models.Model):
+  dtime         = models.DateTimeField('datetime of change')
+  change_status = models.CharField(null=True, max_length=40,
+    choices=PumpStatus.choices,
+    default=PumpStatus.UNDEFINED,
+    )
+  change_descr  = models.CharField(max_length=255)
+  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  
 
 # wie anpassen? XXX
 class Toggle(models.Model):
