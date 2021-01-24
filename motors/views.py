@@ -7,9 +7,11 @@ from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
-from .models import Motor, Rule, RuleHistory, MainValveHistory
-from .tables import MotorListTable, MainValveListTable
+from .models import Motor, Rule, RuleHistory
+from .models import MainValveHistory, WarmwaterPumpHistory
+from .tables import MotorListTable, MainValveListTable, WarmwaterPumpListTable
 from motors.MainValveController import MainValveController
+from motors.WarmwaterPumpController import WarmwaterPumpController
 from motors.RulesController import RulesController
 
 from datetime import datetime
@@ -74,8 +76,33 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         return self.render()
 
 
+class WarmwaterPumpHistoryView(ListView, ViewControllerSupport):
+    """ history table of WarmwaterPump changes """
+    model = WarmwaterPumpHistory
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c = self.listview_helper()
+        context.update(c)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object_list = WarmwaterPumpHistory.objects.order_by('-id')
+        self.init_ctrl()
+        self.fields_noshow = []
+        table = WarmwaterPumpListTable(self.object_list)
+        self.context['table'] = table
+        self.context.update(self.get_context_data())
+        self.template_name = 'motors/index.html'
+        return self.render()
+
+
 def control(request):
   ctrl = MainValveController(request)
+  return ctrl.control_input()
+
+def ww_control(request):
+  ctrl = WarmwaterPumpController(request)
   return ctrl.control_input()
 
 def rules_check(request):

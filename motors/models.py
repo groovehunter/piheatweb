@@ -13,6 +13,8 @@ class Rule(models.Model):
     descr= models.CharField(max_length=255)
     logic= models.CharField(max_length=255)
     count= models.PositiveIntegerField()
+    def get_absolute_url(self):
+      return self.id
 
 
 class RuleHistory(models.Model):
@@ -23,6 +25,8 @@ class RuleHistory(models.Model):
     descr= models.CharField(max_length=255)
     logic= models.CharField(max_length=255)
     count= models.PositiveIntegerField()
+    def get_absolute_url(self):
+      return self.id
 
 
 # XXX rename to AktorInfo ?

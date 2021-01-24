@@ -1,6 +1,10 @@
 from django import forms
 
 
+statuslist = (
+  ("ON", "on"),
+  ("OFF", "off"),
+)
 
 amountlist = (
   (200, 200),
@@ -10,6 +14,7 @@ amountlist = (
   (800, 800),
   (1000, 1000),
 )
+
 class MVControlForm(forms.Form):
   amount    = forms.ChoiceField(label='Amount',
     choices = amountlist
@@ -19,3 +24,7 @@ class MVControlForm(forms.Form):
     )
 
 
+class MotorControlGenericForm(forms.Form):
+  status    = forms.ChoiceField(label='Neuer Status',
+    choices = statuslist
+    )

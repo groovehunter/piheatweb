@@ -18,3 +18,6 @@ class WarmwaterPumpCtrlDummy(object):
 
     def cleanup(self):
       pass
+
+    def work(self, status):
+      pass

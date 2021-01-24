@@ -1,14 +1,16 @@
 mainvalve:
   name: Hauptventil
   descr: Fernwärme-Hauptventiltrieb
+  pin: 21
 
 warmwasserpumpe:
-  name: warmwasserpumpe
+  name: Warmwasserpumpe
   descr: Brauchwasser erwärmen im Kessel
+  pin: 5
 
 heizungspumpe: 
   name: Heizungspumpe
   descr: Haupt-Umwälzpumpe für den Heizkreislauf
-
+  pin: 19
 
 

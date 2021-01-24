@@ -12,6 +12,10 @@
         href:   /actors/mainvalve
       - name:   Hauptventil steuern
         href:   /actors/mainvalve/control
+      - name:   Warmwasser-Pumpe
+        href:   /actors/ww
+      - name:   Warmwasserpumpe steuern
+        href:   /actors/ww/control
 
 - sensors:
     id:     sensors
