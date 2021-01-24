@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+
+{% block content %}
+
+{% block title %}<h3>{{title}}</h3>{% endblock %}
+
+Rules will be checked
+
+<form method="get" action="/motors/rules/check">
+  <input type="submit" name="start" value="start" />
+</form>
+{% endblock %}
