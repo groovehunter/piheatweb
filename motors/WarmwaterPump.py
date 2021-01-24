@@ -4,6 +4,10 @@ import time
 import sys
 
 
+status_map = {
+  1 : GPIO.HIGH,
+  2 : GPIO.LOW,
+}
 
 class WarmwaterPumpCtrl(object):
 
@@ -13,13 +17,18 @@ class WarmwaterPumpCtrl(object):
     def setup(self):
         GPIO.setmode(GPIO.BCM)
         self.pins = {}
-        self.pins['relay'] = 0
-        self.pins['sth'] = 0
+        self.pins['main'] = 5
         GPIO.setwarnings(False)
         for name, pin in self.pins.items():
             GPIO.setup(pin, GPIO.OUT)
 
+    def work(self, status):
+        self.status = status
+        GPIO.output(self.pins['main'], status_map[status])
 
+    def toggle(self):
+        status = not self.status
+        GPIO.output(self.pins['main'], status_map[status])
 
     def enable(self):
         PUL = self.pins['PUL']
@@ -30,7 +39,6 @@ class WarmwaterPumpCtrl(object):
         PUL = self.pins['PUL']
         GPIO.output(PUL, GPIO.LOW)
         time.sleep(sl)
-
 
     def cleanup(self):
         pass
