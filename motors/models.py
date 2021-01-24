@@ -59,11 +59,7 @@ class HeatPumpHistory(models.Model):
     )
   change_descr  = models.CharField(max_length=255)
   rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-<<<<<<< HEAD
-
-=======
   
->>>>>>> 1d5c75e4788a780cdbde3165e6250d86036d1222
 
 # wie anpassen? XXX
 class Toggle(models.Model):
