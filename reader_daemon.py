@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-FREQ=60 # zyklus der abfrage in sekunden
 GAIN = 1
 
 import os
@@ -52,13 +51,17 @@ def read_adc():
   event.save()
 
 
+#FREQ=60 # zyklus der abfrage in sekunden
+#schedule.every(FREQ).seconds.do(read_adc) 
 
+#while True:  
+#  schedule.run_pending()  
 
+# cron version
+from calc_temp_latest_daemon import tempcalc
+if __name__ == '__main__':
+  read_adc()
+  tempcalc()
 
-schedule.every(FREQ).seconds.do(read_adc) 
-
-
-while True:  
-  schedule.run_pending()  
 
 
