@@ -47,5 +47,7 @@ class RulesCliCtrl(KlassLoader):
       raise NameError
 
     rule_klass_obj = self.klass_obj_list[name]
-    rule_klass_obj.rule = rule
+    rule_klass_obj.set_rule(rule)
     rule_klass_obj.check()
+
+

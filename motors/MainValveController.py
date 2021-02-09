@@ -5,9 +5,10 @@ from motors.models import MainValveHistory
 from motors.forms import MVControlForm
 from django.utils.timezone import now
 
+from util import *
 
 def change2db(direction, amount, cur):
-  from motors.models import Rule
+  from motors.models import Rule, RuleHistory
   from motors.models import DEFAULT_RULE
   # Save change to history table
   latest_degree = cur.result_openingdegree
@@ -22,12 +23,19 @@ def change2db(direction, amount, cur):
     'dn': 'Close',
     'up': 'Open',
   }
+  rule_event = RuleHistory(
+    dtime = now(),
+    rule = rule,
+    result = 1,
+  )
+  rule_event.save()
+
   entry = MainValveHistory(
       dtime = now(),
       change_amount = amount,
       change_dir = db_dir[direction],
       result_openingdegree = result_openingdegree,
-      rule = rule
+      rule_event = rule_event,
   )
   entry.save()
 
@@ -48,11 +56,10 @@ class MainValveController(Controller):
             direction = POST['direction']
             amount = int(POST['amount'])
 
-            from platform import machine
-            if machine() == 'armv7l':
+            if IS_RPi:
               from motors.MainValveCtrl import MainValveCtrl
               mvc = MainValveCtrl()
-            else:
+            if IS_PC:
               from motors.MainValveCtrlDummy import MainValveCtrlDummy
               mvc = MainValveCtrlDummy()
 

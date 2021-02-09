@@ -8,7 +8,7 @@ from motors.util import *
 
 if IS_RPi:
   from MainValveCtrl import MainValveCtrl
-  from WarmwaterPumpCtrl import WarmwaterPumpCtrl
+  from WarmwaterPump import WarmwaterPumpCtrl
 if IS_PC:
   from MainValveCtrlDummy import MainValveCtrlDummy
   from WarmwaterPumpDummy import WarmwaterPumpCtrlDummy
@@ -21,30 +21,6 @@ class WarmwasserRangeRule(BaseRule):
   MSG_TO_LOW  = 'Brauchwasser: Temperatur fiel unter %s, Pumpe wird aktiviert.' %lower
   MSG_TO_HIGH = 'Brauchwasser: Temperatur stieg über %s, Pumpe wird deaktiviert.' %upper
 
-  def check(self):
-    entry = None
-    cur = SensorData_03.objects.latest('dtime').temperature
-
-    if cur < self.lower:
-      WarmwaterPumpCtrl.enable()
-      entry = self.history_entry()
-      entry.changed_status = 'ON'
-      entry.change_descr = self.MSG_TO_LOW,
-
-    elif cur > self.upper:
-      WarmwaterPumpCtrl.disable()
-      entry = self.history_entry()
-      entry.changed_status = 'OFF'
-      entry.change_descr = self.MSG_TO_HIGH,
-
-    else:
-      # XXX write to logfile, rule not matches
-      pass
-
-    if entry:
-      entry.save()
-
-
   def history_entry(self):
       entry = WarmwaterPumpHistory(
         dtime = self.now,
@@ -52,6 +28,36 @@ class WarmwasserRangeRule(BaseRule):
         rule = self.DEFAULT_RULE,
       )
       return entry
+
+  def check(self):
+    entry = None
+    cur = SensorData_03.objects.latest('dtime').temperature
+
+    if (cur > self.lower and cur < self.upper):
+      self.rule_event.result = 0
+      self.rule_event.save()
+      return
+
+    entry = self.history_entry()
+
+    if IS_RPi:
+      ctrl = WarmwaterPumpCtrl()
+    if IS_PC:
+      ctrl = WarmwaterPumpCtrlDummy()
+
+    if cur < self.lower:
+      ctrl.enable()
+      entry.changed_status = 'ON'
+      entry.change_descr = self.MSG_TO_LOW,
+
+    elif cur > self.upper:
+      ctrl.disable()
+      entry.changed_status = 'OFF'
+      entry.change_descr = self.MSG_TO_HIGH,
+
+    entry.save()
+
+
 
 
 
@@ -61,19 +67,32 @@ class VorlaufGrenzwertRule(BaseRule):
   MSG_TO_LOW  = 'Vorlauf: Temperatur fiel unter %s, Ventil wird weiter geöffnet.' %lower
   MSG_TO_HIGH = 'Vorlauf: Temperatur stieg über %s, Ventil wird weiter geschlossen.' %upper
 
+  def history_entry(self):
+    entry = MainValveHistory(
+      dtime = self.now,
+      change_amount = 0,
+      rule_event = self.rule_event,
+    )
+    return entry
+
   def check(self):
     super().check()
-    entry = None
     cur = SensorData_01.objects.latest('dtime').temperature
     print("latest temp: ",cur)
-    if IS_RPi:
-      ctrl = MainValveCtrl()
-    if IS_PC:
-      ctrl = MainValveCtrlDummy()
 
     amount = 100    # fix for now
     entry = self.history_entry()
     entry.change_amount = amount
+
+    if (cur > self.lower and cur < self.upper):
+      self.rule_event.result = 0
+      self.rule_event.save()
+      return
+
+    if IS_RPi:
+      ctrl = MainValveCtrl()
+    if IS_PC:
+      ctrl = MainValveCtrlDummy()
 
     if cur < self.lower:
       dir = 'up'
@@ -83,23 +102,9 @@ class VorlaufGrenzwertRule(BaseRule):
       dir = 'dn'
       ctrl.work(dir, amount)
       entry.change_descr = self.MSG_TO_HIGH,
-    else:   # DO NOTHING
-      pass
 
-    if entry:
-      print('saving entry')
-      entry.save()
+    print('saving entry')
+    entry.save()
+    self.rule_event.save()
 
 
-  def history_entry(self):
-    rule_event = RuleHistory()
-    rule_event.dtime = self.now
-    rule_event.rule = self.rule
-    rule_event.save()
-
-    entry = MainValveHistory(
-      dtime = self.now,
-      change_amount = 0,
-      rule_event = rule_event,
-    )
-    return entry
