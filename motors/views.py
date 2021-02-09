@@ -97,6 +97,53 @@ class WarmwaterPumpHistoryView(ListView, ViewControllerSupport):
         return self.render()
 
 
+class MotorController(Controller):
+    def __init__(self, request):
+        Controller.__init__(self, request)
+        self.now = datetime.datetime.now()
+
+    def graph(self):
+      GET = self.request.GET
+      sincehours = int(GET.get('sincehours', default=12))
+      start_date = self.now - datetime.timedelta(hours=sincehours)
+      if GET.get('resolution'):
+        revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+      else:
+        revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
+
+      info = Motor.objects.order_by('id').all()
+      self.lg.debug(len(revents))
+      tempdict = {}
+      timedict = {}
+      c=0
+      for i in range(4):
+        tempdict[i] = []
+        timedict[i] = []
+      for obj in revents:
+        time = obj.dtime
+        for i in range(4):
+          sstr = '0'+str(i+1)
+          temp = eval('obj.sid'+sstr+'.temperature')
+          tempdict[i].append(temp)
+          timedict[i].append(time) #obj.dtime)
+        #c+=1
+      sc = {}
+      col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
+
+      for i in range(2):
+        sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
+                        mode='lines', name=sinfo[i].name, \
+                        opacity=0.8, marker_color=col[i])
+
+      plt_div = plot([sc[0], sc[1]], output_type='div')
+      #plt_div = plot(sc, output_type='div')
+      self.context['plt_div'] = plt_div
+      #self.lg.debug(plt_div)
+      self.template = 'motors/graph.html'
+      return self.render()
+
+
+
 def control(request):
   ctrl = MainValveController(request)
   return ctrl.control_input()
@@ -112,3 +159,7 @@ def rules_check(request):
 def rules_list(request):
   ctrl = RulesController(request)
   return ctrl.rules_list()
+
+def action(request, method):
+  ctrl = MotorController(request)
+  eval('ctrl.'+method+'()')

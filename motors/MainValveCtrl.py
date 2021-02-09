@@ -9,6 +9,7 @@ class MainValveCtrl(object):
 
     def __init__(self):
         self.count = 0
+        self.speed = 50
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)
@@ -46,8 +47,8 @@ class MainValveCtrl(object):
             print('kaelter')
             GPIO.output(DIR, DIR_Left)
             self.count -= steps
-        
-        sl = 0.01 / self.speed 
+
+        sl = 0.01 / self.speed
 
 
         for i in range(steps):
@@ -56,10 +57,6 @@ class MainValveCtrl(object):
             GPIO.output(PUL, GPIO.LOW)
             time.sleep(sl)
 
-
     def release_motor(self):
         ENA_Released = GPIO.HIGH
         GPIO.output(self.pins['ENA'], ENA_Released)
-
-
-

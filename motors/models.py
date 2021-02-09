@@ -5,40 +5,55 @@ from django.utils.translation import gettext_lazy as _
 DEFAULT_RULE = 1
 DEFAULT_MOTOR= 1
 DEFAULT_TOGGLE_RULE = 2
+""" rules script daemon, jede minute zb schedulen;
+Die rules durchgehen, beim einsatz einer regel in die history
+tabelle des jeweiligen aktors ein foreignkey auf das aktuellste
+ReadingEvent setzen,
+Beim aktor ist ja auch schon link zu angewandten regel, so ist
+insgesammt nun schon sehr gut semantisch ineinanderpassend.
+
+So ist ReadingEvent der master des chronologischen speicherns
+beim loopen durch diese events, kann dann der kombi graph von
+sensoren und aktoren erzeugt werden.
+"""
+
+#class ActionEvent(models.Model):
+#  dtime   = models.DateTimeField('datetime of rule check and actions')
 
 
 class Rule(models.Model):
-    """ Regel in der Gesamtlogik des Regelunssystems """
-    name = models.CharField(max_length=32)
-    descr= models.CharField(max_length=255)
-    logic= models.CharField(max_length=255)
-    count= models.PositiveIntegerField()
-    def get_absolute_url(self):
-      return self.id
+  """ Regel in der Gesamtlogik des Regelunssystems """
+  name = models.CharField(max_length=32)
+  descr= models.CharField(max_length=255)
+  logic= models.CharField(max_length=255)
+  count= models.PositiveIntegerField()
+  def get_absolute_url(self):
+    return self.id
+  def __str__(self):
+    return self.name
 
 
 class RuleHistory(models.Model):
-    """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
-    # XXX dtime !!?
-    rule_id = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
-    name = models.CharField(max_length=32)
-    descr= models.CharField(max_length=255)
-    logic= models.CharField(max_length=255)
-    count= models.PositiveIntegerField()
-    def get_absolute_url(self):
-      return self.id
-
+  """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
+  dtime   = models.DateTimeField('rule check and action dtime', null=True)
+  rule = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
+  result = models.CharField(max_length=20, null=True)
+  def get_absolute_url(self):
+    return self.id
+  def __str__(self):
+    return self.rule.name + ' - ' + self.dtime
 
 # XXX rename to AktorInfo ?
 class Motor(models.Model):
-    """ Übersicht aller Aktoren (Motoren, Pumpen, Ventilstrg """
-    name    = models.CharField(max_length=16)
-    descr   = models.CharField(max_length=255)
-    last_toggle = models.CharField(max_length=16)
-    pin     = models.PositiveIntegerField(null=True)
-
-    def get_absolute_url(self):
-      return self.id
+  """ Overview of all actors (Motors, Pumps, Valve ctrl """
+  name    = models.CharField(max_length=16)
+  descr   = models.CharField(max_length=255)
+  last_toggle = models.CharField(max_length=16)
+  pin     = models.PositiveIntegerField(null=True)
+  def get_absolute_url(self):
+    return self.id
+  def __str__(self):
+    return self.name
 
 
 class PumpStatus(models.TextChoices):
@@ -53,7 +68,7 @@ class WarmwaterPumpHistory(models.Model):
     default=PumpStatus.UNDEFINED,
     )
   change_descr  = models.CharField(max_length=255)
-  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
 class HeatPumpHistory(models.Model):
   dtime         = models.DateTimeField('datetime of change')
@@ -62,25 +77,13 @@ class HeatPumpHistory(models.Model):
     default=PumpStatus.UNDEFINED,
     )
   change_descr  = models.CharField(max_length=255)
-  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-
-# wie anpassen? XXX
-class Toggle(models.Model):
-
-    toggle = models.ForeignKey(Motor, on_delete=models.CASCADE, default=DEFAULT_MOTOR)
-    dtime   = models.DateTimeField('date published')
-    state   = models.BooleanField('Status')
-    rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  rule_event    = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
 
 class ChangeDirection(models.TextChoices):
   OPENING   = 'Opening', _('Opening')
   CLOSING   = 'Closing', _('Closing')
   NO_CHANGE  = 'No change', _('No change')
-
-
-#class MainValve(models.Model):
-#  opening_degree = models.IntegerField(null=True)
 
 class MainValveHistory(models.Model):
   dtime         = models.DateTimeField('datetime of change')
@@ -91,6 +94,4 @@ class MainValveHistory(models.Model):
     default=ChangeDirection.NO_CHANGE,
   )
   result_openingdegree = models.IntegerField(null=True)
-  rule    = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-
-
+  rule_event    = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)

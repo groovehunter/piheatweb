@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from .views import MotorListView, MotorDetailView
+from .views import MotorListView, MotorDetailView, MotorController
 from .views import MainValveHistoryView, WarmwaterPumpHistoryView
 from .views import control, ww_control, rules_check, rules_list
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path('ww/control', ww_control,),
     path('rules/check', rules_check),
     path('rules/list', rules_list),
+    path('view/<str:action>', views.action),
 ]

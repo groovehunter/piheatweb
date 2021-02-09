@@ -10,10 +10,15 @@ django.setup()
 from motors.models import *
 
 from motors.rules import *
-  
+from motors.RulesCtrl import RulesCliCtrl
+import motors.util
+
 
 if __name__=='__main__':
   print(sys.argv)
   ### WORK
-  # ctrl = 
-
+  ctrl = RulesCliCtrl()
+  ctrl.setup()
+  ctrl.loop_klasses()
+#  ctrl.rules_list()
+  ctrl.test()

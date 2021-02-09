@@ -3,3 +3,15 @@ dummy:
   descr: Dummy rule which does nothing
   logic: None
   count: 0
+
+warmwater_range:
+  name: warmwater_range
+  descr: Keep warm water between thresholds
+  logic: logogogog
+  count: 0
+  
+vorlauf_grenzwert:
+  name: VorlaufGrenzwertRule
+  descr: VorlaufGrenzwertRule check limits of vorlauf temp
+  logic: asdadssa
+  count: 0
