@@ -18,10 +18,9 @@ if __name__=='__main__':
     print(sys.argv)
     direction   = sys.argv[1]
     amount      = int(sys.argv[2])   
-    speed = 50
     vt = MainValveCtrl()
     vt.setup()
-    vt.speed = int(speed)
+    vt.speed = 50
     ### WORK
     vt.work(direction, amount)
 

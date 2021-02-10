@@ -25,5 +25,10 @@ class BaseRule:
     self.rule_event = rule_event
 
   def check(self):
-    print('checking')
     print("latest temp: ", self.cur)
+
+  def rule_false(self):
+    print("result = FALSE")
+    self.rule_event.result = 0
+    self.rule_event.save()
+
