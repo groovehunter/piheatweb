@@ -1,8 +1,6 @@
 #!/usr/bin/python
 import RPi.GPIO as GPIO
 import time
-import sys
-
 
 
 class MainValveCtrl(object):
@@ -60,3 +58,4 @@ class MainValveCtrl(object):
     def release_motor(self):
         ENA_Released = GPIO.HIGH
         GPIO.output(self.pins['ENA'], ENA_Released)
+

@@ -23,7 +23,7 @@ if __name__=='__main__':
     speed = 50
     vt = MainValveCtrl()
     vt.setup()
-    vt.speed = int(speed)
+    vt.speed = 50
     ### WORK
     vt.work(direction, amount)
 
