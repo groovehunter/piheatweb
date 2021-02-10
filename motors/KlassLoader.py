@@ -9,6 +9,8 @@ class KlassLoader:
     for name, obj in inspect.getmembers(module):
       if not name.endswith(suffix_wanted):
         continue
+      if name == 'BaseRule':
+        continue
       if inspect.isclass(obj):
         #print(name, obj)
         klass_list.append(obj.__name__)

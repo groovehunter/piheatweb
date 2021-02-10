@@ -26,3 +26,4 @@ class BaseRule:
 
   def check(self):
     print('checking')
+    print("latest temp: ", self.cur)

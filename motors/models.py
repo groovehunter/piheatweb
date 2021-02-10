@@ -5,6 +5,18 @@ from django.utils.translation import gettext_lazy as _
 DEFAULT_RULE = 1
 DEFAULT_MOTOR= 1
 DEFAULT_TOGGLE_RULE = 2
+
+class PumpStatus(models.TextChoices):
+  RUNNING   = 'Running', _('Running')
+  Off       = 'Off', _('Off')
+  UNDEFINED = 'Undefined', _('undefined')
+
+class ChangeDirection(models.TextChoices):
+  OPENING   = 'Opening', _('Opening')
+  CLOSING   = 'Closing', _('Closing')
+  NO_CHANGE  = 'No change', _('No change')
+
+
 """ rules script daemon, jede minute zb schedulen;
 Die rules durchgehen, beim einsatz einer regel in die history
 tabelle des jeweiligen aktors ein foreignkey auf das aktuellste
@@ -56,11 +68,6 @@ class Motor(models.Model):
     return self.name
 
 
-class PumpStatus(models.TextChoices):
-  RUNNING   = 'Running', _('Running')
-  Off       = 'Off', _('Off')
-  UNDEFINED = 'Undefined', _('undefined')
-
 class WarmwaterPumpHistory(models.Model):
   dtime         = models.DateTimeField('datetime of change')
   change_status = models.CharField(null=True, max_length=40,
@@ -79,11 +86,6 @@ class HeatPumpHistory(models.Model):
   change_descr  = models.CharField(max_length=255)
   rule_event    = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
-
-class ChangeDirection(models.TextChoices):
-  OPENING   = 'Opening', _('Opening')
-  CLOSING   = 'Closing', _('Closing')
-  NO_CHANGE  = 'No change', _('No change')
 
 class MainValveHistory(models.Model):
   dtime         = models.DateTimeField('datetime of change')

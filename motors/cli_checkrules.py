@@ -19,6 +19,8 @@ if __name__=='__main__':
   ### WORK
   ctrl = RulesCliCtrl()
   ctrl.setup()
-  ctrl.loop_klasses()
+  ctrl.initiate_klasses_obj()
+  ctrl.load_rules_from_db()
 #  ctrl.rules_list()
-  ctrl.test()
+  #ctrl.test()
+  ctrl.loop_rules()
