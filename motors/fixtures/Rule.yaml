@@ -1,11 +1,11 @@
 dummy:
-  name: Dummy-Rule
+  name: DummyRule
   descr: Dummy rule which does nothing
   logic: None
   count: 0
 
 warmwater_range:
-  name: warmwater_range
+  name: WarmwasserRangeRule
   descr: Keep warm water between thresholds
   logic: logogogog
   count: 0
@@ -15,3 +15,5 @@ vorlauf_grenzwert:
   descr: VorlaufGrenzwertRule check limits of vorlauf temp
   logic: asdadssa
   count: 0
+
+

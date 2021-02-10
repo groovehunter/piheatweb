@@ -13,31 +13,30 @@ class RulesCliCtrl(KlassLoader):
     self.klass_list = self.get_klasslist(motors.Rules)
     self.klass_obj_list = {}
     self.list = {}
+    self.rules_list_db = {}
 
-  def loop_klasses(self):
-    count = 0
+  def initiate_klasses_obj(self):
+    """ initiate all classes of Rules.py module """
     for klass_name in self.klass_list:
-      print(klass_name)
-      # create class object
-
       constructor = globals()[klass_name]
       self.klass_obj_list[klass_name] = constructor()
-#      self.klass = constructor(self)
-      count += 1
-      # XXX Check if rule already in DB?
+
+  def load_rules_from_db(self):
+    rules = Rule.objects.all()
+    for rule in rules:
+      print(rule)
+      self.rules_list_db[rule.name] = rule
 
   def loop_rules(self):
-    self.rules_list()
-    for rule in self.list:
-      pass
+    """ load all rules from db and loop them """
+    for rule_name, rule in self.rules_list_db.items():
+      print('checking rule ', rule_name)
+      self.check_rule(rule)
 
-  def rules_list(self):
-    #self.list[] = Rule.objects.all()
-    pass
-
-  def getRuleByName(self, name):
-    rule = Rule.objects.filter(name=name).first()
-    return rule
+  def check_rule(self, rule):
+    rule_klass_obj = self.klass_obj_list[rule.name]
+    rule_klass_obj.set_rule(rule)
+    rule_klass_obj.check()
 
   def test(self):
     name = 'VorlaufGrenzwertRule'
@@ -49,5 +48,3 @@ class RulesCliCtrl(KlassLoader):
     rule_klass_obj = self.klass_obj_list[name]
     rule_klass_obj.set_rule(rule)
     rule_klass_obj.check()
-
-
