@@ -18,6 +18,8 @@ if __name__=='__main__':
     print(sys.argv)
     direction   = sys.argv[1]
     amount      = int(sys.argv[2])   
+    if amount > 1000:
+      input("So MUCH, are you sure?")
     speed = 50
     vt = MainValveCtrl()
     vt.setup()
