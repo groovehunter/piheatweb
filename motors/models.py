@@ -39,6 +39,7 @@ class Rule(models.Model):
   descr= models.CharField(max_length=255)
   logic= models.CharField(max_length=255)
   count= models.PositiveIntegerField()
+  active = models.BooleanField(default=True)
   def get_absolute_url(self):
     return self.id
   def __str__(self):

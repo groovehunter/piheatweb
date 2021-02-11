@@ -1,4 +1,4 @@
-from motors.BaseRule import BaseRule
+from motors.BaseRule import BaseRule, ThresholdRule
 from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
 from motors.models import RuleHistory
@@ -15,12 +15,16 @@ class DummyRule(BaseRule):
   def check(self):
     return
 
-class WarmwaterRangeRule(BaseRule):
+class WarmwaterRangeRule(ThresholdRule):
   """ keep temperatur in kessel on same level if possible """
-  lower = 43
-  upper = 53
-  MSG_TO_LOW  = 'Temperatur ist unter %s, Pumpe wird/bleibt aktiviert.' %lower
-  MSG_TO_HIGH = 'Temperatur ist über %s, Pumpe wird/bleibt deaktiviert.' %upper
+
+  def setup(self):
+    self.lower = 43.0
+    self.upper = 53.0
+    self.MSG_TO_LOW  = 'Temp. ist unter %s, Pumpe wird/bleibt aktiviert.' %self.lower
+    self.MSG_TO_HIGH = 'Temp. ist über %s, Pumpe wird/bleibt deaktiviert.' %self.upper
+    cur = SensorData_03.objects.latest('dtime').temperature
+    self.cur = float(cur)
 
   def history_entry(self):
       entry = WarmwaterPumpHistory(
@@ -30,16 +34,9 @@ class WarmwaterRangeRule(BaseRule):
       )
       return entry
 
-  def check(self):
-    self.cur = SensorData_03.objects.latest('dtime').temperature
-    super().check()
-    cur = self.cur
-    
-    if (cur > self.lower and cur < self.upper):
-      self.rule_event.result = 0
-      self.rule_event.save()
-      return
 
+  def action(self):
+    """ act because rule was not fulfilled """
     self.rule_event.result = 1
 
     entry = self.history_entry()
@@ -48,25 +45,37 @@ class WarmwaterRangeRule(BaseRule):
       ctrl = WarmwaterPumpCtrl()
     if IS_PC:
       ctrl = WarmwaterPumpCtrlDummy()
+    # set pins
     ctrl.setup()
 
-    if cur < self.lower:
-      ctrl.enable()
-      entry.change_status = 'ON'
+    if self.cur < self.lower:
+      if not ctrl.get_status():
+        ctrl.enable()
+        entry.change_status = 'SWITCH ON'
+      else:
+        entry.change_status = 'STAY ON'
       entry.change_descr = self.MSG_TO_LOW,
 
-    if cur > self.upper:
-      ctrl.disable()
-      entry.change_status = 'OFF'
+    if self.cur > self.upper:
+      if ctrl.get_status():
+        ctrl.disable()
+        entry.change_status = 'SWITCH OFF'
+      else:
+        entry.change_status = 'STAY OFF'
       entry.change_descr = self.MSG_TO_HIGH,
 
     self.rule_event.save()
     entry.save()
 
 
-class VorlaufGrenzwertRule(BaseRule):
-  lower = 42
-  upper = 55
+class VorlaufGrenzwertRule(ThresholdRule):
+  """ check if vorlauf is between thresholds """
+
+  def setup(self):
+    self.lower = 42.0
+    self.upper = 49.0
+    cur = SensorData_01.objects.latest('dtime').temperature
+    self.cur = float(cur)
 
   def history_entry(self):
     entry = MainValveHistory(
@@ -76,15 +85,8 @@ class VorlaufGrenzwertRule(BaseRule):
     )
     return entry
 
-  def check(self):
-    self.cur = SensorData_01.objects.latest('dtime').temperature
-    super().check()
-    cur = self.cur
 
-    if (cur > self.lower and cur < self.upper):
-      self.rule_false()
-      return
-
+  def action(self):
     amount = 50    # fix for now
     entry = self.history_entry()
     entry.change_amount = amount
@@ -94,19 +96,22 @@ class VorlaufGrenzwertRule(BaseRule):
     if IS_PC:
       ctrl = MainValveCtrlDummy()
 
-    ctrl.setup()
     latest = MainValveHistory.objects.latest('id')
 
-    if cur < self.lower:
-      dir = 'up'
-      entry.change_dir = 'Open'
-      entry.result_openingdegree = latest.result_openingdegree + amount
-    if cur > self.upper:
-      dir = 'dn'
+    if self.cur > self.upper:
+      direction = 'dn'
       entry.change_dir = 'Close'
       entry.result_openingdegree = latest.result_openingdegree - amount
+    elif self.cur < self.lower:
+      direction = 'up'
+      entry.change_dir = 'Open'
+      entry.result_openingdegree = latest.result_openingdegree + amount
+    else:
+      print("WARNING: none of both conditions was matched !??")
+      return
 
-    ctrl.work(dir, amount)
+    ### the actual work
+    ctrl.work(direction, amount)
 
     print('saving entry')
     self.rule_event.result = 1

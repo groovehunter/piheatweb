@@ -5,7 +5,7 @@ from motors.models import MainValveHistory
 from motors.forms import MVControlForm
 from django.utils.timezone import now
 
-from util import *
+from motors.util import *
 
 def change2db(direction, amount, cur):
   from motors.models import Rule, RuleHistory
