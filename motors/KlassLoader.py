@@ -9,11 +9,10 @@ class KlassLoader:
     for name, obj in inspect.getmembers(module):
       if not name.endswith(suffix_wanted):
         continue
-      if name == 'BaseRule':
+      if name in ('BaseRule', 'ThresholdRule'):
         continue
+
       if inspect.isclass(obj):
         #print(name, obj)
         klass_list.append(obj.__name__)
-#    if 'LightPattern' in pattern_list:
-#        pattern_list.remove('LightPattern')
     return klass_list

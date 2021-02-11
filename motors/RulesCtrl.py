@@ -30,13 +30,22 @@ class RulesCliCtrl(KlassLoader):
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule in self.rules_list_db.items():
+      print()
       print('checking rule ', rule_name)
-      self.check_rule(rule)
+      if rule.active:
+        self.check_rule(rule)
+      else:
+        print("rule inactive")
 
   def check_rule(self, rule):
     rule_klass_obj = self.klass_obj_list[rule.name]
     rule_klass_obj.set_rule(rule)
-    rule_klass_obj.check()
+
+    rule_klass_obj.setup()
+    rule_klass_obj.report()
+    if not rule_klass_obj.check():
+      rule_klass_obj.action()
+
 
   def test(self):
     name = 'VorlaufGrenzwertRule'
@@ -47,4 +56,7 @@ class RulesCliCtrl(KlassLoader):
 
     rule_klass_obj = self.klass_obj_list[name]
     rule_klass_obj.set_rule(rule)
+
     rule_klass_obj.check()
+
+
