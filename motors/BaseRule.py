@@ -34,6 +34,8 @@ class BaseRule:
     rule_event.rule = self.rule
     self.rule_event = rule_event
 
+#  def save_rule_event(self):
+#    self.rule_event.save()
 
   def check(self):
     raise NotImplemented
@@ -61,6 +63,8 @@ class ThresholdRule(BaseRule):
 
     elif (cur < self.lower or cur > self.upper):
       print("correct conditions not fulfilled - going to ACT")
+      self.rule_event.result = 1
+      self.rule_event.save()
       return False
 
 

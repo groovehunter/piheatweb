@@ -3,6 +3,7 @@ from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
 from motors.models import RuleHistory
 from motors.util import *
+from django.db.models import Avg, Max, Min, Sum
 
 if IS_RPi:
   from motors.MainValveCtrl import MainValveCtrl
@@ -23,7 +24,8 @@ class WarmwaterRangeRule(ThresholdRule):
     self.upper = 53.0
     self.MSG_TO_LOW  = 'Temp. ist unter %s, Pumpe wird/bleibt aktiviert.' %self.lower
     self.MSG_TO_HIGH = 'Temp. ist über %s, Pumpe wird/bleibt deaktiviert.' %self.upper
-    cur = SensorData_03.objects.latest('dtime').temperature
+    some = SensorData_03.objects.order_by('-dtime')[1:5]
+    cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur = float(cur)
 
   def history_entry(self):
@@ -64,7 +66,6 @@ class WarmwaterRangeRule(ThresholdRule):
         entry.change_status = 'STAY OFF'
       entry.change_descr = self.MSG_TO_HIGH,
 
-    self.rule_event.save()
     entry.save()
 
 
@@ -113,8 +114,5 @@ class VorlaufGrenzwertRule(ThresholdRule):
     ### the actual work
     ctrl.work(direction, amount)
 
-    print('saving entry')
-    self.rule_event.result = 1
-    self.rule_event.save()
     entry.save()
 
