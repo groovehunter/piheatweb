@@ -53,7 +53,7 @@ class RuleHistory(models.Model):
   def get_absolute_url(self):
     return self.id
   def __str__(self):
-    return self.rule.name + ' - ' + self.dtime
+    return self.rule.name + ' - ' + self.dtime.strftime('%H-%M-%S')
 
 # XXX rename to AktorInfo ?
 class Motor(models.Model):
