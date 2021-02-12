@@ -32,7 +32,7 @@
 - rules:
     id:     rules
     name:   Regeln
-    href:   /motors/rules/
+    href:   motors/rules/
     links:
       - name:   Regel-Liste
         href:   /motors/rules/list
@@ -45,4 +45,4 @@
     href: profile/
     links:
       - name:   Profil editierem
-        href: profile/edit
+        href: /profile/edit
