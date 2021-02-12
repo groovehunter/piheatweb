@@ -14,13 +14,13 @@ class BaseRule:
     """ common things to do in init. """
     self.now = timezone.now()
     self.DEFAULT_RULE = Rule.objects.get(pk=1)
-    print('init base rule', self.__class__.__name__)
 
   def setup(self):
     """ stub if subclass does not need it """
     pass
 
   def report(self):
+    """ stub if subclass does not need it """
     pass
 
   def set_rule(self, rule):
@@ -34,16 +34,9 @@ class BaseRule:
     rule_event.rule = self.rule
     self.rule_event = rule_event
 
-#  def save_rule_event(self):
-#    self.rule_event.save()
-
   def check(self):
     raise NotImplemented
 
-#  def rule_false(self):
-#    print("result = FALSE")
-#    self.rule_event.result = 0
-#    self.rule_event.save()
 
 
 class ThresholdRule(BaseRule):
@@ -62,7 +55,7 @@ class ThresholdRule(BaseRule):
       return True
 
     elif (cur < self.lower or cur > self.upper):
-      print("correct conditions not fulfilled - going to ACT")
+      print("conditions NOT fulfilled - going to ACT")
       self.rule_event.result = 1
       self.rule_event.save()
       return False
