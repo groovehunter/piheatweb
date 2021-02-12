@@ -3,8 +3,8 @@ zulauf:
   descr: Fernwärme
 
 rücklauf:
-  name: Rücklauf Heizkreis
-  descr: Temperatur bevor das Heizwasser erneut in den Wärmetauscher eintritt
+  name: Rücklauf Ferwärme
+  descr: Temperatur der rückläufigen Fernwärme-Leitung
 
 kessel:
   name: Kessel-Temperatur

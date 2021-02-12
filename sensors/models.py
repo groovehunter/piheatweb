@@ -21,6 +21,8 @@ class SensorInfo(models.Model):
     thermistor = models.CharField(max_length=32, null=True)
     def get_absolute_url(self):
       return self.id
+    def __str__(self):
+      return self.name
 
 class SensorData_01(models.Model, SensorBase):
     dtime   = models.DateTimeField('datetime of measurement')
