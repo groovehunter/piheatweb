@@ -21,7 +21,7 @@ class WarmwaterRangeRule(ThresholdRule):
 
   def setup(self):
     self.lower = 43.0
-    self.upper = 53.0
+    self.upper = 50.0
     self.MSG_TO_LOW  = 'Temp. ist unter %s, Pumpe wird/bleibt aktiviert.' %self.lower
     self.MSG_TO_HIGH = 'Temp. ist über %s, Pumpe wird/bleibt deaktiviert.' %self.upper
     some = SensorData_03.objects.order_by('-dtime')[1:5]
@@ -74,7 +74,7 @@ class VorlaufGrenzwertRule(ThresholdRule):
 
   def setup(self):
     self.lower = 42.0
-    self.upper = 49.0
+    self.upper = 47.0
     cur = SensorData_01.objects.latest('dtime').temperature
     self.cur = float(cur)
 
@@ -96,6 +96,7 @@ class VorlaufGrenzwertRule(ThresholdRule):
       ctrl = MainValveCtrl()
     if IS_PC:
       ctrl = MainValveCtrlDummy()
+    ctrl.setup()
 
     latest = MainValveHistory.objects.latest('id')
 

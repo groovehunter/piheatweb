@@ -16,7 +16,6 @@ import motors.util
 
 
 if __name__=='__main__':
-  print(sys.argv)
   ### WORK
   ctrl = RulesCliCtrl()
   ctrl.setup()
