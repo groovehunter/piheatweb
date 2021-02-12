@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import os
-os.chdir('/home/pi/pw/motors')
+os.chdir(os.environ['HOME']+'/pw/motors')
 sys.path.append(os.path.join(os.getcwd(), '..'))
 
 import django
