@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+<div>
 <form action="/sensors/view/graph" method="get">
   <p>
     <label>Zeitraum</label>
@@ -26,6 +27,7 @@
     <input type="submit" name="go" value="Update graph" />
   </p>
 </form>
+</div>
 
 {% autoescape off %}
   {{ plt_div }}

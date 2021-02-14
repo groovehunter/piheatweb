@@ -83,13 +83,12 @@ class ThermistorNT10(Thermistor):
     [25, 10000],
     [150, 180],
   ]
-"""
+class ThermistorNT20(Thermistor):
   measured = [
-    [-40.0, 327344],
-    [25.0, 10000],
-    [110.0, 509],
+    [-50.0, 1667570],
+    [25, 20000],
+    [150, 270],
   ]
-"""
 
 class ThermistorVF20(Thermistor):
   measured = [
