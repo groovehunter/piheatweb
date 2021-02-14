@@ -24,25 +24,20 @@ class WarmwaterPumpCtrl(object):
     def get_status(self):
         cur = GPIO.input(self.pin)
         if cur == GPIO.LOW:
-          return False
+          return 'OFF'
         if cur == GPIO.HIGH:
-          return True
+          return 'ON'
+        return 'UNDEF'
 
     def work(self, status):
         GPIO.output(self.pins['main'], status_map[status])
         self.status = status
-    """
-    def toggle(self):
-        status = not self.status
-        GPIO.output(self.pins['main'], status_map[status])
-    """
+
     def enable(self):
-        if not self.get_status():
-          GPIO.output(self.pin, GPIO.HIGH)
+        GPIO.output(self.pin, GPIO.HIGH)
 
     def disable(self):
-        if self.get_status():
-          GPIO.output(self.pin, GPIO.LOW)
+        GPIO.output(self.pin, GPIO.LOW)
 
     def cleanup(self):
         pass

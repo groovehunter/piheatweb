@@ -9,11 +9,16 @@ os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
 
 from motors.models import *
-
 from motors.rules import *
 from motors.RulesCtrl import RulesCliCtrl
 import motors.util
 
+import logging
+fn = os.environ['HOME'] + '/log/piheat.log'
+logging.basicConfig(filename=fn, level=logging.DEBUG)
+logger = logging.getLogger()
+logger.debug('')
+logger.debug('START CLI')
 
 if __name__=='__main__':
   ### WORK
@@ -22,5 +27,5 @@ if __name__=='__main__':
   ctrl.initiate_klasses_obj()
   ctrl.load_rules_from_db()
 #  ctrl.rules_list()
-  #ctrl.test()
+#  ctrl.test()
   ctrl.loop_rules()

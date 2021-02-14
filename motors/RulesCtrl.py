@@ -6,6 +6,7 @@ from motors import rules
 from motors.models import Rule, RuleHistory
 from motors.KlassLoader import KlassLoader
 
+logger = logging.getLogger()
 
 class RulesCliCtrl(KlassLoader):
   """ non web controller """
@@ -48,15 +49,16 @@ class RulesCliCtrl(KlassLoader):
 
 
   def test(self):
-    name = 'VorlaufGrenzwertRule'
-    rule = self.getRuleByName(name)
-    if name != rule.name:
-      print('mismatch in name, EXIT')
-      raise NameError
+    name = 'VorlaufRule'
+    logger.debug('check Rule %s', name)
+    rule = self.rules_list_db[name]
 
     rule_klass_obj = self.klass_obj_list[name]
     rule_klass_obj.set_rule(rule)
 
-    rule_klass_obj.check()
+    rule_klass_obj.setup()
+    rule_klass_obj.report()
+    if not rule_klass_obj.check():
+      rule_klass_obj.action()
 
 
