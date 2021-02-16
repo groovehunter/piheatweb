@@ -18,30 +18,21 @@ fn = os.environ['HOME'] + '/log/piheat.log'
 logging.basicConfig(
   filename=fn,
   level=logging.DEBUG,
-#  format='%(asctime)s %(levelname) %(message)s',
-#  datefmt='%H:%M:%S',
-#  style='$',
 )
 # create console handler and set level to debug
 logger = logging.getLogger()
-"""
-ch = logging.FileHandler(fn)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-"""
+
 logger.debug('----------------------------------------------')
-logger.debug('START CLI')
+logger.debug('RULE VALUE SET')
+
 
 if __name__=='__main__':
   ### WORK
+  val = sys.argv[1]
+  print(val)
   ctrl = RulesCliCtrl()
-  ctrl.setup()
-  ctrl.initiate_klasses_obj()
   ctrl.load_rules_from_db()
-#  ctrl.rules_list()
-#  ctrl.test()
-  ctrl.loop_rules()
-
+  rulename = 'VorlaufRule'
+  logger.info('set %s value to %s', rulename, val)
+  ctrl.setval(rulename, val)
 

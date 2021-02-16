@@ -17,7 +17,6 @@ class BaseRule:
     self.now = timezone.now()
     self.DEFAULT_RULE = Rule.objects.get(pk=1)
 
-
   def setup(self):
     """ stub if subclass does not need it """
     pass
@@ -31,6 +30,7 @@ class BaseRule:
         so we can access it; 
         And also create a new RuleHistory entry pointing to the rule obj """
     self.rule = rule
+    logger.debug('--- RULE INIT : %s', self.rule.name)
 
     rule_event = RuleHistory()
     rule_event.dtime = self.now
@@ -46,10 +46,8 @@ class FixedGoalAdjustableActuator(BaseRule):
       can adjust actuating values es"""
 
   def report(self):
-    print("CURRENT: ", self.cur)
-    print("GOAL: ", self.goal)
-    logger.debug('CUR: %s', self.cur)
-    logger.debug('GOAL: %s', self.goal)
+    logger.debug("CUR: %s", self.cur)
+    logger.debug("GOAL: %s", self.goal)
 
   def check(self):
     """ false only if very near. 
@@ -59,12 +57,11 @@ class FixedGoalAdjustableActuator(BaseRule):
     print('diff', self.diff)
 
     if self.diff < 2:
-      print("conditions are OKAY - no action needed")
+      logger.debug("conditions are OKAY - no action needed")
       self.rule_event.result = 0
       self.rule_event.save()
       return True
     else:
-      print("conditions NOT fulfilled - going to ACT")
       self.rule_event.result = 1
       self.rule_event.save()
       return False
@@ -78,25 +75,24 @@ class ThresholdRule(BaseRule):
   """ rule which checks one value if between 2 thresholds """
 
   def report(self):
-    print("CURRENT: ", self.cur)
-    print("Lower and upper: ", self.lower, self.upper)
+    logger.debug("CURRENT: %s", self.cur)
+    logger.debug("Lower and upper: %s %s", self.lower, self.upper)
 
   def check(self):
     cur = self.cur
     if (cur > self.lower and cur < self.upper):
-      print("conditions are OKAY - no action needed")
+      logger.debug("conditions are OKAY - no action needed")
       self.rule_event.result = 0
       self.rule_event.save()
       return True
 
     elif (cur < self.lower or cur > self.upper):
-      print("conditions NOT fulfilled - going to ACT")
       self.rule_event.result = 1
       self.rule_event.save()
       return False
 
     else:
-      print("threshold check somehow is out any rule!??")
+      logger.error("threshold check somehow is out any rule!??")
 
 
 

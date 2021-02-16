@@ -7,14 +7,7 @@ from django.db.models import Avg, Max, Min, Sum
 import logging
 from os import environ
 
-#fn = environ['HOME'] + '/log/piheat.log'
-#ch = logging.FileHandler(fn)
-#ch.setLevel(logging.DEBUG)
-#formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#ch.setFormatter(formatter)
-
 logger = logging.getLogger()
-#logger.addHandler(ch)
 
 if IS_RPi:
   from motors.MainValveCtrl import MainValveCtrl
@@ -87,9 +80,10 @@ class WarmwaterRangeRule(ThresholdRule):
       entry.change_descr = self.MSG_TO_HIGH,
 
     else:
-      print("WARNING: none of both conditions was matched !??")
+      logger.error("WARNING: none of both conditions was matched !??")
       return False
 
+    logger.info(entry.change_descr)
     entry.save()
     return True
 
@@ -146,8 +140,7 @@ class VorlaufGrenzwertRule(ThresholdRule):
       return False
 
     ### the actual work
-    logger.debug("work on mainvalve dir:%s amount:%s", direction, amount)
-    print("main dir:%s amount:%s - diff:%s" % (direction, amount, diff))
+    logger.debug("work on mainvalve dir: %s amount: %i", direction, amount)
     ctrl.work(direction, amount)
 
     entry.save()
@@ -156,7 +149,7 @@ class VorlaufGrenzwertRule(ThresholdRule):
 
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
-  min_base = 20
+  min_base = 10
 
   def setup(self):
     some = SensorData_01.objects.order_by('-dtime')[1:5]
@@ -193,8 +186,9 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     diff_int = int(self.diff)
     #diff = abs(int(self.cur) - int(self.goal))
     latest = MainValveHistory.objects.latest('id')
+    if diff_int <3:
+      diff_int = 0  # dont change too much if come near goal
     amount = self.min_base + (self.multipli * diff_int)
-    logger.debug('amount: %s', amount)
 
     if (self.cur - self.goal) > 0:
       direction = 'dn'
@@ -213,7 +207,9 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       return False
 
     ### the actual work
-    logger.debug("work on mainvalve dir:%s amount:%s", direction, amount)
+    sa = str(amount)
+    logger.info("mainvalve amount %s - %s", sa, direction)
+    #logger.debug("work on mainvalve an amount of %s in direction: %s", amount, direction)
     ctrl.work(direction, amount)
 
     entry.save()

@@ -12,31 +12,28 @@ class RulesCliCtrl(KlassLoader):
   """ non web controller """
   def setup(self):
     self.klass_list = self.get_klasslist(motors.Rules)
-    self.klass_obj_list = {}
-    self.list = {}
-    self.rules_list_db = {}
 
   def initiate_klasses_obj(self):
     """ initiate all classes of Rules.py module """
+    self.klass_obj_list = {}
     for klass_name in self.klass_list:
       constructor = globals()[klass_name]
       self.klass_obj_list[klass_name] = constructor()
 
   def load_rules_from_db(self):
+    self.rules_list_db = {}
     rules = Rule.objects.all()
     for rule in rules:
-      print(rule)
       self.rules_list_db[rule.name] = rule
 
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule in self.rules_list_db.items():
-      print()
-      print('checking rule ', rule_name)
+      logger.debug('checking rule: %s ', rule_name)
       if rule.active:
         self.check_rule(rule)
       else:
-        print("rule inactive")
+        logger.debug("... rule inactive")
 
   def check_rule(self, rule):
     rule_klass_obj = self.klass_obj_list[rule.name]
@@ -47,6 +44,10 @@ class RulesCliCtrl(KlassLoader):
     if not rule_klass_obj.check():
       rule_klass_obj.action()
 
+  def setval(self, rulename, val):
+    rule_db = self.rules_list_db[rulename]
+    rule_db.logic = val
+    rule_db.save()
 
   def test(self):
     name = 'VorlaufRule'
