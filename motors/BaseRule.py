@@ -49,12 +49,10 @@ class FixedGoalAdjustableActuator(BaseRule):
     logger.debug("CUR: %s", self.cur)
     logger.debug("GOAL: %s", self.goal)
 
+  # rename to "check_condition"
   def check(self):
     """ false only if very near. 
     otherwise adjust in some way """
-
-    self.diff = abs(self.cur - self.goal)
-    print('diff', self.diff)
 
     if self.diff < 2:
       logger.debug("conditions are OKAY - no action needed")

@@ -140,7 +140,8 @@ class VorlaufGrenzwertRule(ThresholdRule):
       return False
 
     ### the actual work
-    logger.debug("work on mainvalve dir: %s amount: %i", direction, amount)
+    logger.debug("mainvalve dir: %s amount: %i", direction, amount)
+    logger.debug("new openingdegree: %i", entry.result_openingdegree)
     ctrl.work(direction, amount)
 
     entry.save()
@@ -162,6 +163,12 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     except:
       # fallback
       self.goal= 48.0
+    self.diff = abs(self.cur - self.goal)
+
+    # prerequisites:
+    self.must = 'self.main_cur > 4650' # etwa der 0-Strich of valve
+    self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
+
 
   def history_entry(self):
     entry = MainValveHistory(
@@ -170,6 +177,13 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       rule_event = self.rule_event,
     )
     return entry
+
+  def check(self):
+    is_must = eval(self.must)
+    logger.debug('is_must: %s', is_must)
+    if not is_must:
+      return True
+    return super().check()
 
   def action(self):
     amount = 0    # for safety, if not explicit set later 
