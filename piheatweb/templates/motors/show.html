@@ -7,8 +7,18 @@
 
 {% block content %}
 
-<h3 class="text">Motor-Details von: {{ object.name }}</h3>
+<h3 class="text-lg">
+  Motor-Details von:
+  <span class="shadow-lg">{{ object.name }}</span>
+</h3>
 
+{% if history %}
+  {% load render_table from django_tables2 %}
+  <div class="shadow-lg bg-white">
+    {% render_table table %}
+  </div>
 
+{% endif %}
 
+{{debug}}
 {% endblock %}

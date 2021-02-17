@@ -1,5 +1,6 @@
 
 import os
+from piheatweb.util import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TMPPATH = BASE_DIR + '/'
@@ -10,6 +11,7 @@ SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 DEBUG = True
 AUTH_USER_MODEL = "users.CustomUser"
 TAILWIND_APP_NAME = 'theme'
+DJANGO_TABLES2_TEMPLATE = "table.html"
 
 ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev', 'groove.selfhost.eu']
 
@@ -102,6 +104,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 #STATIC_ROOT = os.path.join(BASE_DIR, "static")
+if IS_PC:
+  logfn = os.environ['HOME'] + '/log/debug.log'
+if IS_RPi:
+  logfn = os.environ['HOME'] + '/log/debug.log'
 
 LOGGING = {
     'version': 1,
@@ -110,7 +116,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/home/pi/log/debug.log',
+            'filename': logfn,
         },
     },
     'loggers': {

@@ -10,6 +10,9 @@ class WarmwaterPumpCtrlDummy(object):
     def setup(self):
       pass
 
+    def get_status(self):
+      return True
+
     def enable(self):
       pass
 

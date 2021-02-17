@@ -56,6 +56,7 @@ class RuleHistory(models.Model):
   def __str__(self):
     return self.rule.name + ' - ' + self.dtime.strftime('%H-%M-%S')
 
+
 # XXX rename to AktorInfo ?
 class Motor(models.Model):
   """ Overview of all actors (Motors, Pumps, Valve ctrl """
@@ -63,6 +64,8 @@ class Motor(models.Model):
   descr   = models.CharField(max_length=255)
   last_toggle = models.CharField(max_length=16)
   pin     = models.PositiveIntegerField(null=True)
+  ctrl_class = models.CharField(max_length=50, null=True)
+
   def get_absolute_url(self):
     return self.id
   def __str__(self):

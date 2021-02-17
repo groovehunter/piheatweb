@@ -7,10 +7,11 @@
 
 {% block content %}
 
-{% block title %}<h3 class="text">Motoren</h3>{% endblock %}
+{% block title %}<h3 class="text-xl">Motoren</h3>{% endblock %}
 
 {% load render_table from django_tables2 %}
-
-{% render_table table %}
+<div class="shadow-lg bg-white">
+  {% render_table table %}
+</div>
 
 {% endblock %}

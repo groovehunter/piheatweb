@@ -100,7 +100,23 @@ class WarmwaterPumpHistoryView(ListView, ViewControllerSupport):
 class MotorController(Controller):
     def __init__(self, request):
         Controller.__init__(self, request)
-        self.now = datetime.datetime.now()
+        self.now = datetime.now()
+
+    def show(self, pk):
+      self.object = Motor.objects.filter(id=pk).first()
+      self.template = 'motors/show.html'
+      history = True
+      self.context.update( {'history': history} )
+
+#      klass_name = self.object.ctrl_class
+      #self.context['debug'] = kn
+#      constructor = globals()[klass_name]
+#      self.motor_ctrl = constructor()
+      self.object_list = MainValveHistory.objects.all()[:100]
+      table = MainValveListTable(self.object_list)
+      self.context['table'] = table
+      return self.render()
+
 
     def graph(self):
       GET = self.request.GET
@@ -163,3 +179,7 @@ def rules_list(request):
 def action(request, method):
   ctrl = MotorController(request)
   eval('ctrl.'+method+'()')
+
+def show(request, pk):
+  ctrl = MotorController(request)
+  return ctrl.show(pk)

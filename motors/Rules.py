@@ -2,7 +2,7 @@ from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator
 from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
 from motors.models import RuleHistory
-from motors.util import *
+from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 import logging
 from os import environ

@@ -15,18 +15,21 @@ class MotorListTable(FlowBaseTable):
 
 
     def render_labelterm(self, value):
-        return format_html('<a class="text-blue-700 underline" href="/video/topic/%s">%s</a>' %(value,value))
+        return format_html('<a class="text-blue-700 underline" href="/motors/%s/history">%s</a>' %(value,value))
 
 
 class MainValveListTable(FlowBaseTable):
+  rule_event = tables.Column(linkify=True)
   class Meta:
     model = MainValveHistory
 
 class WarmwaterPumpListTable(FlowBaseTable):
+  rule_event = tables.Column(linkify=True)
   class Meta:
     model = WarmwaterPumpHistory
 
 
 class RulesListTable(FlowBaseTable):
+  name = tables.Column(linkify=True)
   class Meta:
     model = Rule
