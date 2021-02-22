@@ -6,6 +6,7 @@ from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 import logging
 from os import environ
+from datetime import datetime
 
 logger = logging.getLogger()
 
@@ -88,65 +89,6 @@ class WarmwaterRangeRule(ThresholdRule):
     return True
 
 
-class VorlaufGrenzwertRule(ThresholdRule):
-  """ check if vorlauf is between thresholds """
-
-  def setup(self):
-    self.lower = 41.0
-    self.upper = 48.0
-    cur = SensorData_01.objects.latest('dtime').temperature
-    self.cur = float(cur)
-
-  def history_entry(self):
-    entry = MainValveHistory(
-      dtime = self.now,
-      change_amount = 0,
-      rule_event = self.rule_event,
-    )
-    return entry
-
-
-  def action(self):
-    amount = 0    # for safety, if not explicit set later 
-    direction = None
-    entry = self.history_entry()
-
-    if IS_RPi:
-      ctrl = MainValveCtrl()
-    if IS_PC:
-      ctrl = MainValveCtrlDummy()
-    ctrl.setup()
-
-    latest = MainValveHistory.objects.latest('id')
-
-    if self.cur > self.upper:
-      diff = int(self.cur) - int(self.upper)
-      amount = 20 + (5 * diff)
-      direction = 'dn'
-      entry.change_dir = 'Close'
-      entry.change_amount = amount
-      entry.result_openingdegree = latest.result_openingdegree - amount
-
-    elif self.cur < self.lower:
-      diff = int(self.lower) - int(self.cur)
-      amount = 20 + (5 * diff)
-      direction = 'up'
-      entry.change_dir = 'Open'
-      entry.change_amount = amount
-      entry.result_openingdegree = latest.result_openingdegree + amount
-
-    else:
-      print("WARNING: none of both conditions was matched !??")
-      return False
-
-    ### the actual work
-    logger.debug("mainvalve dir: %s amount: %i", direction, amount)
-    logger.debug("new openingdegree: %i", entry.result_openingdegree)
-    ctrl.work(direction, amount)
-
-    entry.save()
-    return True
-
 
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
@@ -156,18 +98,44 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     some = SensorData_01.objects.order_by('-dtime')[1:5]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur = float(cur)
-    logger.debug('setup self.cur %s', self.cur)
-    logic = self.rule.logic
-    try:
-      self.goal = float(logic)
-    except:
-      # fallback
-      self.goal= 48.0
-    self.diff = abs(self.cur - self.goal)
-
     # prerequisites:
     self.must = 'self.main_cur > 4650' # etwa der 0-Strich of valve
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
+
+    self.logic = float(self.rule.logic)
+    self.setup_dep()
+    self.goal = float(self.rule.logic)
+    self.diff = abs(self.cur - self.goal)
+    #logger.debug('end setup')
+
+  def setup_dep(self):
+    """ recalc vorlauf soll by outdoor temp """
+    some = SensorData_04.objects.order_by('-dtime')[1:30]
+    cur = some.aggregate(Avg('temperature'))['temperature__avg']
+    self.cur_outdoor = float(cur)
+    self.soll_calc = (self.cur_outdoor * -1.2) + 44
+    logger.debug("current outdoor temp %s", self.cur_outdoor)
+    logger.debug("calculated Soll by outdoor temp %s", self.soll_calc)
+
+    ### nachtabsenkung
+    absenk = 0
+    now = datetime.now()
+    if (now.hour > 23 or now.hour < 5): 
+      absenk = -7
+    self.soll_calc = self.soll_calc + absenk
+    logger.debug('nachtabsenkung?: %s', absenk)
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
+
+    # Is Soll to Ist difference more than 2
+    if (abs(self.logic - self.soll_calc) > 2):
+      logic_new = str(round(self.soll_calc))
+      logger.debug("ACT: setting rule logic to %s", logic_new)
+      self.rule.logic = logic_new
+      self.rule.save()
+    else:
+      logger.debug('OK - leave rule logic as is: %s', self.rule.logic)
+
+    return None
 
 
   def history_entry(self):

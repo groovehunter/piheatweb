@@ -11,7 +11,7 @@ django.setup()
 from motors.models import *
 from motors.rules import *
 from motors.RulesCtrl import RulesCliCtrl
-import motors.util
+import piheatweb.util
 
 import logging
 fn = os.environ['HOME'] + '/log/piheat.log'

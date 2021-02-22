@@ -29,11 +29,13 @@ class RulesCliCtrl(KlassLoader):
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule in self.rules_list_db.items():
-      logger.debug('checking rule: %s ', rule_name)
+      #logger.debug('checking rule: %s ', rule_name)
       if rule.active:
         self.check_rule(rule)
+        logger.debug('checking rule: %s ', rule_name)
       else:
-        logger.debug("... rule inactive")
+        #logger.debug("... rule inactive")
+        pass
 
   def check_rule(self, rule):
     rule_klass_obj = self.klass_obj_list[rule.name]
