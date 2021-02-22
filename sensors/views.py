@@ -18,6 +18,7 @@ from plotly.graph_objs import Scatter
 import plotly.express as px
 
 
+
 class SensorListView(ListView, ViewControllerSupport):
     model = SensorInfo
 
@@ -144,6 +145,7 @@ class SensorDataView(Controller):
       #self.context['plt_div2'] = plt_div2
       #self.lg.debug(plt_div)
       self.template = 'sensors/graph.html'
+      self.somedata()
       return self.render()
 
 
@@ -180,6 +182,11 @@ class SensorDataView(Controller):
         self.context['keys'] = keys
         return self.render()
 
+    def somedata(self):
+        t_vor = SensorData_01.objects.latest('dtime').temperature
+        t_rue = SensorData_02.objects.latest('dtime').temperature
+        spreiz = t_vor - t_rue
+        self.context['data'] = spreiz
 
 def data(request, sid, action):
   ctrl = SensorDataView(request)

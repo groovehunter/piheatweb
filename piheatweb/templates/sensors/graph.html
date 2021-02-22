@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-<div>
+{% include "sensors/somedata.html" %}
+
+<div class="m-2 p-4 bg-orange">
 <form action="/sensors/view/graph" method="get">
   <p>
     <label>Zeitraum</label>
