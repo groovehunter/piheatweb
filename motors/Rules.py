@@ -20,7 +20,8 @@ if IS_PC:
 class DummyRule(BaseRule):
   def check(self):
     return
-
+  def action(self):
+    pass
 
 class WarmwaterRangeRule(ThresholdRule):
   """ keep temperatur in kessel on same level if possible """
@@ -89,6 +90,23 @@ class WarmwaterRangeRule(ThresholdRule):
     return True
 
 
+class PI_ControlRule(BaseRule):
+  """ prop-integr-control;
+      two distinct points in time, a)now and b)one period before and their values 
+      are needed for calculation.
+      Wo wie speichern? erstmal quick a file
+  """
+  def setup(self):
+    fn = settings.TMPPATH + 'pi_vals.txt'
+    f = open(fn, 'rw')
+    vals = f.read()
+    logger.debug(vals)
+
+  def check(self):
+    pass
+  def action(self):
+    pass
+
 
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
@@ -103,7 +121,8 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
 
     self.logic = float(self.rule.logic)
-    self.setup_dep()
+    #self.setup_dep()
+    self.ctrl.vorlauf_soll_temp()
     self.goal = float(self.rule.logic)
     self.diff = abs(self.cur - self.goal)
     #logger.debug('end setup')
@@ -120,7 +139,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     ### nachtabsenkung
     absenk = 0
     now = datetime.now()
-    if (now.hour > 23 or now.hour < 5): 
+    if (now.hour > 23 or now.hour < 5):
       absenk = -7
     self.soll_calc = self.soll_calc + absenk
     logger.debug('nachtabsenkung?: %s', absenk)
@@ -154,7 +173,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     return super().check()
 
   def action(self):
-    amount = 0    # for safety, if not explicit set later 
+    amount = 0    # for safety, if not explicit set later
     direction = None
     entry = self.history_entry()
 
@@ -196,6 +215,3 @@ class VorlaufRule(FixedGoalAdjustableActuator):
 
     entry.save()
     return True
-
-
-
