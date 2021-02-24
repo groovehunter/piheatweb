@@ -5,11 +5,16 @@ import motors.Rules
 from motors import rules
 from motors.models import Rule, RuleHistory
 from motors.KlassLoader import KlassLoader
+from django.utils.timezone import now
 
 logger = logging.getLogger()
 
 class RulesCliCtrl(KlassLoader):
   """ non web controller """
+
+  def __init__(self):
+    self.now = now()
+
   def setup(self):
     self.klass_list = self.get_klasslist(motors.Rules)
 
