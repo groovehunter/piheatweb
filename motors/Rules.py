@@ -114,7 +114,6 @@ class VorlaufRule(FixedGoalAdjustableActuator):
   min_base = 10
 
   def setup(self):
-    logger.debug("X")
     some = SensorData_01.objects.order_by('-dtime')[1:5]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur = float(cur)
@@ -125,37 +124,20 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.logic = float(self.rule.logic)
     #self.setup_dep()
     self.ctrl.vorlauf_soll_temp()
+    self.save_logic()
     self.goal = float(self.rule.logic)
     self.diff = abs(self.cur - self.goal)
     #logger.debug('end setup')
 
   def setup_dep(self):
     """ recalc vorlauf soll by outdoor temp """
-    start_date = self.now - timedelta(hours=24)
-    h24 = SensorData_04.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
-    some = SensorData_04.objects.order_by('-dtime')[1:30]
-    cur   = some.aggregate(Avg('temperature'))['temperature__avg']
-    avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
-    self.cur_outdoor = float(cur)
-    self.avg24_outdoor = float(avg24)
+    pass
 
-    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
-    logger.debug("av24h outdoor temp %s", self.avg24_outdoor)
-    logger.debug("current outdoor temp %s", self.cur_outdoor)
-    logger.debug("calculated Soll by outdoor temp %s", self.soll_calc)
 
-    ### nachtabsenkung
-    absenk = 0
-    now = datetime.now()
-    if (now.hour > 23 or now.hour < 5):
-      absenk = -7
-    self.soll_calc = self.soll_calc + absenk
-    logger.debug('nachtabsenkung?: %s', absenk)
-    logger.debug("calculated final Soll:  %s", self.soll_calc)
-
+  def save_logic(self):
     # Is Soll to Ist difference more than 2
-    if (abs(self.logic - self.soll_calc) > 2):
-      logic_new = str(round(self.soll_calc))
+    if (abs(self.logic - self.ctrl.soll_calc) > 2):
+      logic_new = str(round(self.ctrl.soll_calc))
       logger.debug("ACT: setting rule logic to %s", logic_new)
       self.rule.logic = logic_new
       self.rule.save()
