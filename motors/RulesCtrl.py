@@ -3,10 +3,27 @@ from motors.Rules import *
 import motors.Rules
 
 from motors import rules
-from motors.models import Rule, RuleHistory, RuleResultHistory
+from motors.models import Rule, RuleHistory
+#from motors.models import RuleResultHistory
 from motors.KlassLoader import KlassLoader
+from django.utils.timezone import now
 
 logger = logging.getLogger()
+
+class Nachtabsenkung(BaseRule):
+  pass
+
+class IntermediateRule:
+  """ rule that calcs some intermediate values from sensor date
+      and stores them, ie as logic for other rules """
+  def work(self):
+    pass
+
+class CalcVorlaufSoll(IntermediateRule):
+  def work(self):
+    # 2 steps: use outdoor wisely
+    # apply nightabsenk    
+    pass
 
 class Calc:
   def load_sensordata(self):
@@ -15,32 +32,36 @@ class Calc:
     self.cur_outdoor = float(cur)
 
   def vorlauf_soll_temp(self):
-    logger.debug("current outdoor temp %s", self.cur_outdoor)
-    logger.debug("calculated Soll by outdoor temp %s", self.soll_calc)
+    # daily average temp
+    start_date = self.now - timedelta(hours=24)
+    h24 = SensorData_04.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+    avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
+    self.avg24_outdoor = float(avg24)
+
+    # calc soll by outdoor - heating kennlinie
+    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
 
     ### nachtabsenkung
     absenk = 0
     now = datetime.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
+      logger.debug('nachtabsenkung!!: %s', absenk)
     self.soll_calc = self.soll_calc + absenk
-    logger.debug('nachtabsenkung?: %s', absenk)
     logger.debug("calculated final Soll:  %s", self.soll_calc)
 
-    # Is Soll to Ist difference more than 2
-    if (abs(self.logic - self.soll_calc) > 2):
-      logic_new = str(round(self.soll_calc))
-      logger.debug("ACT: setting rule logic to %s", logic_new)
-      self.rule.logic = logic_new
-      self.rule.save()
-    else:
-      logger.debug('OK - leave rule logic as is: %s', self.rule.logic)
+    # XXX save to DB
 
 
 class RulesCliCtrl(KlassLoader, Calc):
   """ non web controller """
+
+  def __init__(self):
+    self.now = now()
+
   def setup(self):
     self.klass_list = self.get_klasslist(motors.Rules)
+    self.load_sensordata()
 
   def initiate_klasses_obj(self):
     """ initiate all classes of Rules.py module """
