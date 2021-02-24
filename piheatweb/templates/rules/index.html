@@ -11,8 +11,14 @@
 {% include "title.html" %}
 
 {% load render_table from django_tables2 %}
-<div class="shadow-lg bg-white">
+<form action="actors/rules/delete">
+<div class="bg-white">
   {% render_table table %}
 </div>
+  <div class="mt-6">
+    <input type="submit" name="delete" value="Löschen" />
+  </div>
+</form>
+
 
 {% endblock %}

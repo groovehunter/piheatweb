@@ -6,13 +6,12 @@
       <img class="h-8" src="{% static "img/Om-25.png" %}" alt="logo OM" />
     </a>
   </div>
+  <div class="flex items-center justify-between px-4 py-3">
+    {% for section in menudata %}
+      <a href="/{{section.href}}" class="block font-semibold px-4 rounded bg-grey-200 hover:bg-gray-500">{{section.name}}</a>
+    {% endfor %}
+  </div>
   <div class="text-lg text-semibold">
     <h3>Pi-Heat Control</h3>
   </div>
-</div>
-
-<div class="flex items-center justify-between px-4 py-3">
-  {% for section in menudata %}
-    <a href="/{{section.href}}" class="mt-1 block font-semibold px-4 rounded hover:bg-gray-500">{{section.name}}</a>
-  {% endfor %}
 </div>

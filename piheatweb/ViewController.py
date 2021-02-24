@@ -1,9 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
+from django.utils import timezone
 
 from .settings import BASE_DIR, TMPPATH, DEBUG, DEBUG2
 from .BaseCtrl import BaseCtrl
-
 #import logging
 
 
@@ -28,6 +28,8 @@ class ViewControllerSupport(BaseCtrl):
         self.context['common_static'] = '/static/'
         self.yaml_load()
         self.yamlmenu()
+        self.now = timezone.now()
+        self.context['now'] = self.now
 
         if self.request.GET:
             GET = self.request.GET

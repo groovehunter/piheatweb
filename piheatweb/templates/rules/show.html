@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+
+{% block content %}
+{% include "title.html" %}
+
+<h3 class="text-lg">
+  Details für:  <span class="shadow-lg">{{ object.name }}</span>
+</h3>
+<ul class="list-none">
+<li>ID: {{object.id}}</li>
+<li>Name: {{object.name}}</li>
+<li>Beschreibung: {{object.descr}}</li>
+<li>Aktiv: {{object.active}}</li>
+</ul>
+{{debug}}
+{% endblock %}
