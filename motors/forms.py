@@ -1,5 +1,6 @@
 from django import forms
 
+from motors.models import Rule
 
 statuslist = (
   ("ON", "on"),
@@ -28,3 +29,9 @@ class MotorControlGenericForm(forms.Form):
   status    = forms.ChoiceField(label='Neuer Status',
     choices = statuslist
     )
+
+class RuleEditForm(forms.ModelForm):
+  class Meta:
+    model = Rule
+    fields = ['name', 'descr', 'logic', 'count']
+    exclude = ['id']

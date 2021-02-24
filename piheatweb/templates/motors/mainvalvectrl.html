@@ -7,13 +7,16 @@
 
 {% block content %}
 
+{% include "title.html" %}
 <b>Main valve control </b>
 
+<div class="">
 {{cur.result_openingdegree}} -
 {{cur.dtime}}
+</div>
 <hr>
 
-<form action="/actors/mainvalve/control" method="post">
+<form action="/actors/mainvalve/control" method="post" class="bg-orange-200 width-auto">
   {% csrf_token %}
   {{ form.as_table }}
   <input type="submit" value="Submit">

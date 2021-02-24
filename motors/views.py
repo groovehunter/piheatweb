@@ -51,6 +51,7 @@ class MotorDetailView(DetailView, ViewControllerSupport):
         self.object = self.get_object() #labelterm=kwargs['pk'])
         self.template_name = 'motors/show.html'
         self.fields_noshow = []
+        self.context['title'] = "Motor / Aktor - Detail view"
         self.context.update(self.get_context_data())
         return self.render()
 
@@ -66,8 +67,11 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         return context
 
     def get(self, request, *args, **kwargs):
-        self.object_list = MainValveHistory.objects.order_by('-id')
+        start_date = self.now - datetime.timedelta(hours=3)
+        end_date = self.now
+        self.object_list = MainValveHistory.objects.filter(dtime__range=(start_date, end_date)).order_by('-id')
         self.init_ctrl()
+
         self.fields_noshow = []
         table = MainValveListTable(self.object_list)
         self.context['table'] = table
@@ -176,6 +180,19 @@ def rules_list(request):
   ctrl = RulesController(request)
   return ctrl.rules_list()
 
+def rule_delete(request, pk):
+  ctrl = RulesController(request)
+  return ctrl.rule_delete(pk)
+
+def rule_show(request, pk):
+  ctrl = RulesController(request)
+  return ctrl.rule_show(pk)
+
+def rule_edit(request, pk):
+  ctrl = RulesController(request)
+  return ctrl.rule_edit(pk)
+
+#### Motor
 def action(request, method):
   ctrl = MotorController(request)
   eval('ctrl.'+method+'()')

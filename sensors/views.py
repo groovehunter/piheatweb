@@ -103,7 +103,7 @@ class SensorDataView(Controller):
 
     def graph(self):
       GET = self.request.GET
-      sincehours = int(GET.get('sincehours', default=12))
+      sincehours = int(GET.get('sincehours', default=3))
       start_date = self.now - datetime.timedelta(hours=sincehours)
       if GET.get('resolution'):
         revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
@@ -182,11 +182,6 @@ class SensorDataView(Controller):
         self.context['keys'] = keys
         return self.render()
 
-    def somedata(self):
-        t_vor = SensorData_01.objects.latest('dtime').temperature
-        t_rue = SensorData_02.objects.latest('dtime').temperature
-        spreiz = t_vor - t_rue
-        self.context['data'] = spreiz
 
 def data(request, sid, action):
   ctrl = SensorDataView(request)

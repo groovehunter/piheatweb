@@ -3,6 +3,7 @@ from django.template import loader
 
 from .settings import TMPPATH, DEBUG, DEBUG2
 from .BaseCtrl import BaseCtrl
+from django.utils import timezone
 
 import logging
 
@@ -17,6 +18,8 @@ class Controller(BaseCtrl):
             self.context['debug2'] = True
         self.request = request
         self.init_ctrl()
+        self.now = timezone.now()
+        self.context['now'] = self.now
 
     def init_ctrl(self):
 #        self.lg.debug(self.request.user)

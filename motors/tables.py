@@ -28,8 +28,17 @@ class WarmwaterPumpListTable(FlowBaseTable):
   class Meta:
     model = WarmwaterPumpHistory
 
+#<a href="{% url 'deleteRule' object.pk %}">delete</a>
+TEMPLATE = '''
+<a href="/actors/rules/{{record.id}}/delete">delete</a>
+'''
+TEMPL_EDIT = '''
+<a href="/actors/rules/{{record.id}}/edit">edit</a>
+'''
 
 class RulesListTable(FlowBaseTable):
   name = tables.Column(linkify=True)
+  del_link  = tables.TemplateColumn(TEMPLATE)
+  edit_link  = tables.TemplateColumn(TEMPL_EDIT)
   class Meta:
     model = Rule
