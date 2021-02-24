@@ -45,7 +45,6 @@ class Rule(models.Model):
   def __str__(self):
     return self.name
 
-
 class RuleHistory(models.Model):
   """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
   dtime   = models.DateTimeField('rule check and action dtime', null=True)
@@ -56,13 +55,18 @@ class RuleHistory(models.Model):
   def __str__(self):
     return self.rule.name + ' - ' + self.dtime.strftime('%H-%M-%S')
 
+class RuleResultData_01(models.Model):
+  """ calculated Vorlauf-Soll """
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  dtime      = models.DateTimeField('action dtime', null=True)
+  value      = models.FloatField()
+
 
 # XXX rename to AktorInfo ?
 class Motor(models.Model):
   """ Overview of all actors (Motors, Pumps, Valve ctrl """
   name    = models.CharField(max_length=16)
   descr   = models.CharField(max_length=255)
-  last_toggle = models.CharField(max_length=16)
   pin     = models.PositiveIntegerField(null=True)
   ctrl_class = models.CharField(max_length=50, null=True)
 
