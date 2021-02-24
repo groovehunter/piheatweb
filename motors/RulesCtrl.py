@@ -4,7 +4,7 @@ import motors.Rules
 
 from motors import rules
 from motors.models import Rule, RuleHistory
-#from motors.models import RuleResultHistory
+from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
 from django.utils.timezone import now
 
@@ -21,23 +21,6 @@ class IntermediateRule:
 
 class CalcVorlaufSoll(IntermediateRule):
   def work(self):
-    # 2 steps: use outdoor wisely
-    # apply nightabsenk    
-    pass
-
-class Calc:
-  def load_sensordata(self):
-    some = SensorData_04.objects.order_by('-dtime')[1:30]
-    cur = some.aggregate(Avg('temperature'))['temperature__avg']
-    self.cur_outdoor = float(cur)
-
-  def vorlauf_soll_temp(self):
-    # daily average temp
-    start_date = self.now - timedelta(hours=24)
-    h24 = SensorData_04.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
-    avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
-    self.avg24_outdoor = float(avg24)
-
     # calc soll by outdoor - heating kennlinie
     self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
 
@@ -51,6 +34,36 @@ class Calc:
     logger.debug("calculated final Soll:  %s", self.soll_calc)
 
     # XXX save to DB
+    #data = RuleResultData_01()
+    #data.rule_event = self.
+
+
+class Calc:
+  def load_sensordata(self):
+    self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
+    some = SensorData_04.objects.order_by('-dtime')[1:30]
+    cur = some.aggregate(Avg('temperature'))['temperature__avg']
+    self.cur_outdoor = float(cur)
+    # daily average temp
+    start_date = self.now - timedelta(hours=24)
+    h24 = SensorData_04.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+    avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
+    self.avg24_outdoor = float(avg24)
+
+  def vorlauf_soll_temp(self):
+    # calc soll by outdoor - heating kennlinie
+    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
+
+    ### nachtabsenkung
+    absenk = 0
+    now = datetime.now()
+    if (now.hour > 23 or now.hour < 5):
+      absenk = -7
+      logger.debug('nachtabsenkung!!: %s', absenk)
+    self.soll_calc = self.soll_calc + absenk
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
+
+
 
 
 class RulesCliCtrl(KlassLoader, Calc):
@@ -88,13 +101,24 @@ class RulesCliCtrl(KlassLoader, Calc):
         pass
 
   def check_rule(self, rule):
+    # get object of initiated rule class
     rule_klass_obj = self.klass_obj_list[rule.name]
+    # this object needs the DB rule entry, so set it
     rule_klass_obj.set_rule(rule)
+    # the object needs access to self, the controller and its methods
     rule_klass_obj.ctrl = self
+
+    # a few things to setup
     rule_klass_obj.setup()
+    # log main values
     rule_klass_obj.report()
+
+    
+
+    ### NOW: check if rule is fulfilled --> No acting
     if not rule_klass_obj.check():
       rule_klass_obj.action()
+
 
   def setval(self, rulename, val):
     rule_db = self.rules_list_db[rulename]

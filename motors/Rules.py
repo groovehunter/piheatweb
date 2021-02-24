@@ -112,26 +112,22 @@ class PI_ControlRule(BaseRule):
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
   min_base = 10
+  depends = ('CalcVorlaufSoll')
 
   def setup(self):
-    some = SensorData_01.objects.order_by('-dtime')[1:5]
-    cur = some.aggregate(Avg('temperature'))['temperature__avg']
-    self.cur = float(cur)
     # prerequisites:
+    #1
     self.must = 'self.main_cur > 4650' # etwa der 0-Strich of valve
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
+    #2 - soll temp ready calculated?!
 
     self.logic = float(self.rule.logic)
-    #self.setup_dep()
     self.ctrl.vorlauf_soll_temp()
     self.save_logic()
     self.goal = float(self.rule.logic)
-    self.diff = abs(self.cur - self.goal)
+    self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
+    self.cur = self.ctrl.cur_vorlauf
     #logger.debug('end setup')
-
-  def setup_dep(self):
-    """ recalc vorlauf soll by outdoor temp """
-    pass
 
 
   def save_logic(self):
@@ -143,7 +139,6 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       self.rule.save()
     else:
       logger.debug('OK - leave rule logic as is: %s', self.rule.logic)
-
     return None
 
 
@@ -156,6 +151,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     return entry
 
   def check(self):
+    logger.debug('vorlauf - check')
     is_must = eval(self.must)
     logger.debug('is_must: %s', is_must)
     if not is_must:
