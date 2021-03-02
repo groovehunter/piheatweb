@@ -27,17 +27,11 @@ class BaseRule:
     pass
 
   def set_rule(self, rule):
-    """ just need to set rule obj as a member of the subclass 
-        so we can access it; 
+    """ just need to set rule obj as a member of the subclass
+        so we can access it;
         And also create a new RuleHistory entry pointing to the rule obj """
     self.rule = rule
     logger.debug('--- RULE INIT : %s', self.rule.name)
-
-  def create_rule_event(self):
-    rule_event = RuleHistory()
-    rule_event.dtime = self.now
-    rule_event.rule = self.rule
-    self.rule_event = rule_event
 
   def check(self):
     raise NotImplemented
@@ -53,17 +47,17 @@ class FixedGoalAdjustableActuator(BaseRule):
 
   # rename to "check_condition"
   def check(self):
-    """ false only if very near. 
+    """ false only if very near.
     otherwise adjust in some way """
 
     if self.diff < 2:
       logger.debug("conditions are OKAY - no action needed")
-      self.rule_event.result = 0
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.save()
       return True
     else:
-      self.rule_event.result = 1
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.save()
       return False
 
   def action(self):
@@ -82,24 +76,15 @@ class ThresholdRule(BaseRule):
     cur = self.cur
     if (cur > self.lower and cur < self.upper):
       logger.debug("conditions are OKAY - no action needed")
-      self.rule_event.result = 0
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.save()
       return True
 
     elif (cur < self.lower or cur > self.upper):
-      self.rule_event.result = 1
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.save()
       return False
 
     else:
       logger.error("threshold check somehow is out any rule!??")
-
-
-class IntermediateRule:
-  """ rule that calcs some intermediate values from sensor date
-      and stores them, ie as logic for other rules """
-  def work(self):
-    pass
-
-
 
