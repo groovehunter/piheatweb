@@ -1,4 +1,4 @@
-from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator
+from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator, IntermediateRule
 from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
 from motors.models import RuleHistory
@@ -109,6 +109,25 @@ class PI_ControlRule(BaseRule):
     pass
 
 
+class CalcVorlaufSoll(IntermediateRule):
+  def work(self):
+    # calc soll by outdoor - heating kennlinie
+    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
+
+    ### nachtabsenkung
+    absenk = 0
+    now = datetime.now()
+    if (now.hour > 23 or now.hour < 5):
+      absenk = -7
+      logger.debug('nachtabsenkung!!: %s', absenk)
+    self.soll_calc = self.soll_calc + absenk
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
+
+    # XXX save to DB
+    #data = RuleResultData_01()
+    #data.rule_event = self.
+
+
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
   min_base = 10
@@ -120,6 +139,8 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.must = 'self.main_cur > 4650' # etwa der 0-Strich of valve
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
     #2 - soll temp ready calculated?!
+    #self.rule_event
+    #RuleResultData_01.objects.filter(rule_event
 
     self.logic = float(self.rule.logic)
     self.ctrl.vorlauf_soll_temp()
@@ -127,7 +148,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.goal = float(self.rule.logic)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
-    #logger.debug('end setup')
+    logger.debug('end setup')
 
 
   def save_logic(self):
@@ -181,23 +202,26 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       direction = 'dn'
       entry.change_dir = 'Close'
       entry.change_amount = amount
-      entry.result_openingdegree = latest.result_openingdegree - amount
+      tmp = latest.result_openingdegree - amount
 
     elif (self.cur - self.goal) < 0:
       direction = 'up'
       entry.change_dir = 'Open'
       entry.change_amount = amount
-      entry.result_openingdegree = latest.result_openingdegree + amount
+      tmp = latest.result_openingdegree + amount
 
     else:
-      print("WARNING: none of both conditions was matched !??")
+      logger.error("WARNING: none of both conditions was matched !??")
       return False
 
+    entry.result_openingdegree = tmp
+    entry.save()
     ### the actual work
     sa = str(amount)
-    logger.info("mainvalve amount %s - %s", sa, direction)
-    #logger.debug("work on mainvalve an amount of %s in direction: %s", amount, direction)
+    logger.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
     ctrl.work(direction, amount)
 
-    entry.save()
     return True
+
+
+

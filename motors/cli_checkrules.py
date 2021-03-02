@@ -17,7 +17,7 @@ import logging
 fn = os.environ['HOME'] + '/log/piheat.log'
 logging.basicConfig(
   filename=fn,
-  level=logging.DEBUG,
+  level=logging.INFO,
 #  format='%(asctime)s %(levelname) %(message)s',
 #  datefmt='%H:%M:%S',
 #  style='$',

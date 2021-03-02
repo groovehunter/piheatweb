@@ -11,6 +11,7 @@ logger = logging.getLogger()
 class BaseRule:
   """ maybe:
       provide access to SensorInfo
+      Base for 'main' rules = create an own rule_event
   """
   def __init__(self):
     """ common things to do in init. """
@@ -32,6 +33,7 @@ class BaseRule:
     self.rule = rule
     logger.debug('--- RULE INIT : %s', self.rule.name)
 
+  def create_rule_event(self):
     rule_event = RuleHistory()
     rule_event.dtime = self.now
     rule_event.rule = self.rule
@@ -92,6 +94,12 @@ class ThresholdRule(BaseRule):
     else:
       logger.error("threshold check somehow is out any rule!??")
 
+
+class IntermediateRule:
+  """ rule that calcs some intermediate values from sensor date
+      and stores them, ie as logic for other rules """
+  def work(self):
+    pass
 
 
 

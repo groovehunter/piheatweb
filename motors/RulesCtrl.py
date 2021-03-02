@@ -10,37 +10,18 @@ from django.utils.timezone import now
 
 logger = logging.getLogger()
 
-class Nachtabsenkung(BaseRule):
-  pass
-
-class IntermediateRule:
-  """ rule that calcs some intermediate values from sensor date
-      and stores them, ie as logic for other rules """
-  def work(self):
-    pass
-
-class CalcVorlaufSoll(IntermediateRule):
-  def work(self):
-    # calc soll by outdoor - heating kennlinie
-    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
-
-    ### nachtabsenkung
-    absenk = 0
-    now = datetime.now()
-    if (now.hour > 23 or now.hour < 5):
-      absenk = -7
-      logger.debug('nachtabsenkung!!: %s', absenk)
-    self.soll_calc = self.soll_calc + absenk
-    logger.debug("calculated final Soll:  %s", self.soll_calc)
-
-    # XXX save to DB
-    #data = RuleResultData_01()
-    #data.rule_event = self.
 
 
 class Calc:
   def load_sensordata(self):
     self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
+    logger.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
+    if int(self.cur_vorlauf) == 0:
+      logger.error('vorlauf was 0.0 - recalc average of latest 5')
+      some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
+      self.cur_vorlauf = float(some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
+    logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
+
     some = SensorData_04.objects.order_by('-dtime')[1:30]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur_outdoor = float(cur)
@@ -60,8 +41,14 @@ class Calc:
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
       logger.debug('nachtabsenkung!!: %s', absenk)
-    self.soll_calc = self.soll_calc + absenk
+    self.soll_calc = int(self.soll_calc + absenk)
     logger.debug("calculated final Soll:  %s", self.soll_calc)
+    data = RuleResultData_01()
+    data.value = self.soll_calc
+    data.dtime = self.now
+    # XXX only AVAIL. when Rule object running
+    #data.rule_event = self.
+    data.save()
 
 
 
@@ -105,8 +92,12 @@ class RulesCliCtrl(KlassLoader, Calc):
     rule_klass_obj = self.klass_obj_list[rule.name]
     # this object needs the DB rule entry, so set it
     rule_klass_obj.set_rule(rule)
+    rule_klass_obj.create_rule_event()
     # the object needs access to self, the controller and its methods
     rule_klass_obj.ctrl = self
+
+    # check depends - ?
+    #rule_klass_obj.depends
 
     # a few things to setup
     rule_klass_obj.setup()
