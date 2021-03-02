@@ -10,6 +10,25 @@ from django.utils.timezone import now
 
 logger = logging.getLogger()
 
+class CalcMethod:
+  pass
+
+class CalcVorlaufSoll(CalcMethod):
+  def work(self):
+    # calc soll by outdoor - heating kennlinie
+    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
+    ### nachtabsenkung
+    absenk = 0
+    now = datetime.now()
+    if (now.hour > 23 or now.hour < 5):
+      absenk = -7
+      logger.debug('nachtabsenkung!!: %s', absenk)
+    self.soll_calc = self.soll_calc + absenk
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
+
+    # XXX save to DB
+    #data = RuleResultData_01()
+    #data.rule_event = self.
 
 
 class Calc:
@@ -22,6 +41,7 @@ class Calc:
       self.cur_vorlauf = float(some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
     logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
 
+
     some = SensorData_04.objects.order_by('-dtime')[1:30]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur_outdoor = float(cur)
@@ -31,21 +51,32 @@ class Calc:
     avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
     self.avg24_outdoor = float(avg24)
 
-  def vorlauf_soll_temp(self):
-    # calc soll by outdoor - heating kennlinie
-    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
+  def load_calcdata(self):
+    self.soll_calc_db = RuleResultData_01.objects.latest('-dtime').value
 
+  def getVorlaufSollCalc(self):
+    if not hasattr(self, 'soll_calc_db'):
+      self.load_calcdata()
+    return self.soll_calc_db
+
+  # XXX Move this to rule subclass??? Dann sind alle werte
+  # weiterhin nur als ctrl attribute zugänglich,
+  # ziemliches kuddelmuddel
+  def calc_vorlauf_soll_temp(self):
+    # calc soll by outdoor - heating kennlinie
+    soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
     ### nachtabsenkung
     absenk = 0
     now = datetime.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
       logger.debug('nachtabsenkung!!: %s', absenk)
-    self.soll_calc = int(self.soll_calc + absenk)
+    self.soll_calc = int(soll_calc + absenk)
     logger.debug("calculated final Soll:  %s", self.soll_calc)
     data = RuleResultData_01()
     data.value = self.soll_calc
     data.dtime = self.now
+    data.rule_event = self.rule_event
     # XXX only AVAIL. when Rule object running
     #data.rule_event = self.
     data.save()
@@ -87,28 +118,33 @@ class RulesCliCtrl(KlassLoader, Calc):
         #logger.debug("... rule inactive")
         pass
 
+  ### rule = a object of db-entry, so find a better name
   def check_rule(self, rule):
+    self.create_rule_event()
     # get object of initiated rule class
     rule_klass_obj = self.klass_obj_list[rule.name]
     # this object needs the DB rule entry, so set it
     rule_klass_obj.set_rule(rule)
-    rule_klass_obj.create_rule_event()
+    # rule_klass_obj.create_rule_event() # NOW ctrl method
     # the object needs access to self, the controller and its methods
     rule_klass_obj.ctrl = self
-
-    # check depends - ?
-    #rule_klass_obj.depends
 
     # a few things to setup
     rule_klass_obj.setup()
     # log main values
     rule_klass_obj.report()
 
-    
-
     ### NOW: check if rule is fulfilled --> No acting
     if not rule_klass_obj.check():
       rule_klass_obj.action()
+
+
+  # XXX create OR get existing rule_event
+  def create_rule_event(self):
+    rule_event = RuleHistory()
+    rule_event.dtime = self.now
+    rule_event.rule = self.rule
+    self.rule_event = rule_event
 
 
   def setval(self, rulename, val):

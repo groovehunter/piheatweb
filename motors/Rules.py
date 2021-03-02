@@ -93,7 +93,7 @@ class WarmwaterRangeRule(ThresholdRule):
 
 class PI_ControlRule(BaseRule):
   """ prop-integr-control;
-      two distinct points in time, a)now and b)one period before and their values 
+      two distinct points in time, a)now and b)one period before and their values
       are needed for calculation.
       Wo wie speichern? erstmal quick a file
   """
@@ -109,29 +109,11 @@ class PI_ControlRule(BaseRule):
     pass
 
 
-class CalcVorlaufSoll(IntermediateRule):
-  def work(self):
-    # calc soll by outdoor - heating kennlinie
-    self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
-
-    ### nachtabsenkung
-    absenk = 0
-    now = datetime.now()
-    if (now.hour > 23 or now.hour < 5):
-      absenk = -7
-      logger.debug('nachtabsenkung!!: %s', absenk)
-    self.soll_calc = self.soll_calc + absenk
-    logger.debug("calculated final Soll:  %s", self.soll_calc)
-
-    # XXX save to DB
-    #data = RuleResultData_01()
-    #data.rule_event = self.
-
 
 class VorlaufRule(FixedGoalAdjustableActuator):
   multipli = 5
   min_base = 10
-  depends = ('CalcVorlaufSoll')
+  depends_on = ('CalcVorlaufSoll')
 
   def setup(self):
     # prerequisites:
@@ -148,13 +130,13 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.goal = float(self.rule.logic)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
-    logger.debug('end setup')
-
+    #logger.debug('end setup')
+    #self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
 
   def save_logic(self):
     # Is Soll to Ist difference more than 2
-    if (abs(self.logic - self.ctrl.soll_calc) > 2):
-      logic_new = str(round(self.ctrl.soll_calc))
+    if (abs(self.logic - self.vorlauf_soll_calc) > 2):
+      logic_new = str(round(self.vorlauf_soll_calc))
       logger.debug("ACT: setting rule logic to %s", logic_new)
       self.rule.logic = logic_new
       self.rule.save()
@@ -167,7 +149,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     entry = MainValveHistory(
       dtime = self.now,
       change_amount = 0,
-      rule_event = self.rule_event,
+      rule_event = self.ctrl.rule_event,
     )
     return entry
 
@@ -222,6 +204,3 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     ctrl.work(direction, amount)
 
     return True
-
-
-
