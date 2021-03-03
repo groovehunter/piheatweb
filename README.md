@@ -72,12 +72,21 @@ programmiertechnisch, könnte jede regel eine klasse sein. Alle klassen sind reg
 * heizungspumpe: Leistungsstufe 1...10 
 * Warmwasserpumpe: An / Aus, Stufe?
 
-### toggles, changes
+#### toggles, changes
 writing changes of motor states to DB
 properties:
 - From state
 - To state
 - dtime
 - rule
+
+#### Heizungspumpe Grundfos Alpha UPM3 Hybrid
+
+##### PWM-Steuersignale
+
+Kabelfarben:  
+* blau=Masse
+* Pin 23 - schwarz=Rueckmelde-Signal 75Hz
+* Pin 24 - braun  =Steuersignal 1000-4000Hz
 
 

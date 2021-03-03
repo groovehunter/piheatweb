@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 
 from django.views.generic import ListView, DetailView, CreateView
+#from django.contrib.auth.decorators import login_required
+
 from .models import SensorData_01, SensorData_02, \
 SensorData_03, SensorData_04
 from .models import SensorInfo, ReadingEvent
@@ -65,6 +67,7 @@ class SensorDetailView(DetailView, ViewControllerSupport):
 
 class SensorDataView(Controller):
     """ data of sensor 01 only """
+
     # generalize later
     def __init__(self, request):
         Controller.__init__(self, request)
@@ -153,7 +156,6 @@ class SensorDataView(Controller):
       start_date = datetime.date(2021, 1, 1)
       end_date = datetime.date(2021, 1, 2)
       return SensorData_01.objects.filter(dtime__range=(start_date, end_date))
-
 
     def list(self, sid):
         sensorinfo = SensorInfo.objects.get(pk=sid)

@@ -17,6 +17,7 @@ class ViewControllerSupport(BaseCtrl):
 
     def init_ctrl(self):
         self.context = {}
+        self.context['now'] = timezone.now()
         self.fields_noshow = []
         if DEBUG:
             self.init_logging()
@@ -29,7 +30,6 @@ class ViewControllerSupport(BaseCtrl):
         self.yaml_load()
         self.yamlmenu()
         self.now = timezone.now()
-        self.context['now'] = self.now
 
         if self.request.GET:
             GET = self.request.GET

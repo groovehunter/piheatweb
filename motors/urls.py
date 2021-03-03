@@ -4,6 +4,7 @@ from . import views
 from .views import MotorListView, MotorDetailView, MotorController
 from .views import MainValveHistoryView, WarmwaterPumpHistoryView
 from .views import control, ww_control, rules_check, rules_list, rule_delete, rule_show, rule_edit
+#from django.contrib.auth.decorators import login_required, permission_required
 
 
 urlpatterns = [
