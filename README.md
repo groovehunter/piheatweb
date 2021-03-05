@@ -31,9 +31,16 @@ Regelmäßiges: Per cron oder als python dev
 
 App thread, watching configurated profiles and triggering possible necessary action to handlers;
 
-
 deamon thread checking for threshold lightweight.
 
+### Konzept von TimeEvents
+
+ein table der timeevents mit ihrem dtime stamp speichert. Jeweils ein event wird referenziert per foreignkey von einem rulecheck, einem rulecalc und einem ruleresult. Damit man sieht was zusammengehört an Daten; 
+
+Bisher war das für sensoren ein ReadingEvent. Dies soll nun verallgemeinert werden. Da rulecalcs sensordaten verarbeiten und klar sein muss von welchem time/event sie die sensordaten verarbeitet haben.  
+Leider hat der readingevent bisher in seiner tabelle die Referenzen auf die 4 sensordata einträge abgelegt. 
+
+Dies komplett zu ändern macht natürlich die bisherigen sensordaten nur mehr isoliert zu greifbar. Es sei denn man erstellt ein migration script dass, die neuen foreign keys einträgt. Vielleicht auch eine neu erstellte tabelle/modell als namen vllt. "ControlEvent", das als eintragungs ort für alles migrierte dient. 
 
 
 ## WEB django gui
