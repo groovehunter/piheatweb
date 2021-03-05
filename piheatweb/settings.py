@@ -109,6 +109,7 @@ if IS_PC:
 if IS_RPi:
   logfn = os.environ['HOME'] + '/log/debug.log'
 
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -127,3 +128,6 @@ LOGGING = {
         },
     },
 }
+"""
+
+

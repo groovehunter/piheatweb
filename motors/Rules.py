@@ -132,6 +132,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
     #logger.debug('end setup')
+    #self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
 
   def save_logic(self):
     # Is Soll to Ist difference more than 2

@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import get_template
-
 from django.views.generic import ListView, DetailView, CreateView
+from django.utils import timezone
+
 from .models import SensorData_01, SensorData_02, \
 SensorData_03, SensorData_04
 from .models import SensorInfo, ReadingEvent
@@ -115,11 +116,12 @@ class SensorDataView(Controller):
       tempdict = {}
       timedict = {}
       c=0
+      tz = timezone.get_current_timezone()
       for i in range(4):
         tempdict[i] = []
         timedict[i] = []
       for obj in revents:
-        time = obj.dtime
+        time = obj.dtime.astimezone(tz=tz)
         for i in range(4):
           sstr = '0'+str(i+1)
           temp = eval('obj.sid'+sstr+'.temperature')

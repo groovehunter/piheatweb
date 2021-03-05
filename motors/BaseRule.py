@@ -87,4 +87,3 @@ class ThresholdRule(BaseRule):
 
     else:
       logger.error("threshold check somehow is out any rule!??")
-

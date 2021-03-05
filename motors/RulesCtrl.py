@@ -120,6 +120,7 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   ### rule = a object of db-entry, so find a better name
   def check_rule(self, rule_db):
+    self.create_rule_event()
     # get object of initiated rule class
     rule_klass_obj = self.klass_obj_list[rule_db.name]
     # this object needs the DB rule entry, so set it

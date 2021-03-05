@@ -63,6 +63,9 @@ ständig geltendes, wie zb absolute limits für diverse temperaturen.
 
 programmiertechnisch, könnte jede regel eine klasse sein. Alle klassen sind registriert in file bzw directory und der reihe nach wird eine bestimmte methode von ihnen ("check") ausgeführt. 
 
+Logische Zusammenhänge von Werten: Soll-Vorlauf hängt proportional (ua) an Aussentemperatur. Ersteren also alle viertelstd.(?) neu errechnen aus Durchschnitt der Aussenmesswerte der letzen halben Stunde. 
+
+PID-Regelung implementieren.
 
 ### Aktoren
 
