@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'piheatweb.apps.PiheatwebConfig',
     'sensors.apps.SensorsConfig',
     'motors.apps.MotorsConfig',
+    'cntrl.apps.CntrlConfig',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -138,5 +139,3 @@ LOGGING = {
     },
 }
 """
-
-

@@ -1,5 +1,5 @@
 from django.db import models
-
+from cntrl.models import ControlEvent, DEFAULT_EVENT
 
 
 UNIT_AVAIL = (
@@ -29,24 +29,36 @@ class SensorData_01(models.Model, SensorBase):
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_02(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_03(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_04(models.Model, SensorBase):
     dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 
 class ReadingEvent(models.Model):

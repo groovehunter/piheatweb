@@ -15,26 +15,21 @@ import Adafruit_ADS1x15
 from sensors.models import *
 from sensors.Thermistor import *
 from sensors.TempCalc import TempCalc
+from cntrl.models import ControlEvent
 
 adc = Adafruit_ADS1x15.ADS1115()
 
-#print('Reading ADS1x15 values, press Ctrl-C to quit...')
-# Print nice channel column headers.
-#print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
-#print('-' * 37)
-
 def read_adc():
-  #from django.utils.timezone import now
   from django.utils import timezone 
   # Read all the ADC channel values in a list.
   values = [0]*4
   tz_now = timezone.now() # TZ aware :)
-  #print(tz_now)
-  #print(timezone.is_aware(tz_now))
 
   temp = 0
 
   event = ReadingEvent(dtime=tz_now)
+  ctrl_ev = ControlEvent(dtime=tz_now)
+
   for i in range(4):
     values[i] = adc.read_adc(i, gain=GAIN, data_rate=128)
     sid = '0'+str(i+1)
@@ -44,6 +39,7 @@ def read_adc():
     obj.adc_out = values[i]
     obj.temperature = 0
     obj.resistance = 0
+    obj.ctrl_ev = ctrl_ev
     obj.save()
     evalstr = 'event.sid'+sid+'=obj'
     exec(evalstr)
@@ -51,11 +47,6 @@ def read_adc():
   event.save()
 
 
-#FREQ=60 # zyklus der abfrage in sekunden
-#schedule.every(FREQ).seconds.do(read_adc) 
-
-#while True:  
-#  schedule.run_pending()  
 
 # cron version
 from calc_temp_latest_daemon import tempcalc
