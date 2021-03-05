@@ -66,6 +66,7 @@ class SensorDetailView(DetailView, ViewControllerSupport):
 
 class SensorDataView(Controller):
     """ data of sensor 01 only """
+
     # generalize later
     def __init__(self, request):
         Controller.__init__(self, request)
@@ -155,7 +156,6 @@ class SensorDataView(Controller):
       start_date = datetime.date(2021, 1, 1)
       end_date = datetime.date(2021, 1, 2)
       return SensorData_01.objects.filter(dtime__range=(start_date, end_date))
-
 
     def list(self, sid):
         sensorinfo = SensorInfo.objects.get(pk=sid)

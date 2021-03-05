@@ -40,8 +40,17 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+LOGIN_REQUIRED_IGNORE_PATHS = [
+    r'/users/logout/$'
+    r'/users/login/$',
+    r'/admin/$',
+    r'/admin/login/$',
+    r'/about/$'
 ]
 
 ROOT_URLCONF  = 'piheatweb.urls'
@@ -100,7 +109,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-
+LOGIN_URL = '/users/login'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 #STATIC_ROOT = os.path.join(BASE_DIR, "static")

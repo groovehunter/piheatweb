@@ -61,12 +61,3 @@ class BaseCtrl:
     def access_denied(self):
         self.template = 'access_denied.html'
         return self.render()
-
-    # XXX move to own parent class / and module with own imports for sensor access
-    def somedata(self):
-      t_vor = SensorData_01.objects.latest('dtime').temperature
-      t_rue = SensorData_02.objects.latest('dtime').temperature
-      spreiz = t_vor - t_rue
-      self.context['data'] = spreiz
-
-

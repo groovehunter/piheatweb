@@ -4,6 +4,7 @@ from django.template import loader
 from .settings import TMPPATH, DEBUG, DEBUG2
 from .BaseCtrl import BaseCtrl
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 import logging
 

@@ -14,8 +14,9 @@ from motors.MainValveController import MainValveController
 from motors.WarmwaterPumpController import WarmwaterPumpController
 from motors.RulesController import RulesController
 
-from datetime import datetime
-
+from datetime import datetime, timedelta
+from django.utils import timezone
+now = timezone.now()
 
 class MotorListView(ListView, ViewControllerSupport):
     model = Motor
@@ -67,10 +68,10 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         return context
 
     def get(self, request, *args, **kwargs):
-        start_date = self.now - datetime.timedelta(hours=3)
-        end_date = self.now
-        self.object_list = MainValveHistory.objects.filter(dtime__range=(start_date, end_date)).order_by('-id')
         self.init_ctrl()
+        start_date = now - timedelta(hours=3)
+        end_date = now
+        self.object_list = MainValveHistory.objects.filter(dtime__range=(start_date, end_date)).order_by('-id')
 
         self.fields_noshow = []
         table = MainValveListTable(self.object_list)
@@ -125,7 +126,7 @@ class MotorController(Controller):
     def graph(self):
       GET = self.request.GET
       sincehours = int(GET.get('sincehours', default=12))
-      start_date = self.now - datetime.timedelta(hours=sincehours)
+      start_date = self.now - timedelta(hours=sincehours)
       if GET.get('resolution'):
         revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
       else:
