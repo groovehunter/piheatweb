@@ -1,4 +1,4 @@
-from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator, IntermediateRule
+from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator
 from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
 from motors.models import RuleHistory
@@ -48,14 +48,14 @@ class WarmwaterRangeRule(ThresholdRule):
       entry = WarmwaterPumpHistory(
         dtime = self.now,
         change_status = 'UNDEFINED',
-        rule_event = self.rule_event,
+        rule_event = self.ctrl.rule_event,
       )
       return entry
 
 
   def action(self):
     """ act because rule was not fulfilled """
-    self.rule_event.result = 1
+    self.ctrl.rule_event.result = 1
 
     entry = self.history_entry()
 
@@ -125,7 +125,8 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     #RuleResultData_01.objects.filter(rule_event
 
     self.logic = float(self.rule.logic)
-    self.ctrl.vorlauf_soll_temp()
+    #self.ctrl.vorlauf_soll_temp()
+    self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
     self.save_logic()
     self.goal = float(self.rule.logic)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)

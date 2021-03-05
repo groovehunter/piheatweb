@@ -4,6 +4,8 @@ from os.path import join
 from .settings import BASE_DIR, TMPPATH, MENU_CONF
 import logging
 
+from sensors.models import SensorData_01, SensorData_02
+
 
 class BaseCtrl:
     """ common methods for gui """

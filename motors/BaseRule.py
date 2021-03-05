@@ -52,12 +52,12 @@ class FixedGoalAdjustableActuator(BaseRule):
 
     if self.diff < 2:
       logger.debug("conditions are OKAY - no action needed")
-      self.rule_event.result = 0
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.save()
       return True
     else:
-      self.rule_event.result = 1
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.save()
       return False
 
   def action(self):
@@ -76,13 +76,13 @@ class ThresholdRule(BaseRule):
     cur = self.cur
     if (cur > self.lower and cur < self.upper):
       logger.debug("conditions are OKAY - no action needed")
-      self.rule_event.result = 0
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.save()
       return True
 
     elif (cur < self.lower or cur > self.upper):
-      self.rule_event.result = 1
-      self.rule_event.save()
+      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.save()
       return False
 
     else:

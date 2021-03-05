@@ -109,22 +109,23 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   def loop_rules(self):
     """ load all rules from db and loop them """
-    for rule_name, rule in self.rules_list_db.items():
+    for rule_name, rule_db in self.rules_list_db.items():
       #logger.debug('checking rule: %s ', rule_name)
-      if rule.active:
-        self.check_rule(rule)
+      if rule_db.active:
+        self.check_rule(rule_db)
         logger.debug('checking rule: %s ', rule_name)
       else:
         #logger.debug("... rule inactive")
         pass
 
   ### rule = a object of db-entry, so find a better name
-  def check_rule(self, rule):
+  def check_rule(self, rule_db):
     self.create_rule_event()
     # get object of initiated rule class
-    rule_klass_obj = self.klass_obj_list[rule.name]
+    rule_klass_obj = self.klass_obj_list[rule_db.name]
     # this object needs the DB rule entry, so set it
-    rule_klass_obj.set_rule(rule)
+    rule_klass_obj.set_rule(rule_db)
+    self.create_rule_event(rule_db)
     # rule_klass_obj.create_rule_event() # NOW ctrl method
     # the object needs access to self, the controller and its methods
     rule_klass_obj.ctrl = self
@@ -140,10 +141,10 @@ class RulesCliCtrl(KlassLoader, Calc):
 
 
   # XXX create OR get existing rule_event
-  def create_rule_event(self):
+  def create_rule_event(self, rule_db):
     rule_event = RuleHistory()
     rule_event.dtime = self.now
-    rule_event.rule = self.rule
+    rule_event.rule = rule_db
     self.rule_event = rule_event
 
 

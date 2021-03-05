@@ -45,3 +45,6 @@ ENV/
 #### byflo
 node_modules/
 nohup.out
+
+# tailwind master generated css
+index.css
