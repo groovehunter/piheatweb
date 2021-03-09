@@ -3,14 +3,19 @@
 GAIN = 1
 
 import os
+import logging
+fn = os.environ['HOME'] + '/log/piheat.log'
+logging.basicConfig(
+  filename=fn,
+  level=logging.INFO,
+)
+# create console handler and set level to debug
+logger = logging.getLogger()
+
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
 
-import time
-import schedule
-
-# from datetime import datetime   # non timezone aware obj, deprec.
 import Adafruit_ADS1x15
 from sensors.models import *
 from sensors.Thermistor import *
@@ -25,10 +30,9 @@ def read_adc():
   values = [0]*4
   tz_now = timezone.now() # TZ aware :)
 
-  temp = 0
-
   event = ReadingEvent(dtime=tz_now)
-  ctrl_ev = ControlEvent(dtime=tz_now)
+  ctrl_event = ControlEvent(dtime=tz_now)
+  ctrl_event.save()
 
   for i in range(4):
     values[i] = adc.read_adc(i, gain=GAIN, data_rate=128)
@@ -39,8 +43,10 @@ def read_adc():
     obj.adc_out = values[i]
     obj.temperature = 0
     obj.resistance = 0
-    obj.ctrl_ev = ctrl_ev
+    obj.ctrl_event = ctrl_event
     obj.save()
+    #logger.info(obj.ctrl_event.id)
+    #logger.info(obj.ctrl_event_id)
     evalstr = 'event.sid'+sid+'=obj'
     exec(evalstr)
  

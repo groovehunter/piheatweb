@@ -16,10 +16,11 @@ sdata = {}
 
 
 def sensor_cntrl_event():
-  revents = ReadingEvent.objects.all().order_by('id')[0:10]
+  #revents = ReadingEvent.objects.all().order_by('id')
+  revents = ReadingEvent.objects.all().order_by('id')[86950:]
   
   for re in revents:
-    print(re.id, re.dtime)
+    #print(re.id, re.dtime)
     ce = ControlEvent.objects.get_or_create(dtime=re.dtime)[0]
     print(ce)
 
