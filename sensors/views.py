@@ -130,7 +130,7 @@ class SensorDataView(Controller):
           timedict[i].append(time) #obj.dtime)
         #c+=1
       sc = {}
-      col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
+      col = {0:'red', 1:'blue', 2:'green', 3:'orange'}
 
 
       for i in range(4):
@@ -148,7 +148,7 @@ class SensorDataView(Controller):
       #self.context['plt_div2'] = plt_div2
       #self.lg.debug(plt_div)
       self.template = 'sensors/graph.html'
-      self.somedata()
+      #self.somedata()
       return self.render()
 
 
