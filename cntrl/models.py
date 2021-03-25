@@ -6,7 +6,7 @@ class ControlEvent(models.Model):
   def get_absolute_url(self):
     return self.id
   def __str__(self):
-    return self.dtime.strftime('%H-%M-%S')
+    return self.dtime.strftime('%m-%d %H:%M:%S')
 
 
 DEFAULT_EVENT = 1
