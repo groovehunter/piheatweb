@@ -6,7 +6,7 @@ from motors import rules
 from motors.models import Rule, RuleHistory
 from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
-from django.utils.timezone import now
+from django.utils import timezone
 
 logger = logging.getLogger()
 
@@ -19,7 +19,7 @@ class CalcVorlaufSoll(CalcMethod):
     self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
     ### nachtabsenkung
     absenk = 0
-    now = datetime.now()
+    now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
       logger.debug('nachtabsenkung!!: %s', absenk)
@@ -33,15 +33,16 @@ class CalcVorlaufSoll(CalcMethod):
 
 class Calc:
   def load_sensordata(self):
+    # vorlauf temp
     self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
-    logger.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
+    self.some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
+    #logger.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
     if int(self.cur_vorlauf) == 0:
       logger.error('vorlauf was 0.0 - recalc average of latest 5')
-      some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
-      self.cur_vorlauf = float(some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
-    logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
+      self.cur_vorlauf = float(self.some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
+    #logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
 
-
+    # outdoor temp 
     some = SensorData_04.objects.order_by('-dtime')[1:30]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur_outdoor = float(cur)
@@ -51,12 +52,12 @@ class Calc:
     avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
     self.avg24_outdoor = float(avg24)
 
-  def load_calcdata(self):
-    self.soll_calc_db = RuleResultData_01.objects.latest('-dtime').value
+  def load_latest_db_soll_calc(self):
+    self.soll_calc_db = RuleResultData_01.objects.latest('dtime').value
 
   def getVorlaufSollCalc(self):
     if not hasattr(self, 'soll_calc_db'):
-      self.load_calcdata()
+      self.load_latest_db_soll_calc()
     return self.soll_calc_db
 
   # XXX Move this to rule subclass??? Dann sind alle werte
@@ -67,7 +68,7 @@ class Calc:
     soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
     ### nachtabsenkung
     absenk = 0
-    now = datetime.now()
+    now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
       logger.debug('nachtabsenkung!!: %s', absenk)
@@ -75,7 +76,7 @@ class Calc:
     logger.debug("calculated final Soll:  %s", self.soll_calc)
     data = RuleResultData_01()
     data.value = self.soll_calc
-    data.dtime = self.now
+    data.dtime = now
     data.rule_event = self.rule_event
     # XXX only AVAIL. when Rule object running
     #data.rule_event = self.
@@ -88,7 +89,7 @@ class RulesCliCtrl(KlassLoader, Calc):
   """ non web controller """
 
   def __init__(self):
-    self.now = now()
+    self.now = timezone.now()
 
   def setup(self):
     self.klass_list = self.get_klasslist(motors.Rules)
@@ -113,7 +114,7 @@ class RulesCliCtrl(KlassLoader, Calc):
       #logger.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
-        logger.debug('checking rule: %s ', rule_name)
+        #logger.debug('checking rule: %s ', rule_name)
       else:
         #logger.debug("... rule inactive")
         pass
