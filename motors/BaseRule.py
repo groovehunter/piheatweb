@@ -42,15 +42,14 @@ class FixedGoalAdjustableActuator(BaseRule):
       can adjust actuating values es"""
 
   def report(self):
-    logger.debug("CUR: %s", self.cur)
-    logger.debug("GOAL: %s", self.goal)
+    logger.debug("CUR: %s -- GOAL %s", self.cur, self.goal)
 
   # rename to "check_condition"
   def check(self):
     """ false only if very near.
     otherwise adjust in some way """
 
-    if self.diff < 2:
+    if self.diff < 1:
       logger.debug("conditions are OKAY - no action needed")
       self.ctrl.rule_event.result = 0
       self.ctrl.rule_event.save()
@@ -69,8 +68,9 @@ class ThresholdRule(BaseRule):
   """ rule which checks one value if between 2 thresholds """
 
   def report(self):
-    logger.debug("CURRENT: %s", self.cur)
-    logger.debug("Lower and upper: %s %s", self.lower, self.upper)
+    #logger.debug("CURRENT: %s", self.cur)
+    #logger.debug("Lower and upper: %s %s", self.lower, self.upper)
+    pass
 
   def check(self):
     cur = self.cur

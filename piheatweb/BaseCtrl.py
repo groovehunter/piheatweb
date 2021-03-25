@@ -49,7 +49,7 @@ class BaseCtrl:
     def init_logging(self):
         self.lg = logging.getLogger('test')
         if not getattr(self.lg, 'handler_set', None):
-            fh = logging.handlers.TimedRotatingFileHandler(TMPPATH+'/log/debug.log', when='midnight')
+            fh = logging.handlers.TimedRotatingFileHandler(BASE_DIR+'/log/debug.log', when='midnight')
             fmt = '%(module)s,%(lineno)d - %(levelname)s - %(message)s'
             form = logging.Formatter(fmt=fmt)
             fh.setFormatter(form)

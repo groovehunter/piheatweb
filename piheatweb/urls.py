@@ -2,7 +2,6 @@
 from django.contrib import admin
 from django.urls import include, path
 from piheatweb import views
-from django.contrib.auth.decorators import login_required, permission_required
 
 urlpatterns = [
 #    path('', views.index, name='index'),

@@ -8,6 +8,8 @@ class MainValveCtrl(object):
     def __init__(self):
         self.count = 0
         self.speed = 50
+        self.openingdegree_minimum = 4600
+        self.openingdegree_maximum = 18000
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)

@@ -3,8 +3,8 @@ import os
 from piheatweb.util import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-TMPPATH = BASE_DIR + '/'
-#LOG_DIR = BASE_DIR + '/log'
+LOG_DIR = BASE_DIR + '/log'
+TMPPATH = BASE_DIR + '/tmp/'
 DEBUG2=False
 
 SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
