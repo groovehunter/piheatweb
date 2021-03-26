@@ -3,6 +3,7 @@ import os
 from piheatweb.util import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+LOG_DIR = BASE_DIR + '/log'
 TMPPATH = BASE_DIR + '/tmp/'
 DEBUG2=False
 
@@ -119,7 +120,6 @@ if IS_PC:
 if IS_RPi:
   logfn = os.environ['HOME'] + '/log/debug.log'
 
-"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -133,9 +133,10 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
 }
+"""
 """

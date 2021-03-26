@@ -1,19 +1,24 @@
 
-from motors.Rules import *
-import motors.Rules
+#from motors.Rules import *
+#import motors.Rules
+import motors.rules
 
 from motors import rules
+from motors.rules import *
 from motors.models import Rule, RuleHistory
 from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
 from django.utils import timezone
+from piheatweb.LoggingSupport import LoggingSupport
+from sensors.models import SensorData_01, SensorData_04
+from django.db.models import Avg, Max, Min, Sum
+from datetime import datetime, timedelta
 
-logger = logging.getLogger()
 
 class CalcMethod:
   pass
 
-class CalcVorlaufSoll(CalcMethod):
+class CalcVorlaufSoll(CalcMethod, LoggingSupport):
   def work(self):
     # calc soll by outdoor - heating kennlinie
     self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
@@ -22,9 +27,9 @@ class CalcVorlaufSoll(CalcMethod):
     now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
-      logger.debug('nachtabsenkung!!: %s', absenk)
+      self.lg.debug('nachtabsenkung!!: %s', absenk)
     self.soll_calc = self.soll_calc + absenk
-    logger.debug("calculated final Soll:  %s", self.soll_calc)
+    self.lg.debug("calculated final Soll:  %s", self.soll_calc)
 
     # XXX save to DB
     #data = RuleResultData_01()
@@ -36,13 +41,13 @@ class Calc:
     # vorlauf temp
     self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
     self.some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
-    #logger.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
+    #self.lg.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
     if int(self.cur_vorlauf) == 0:
-      logger.error('vorlauf was 0.0 - recalc average of latest 5')
+      self.lg.error('vorlauf was 0.0 - recalc average of latest 5')
       self.cur_vorlauf = float(self.some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
-    #logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
+    #self.lg.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
 
-    # outdoor temp 
+    # outdoor temp
     some = SensorData_04.objects.order_by('-dtime')[1:30]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur_outdoor = float(cur)
@@ -71,9 +76,9 @@ class Calc:
     now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
-      logger.debug('nachtabsenkung!!: %s', absenk)
+      self.lg.debug('nachtabsenkung!!: %s', absenk)
     self.soll_calc = int(soll_calc + absenk)
-    logger.debug("calculated final Soll:  %s", self.soll_calc)
+    self.lg.debug("calculated final Soll:  %s", self.soll_calc)
     data = RuleResultData_01()
     data.value = self.soll_calc
     data.dtime = now
@@ -85,14 +90,17 @@ class Calc:
 
 
 
-class RulesCliCtrl(KlassLoader, Calc):
+class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
   """ non web controller """
 
   def __init__(self):
+    self.init_logging()
     self.now = timezone.now()
 
   def setup(self):
-    self.klass_list = self.get_klasslist(motors.Rules)
+#    self.klass_list_old = self.get_klasslist(motors.Rules)
+    self.klass_list = self.get_klasslist(motors.rules)
+    self.lg.debug(self.klass_list)
     self.load_sensordata()
 
   def initiate_klasses_obj(self):
@@ -101,6 +109,7 @@ class RulesCliCtrl(KlassLoader, Calc):
     for klass_name in self.klass_list:
       constructor = globals()[klass_name]
       self.klass_obj_list[klass_name] = constructor()
+    #self.lg.debug(self.klass_obj_list)
 
   def load_rules_from_db(self):
     self.rules_list_db = {}
@@ -111,19 +120,21 @@ class RulesCliCtrl(KlassLoader, Calc):
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule_db in self.rules_list_db.items():
-      #logger.debug('checking rule: %s ', rule_name)
+      #self.lg.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
-        #logger.debug('checking rule: %s ', rule_name)
+        #self.lg.debug('checking rule: %s ', rule_name)
       else:
-        #logger.debug("... rule inactive")
+        #self.lg.debug("... rule inactive")
         pass
 
   ### rule = a object of db-entry, so find a better name
   def check_rule(self, rule_db):
+    self.lg.debug("check rule %s", rule_db)
     self.create_rule_event(rule_db)
     # get object of initiated rule class
     rule_klass_obj = self.klass_obj_list[rule_db.name]
+    self.lg.debug(rule_klass_obj)
     # this object needs the DB rule entry, so set it
     rule_klass_obj.set_rule(rule_db)
     # rule_klass_obj.create_rule_event() # NOW ctrl method
@@ -155,7 +166,7 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   def test(self):
     name = 'VorlaufRule'
-    logger.debug('check Rule %s', name)
+    self.lg.debug('check Rule %s', name)
     rule = self.rules_list_db[name]
 
     rule_klass_obj = self.klass_obj_list[name]

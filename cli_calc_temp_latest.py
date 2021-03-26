@@ -1,8 +1,24 @@
 #!/usr/bin/python3
+import os
+import django
+os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
+django.setup()
+from django.utils import timezone
 
 from sensors.models import SensorInfo
 from sensors.Thermistor import *
 from sensors.TempCalc import TempCalc
+
+import logging
+fn = os.environ['HOME'] + '/log/pi_sim.log'
+logging.basicConfig(
+  filename=fn,
+  #level=logging.INFO,
+  level=logging.DEBUG,
+)
+# create console handler and set level to debug
+logger = logging.getLogger()
+
 
 
 def tempcalc():

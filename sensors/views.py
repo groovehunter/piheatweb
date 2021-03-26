@@ -70,7 +70,7 @@ class SensorDataView(Controller):
     # generalize later
     def __init__(self, request):
         Controller.__init__(self, request)
-        self.now = datetime.datetime.now()
+        self.now = timezone.now()
 
     def all_sensors(self, *args):
       """ all sensors temp next to each other
