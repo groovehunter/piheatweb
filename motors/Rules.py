@@ -1,13 +1,13 @@
 from motors.BaseRule import BaseRule, ThresholdRule, FixedGoalAdjustableActuator
 from sensors.models import *
 from motors.models import WarmwaterPumpHistory, MainValveHistory
-from motors.models import RuleHistory
+from motors.models import RuleHistory, Rule
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 from piheatweb.settings import TMPPATH
 import logging
 from os import environ
-#from django.utils import timezone
+from django.utils import timezone
 from datetime import datetime, timedelta
 #from numpi import picalc
 #from pidcontrol import picalc
@@ -104,13 +104,14 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
   def setup(self):
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
     goal, pidparam = self.rule.logic.split('__')
-    logger.debug('PID params: %s', pidparam)
+    #logger.debug('PID params: %s', pidparam)
     p,i,d = pidparam.split(',')
     self.pid = PID.PID(int(p), int(i), int(d))
     self.pid.setWindup(300.0)
     self.goal = float(goal)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
+    self.now = timezone.now()
 
   def history_entry(self):
     entry = MainValveHistory(
@@ -124,18 +125,19 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     return super().check()
 
   def action(self):
-    # u_ vorherige stellgroesse
     latest = MainValveHistory.objects.latest('id')
     e_  = self.goal - float(self.ctrl.some_cur_vorlauf[1].temperature)
-    #u_  = latest.change_amount
-    last_time = self.ctrl.some_cur_vorlauf[0].dtime
-    #logger.debug('CALL pid with e_=%s', e_)
-    #logger.debug('last_time : %s', last_time)
+    logger.debug('CALL pid with e_=%s', e_)
 
     pid = self.pid
     pid.SetPoint = self.goal
     pid.setSampleTime(60)
     pid.setLastError(e_)
+
+    # find out exec time of last time of PID-Rule
+    rh = RuleHistory.objects.filter(rule__name='PI_ControlRule').order_by('-dtime')[1]
+    last_time = rh.dtime
+    #logger.debug('last_time : %s', last_time)
     pid.setLastTime(last_time)
 
     pid.update(self.cur)

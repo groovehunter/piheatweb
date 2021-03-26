@@ -137,9 +137,10 @@ class MotorController(Controller):
       tempdict = {}
       timedict = {}
       c=0
-      for i in range(4):
+      for i in range(1):
         tempdict[i] = []
         timedict[i] = []
+
       for obj in revents:
         time = obj.dtime
         for i in range(4):

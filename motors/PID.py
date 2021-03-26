@@ -46,7 +46,7 @@ class PID:
         #logger.debug('current time: %s', self.current_time)
         delta_time = self.current_time - self.last_time
         #logger.debug('delta time: %s', delta_time)
-        #logger.debug('delta time.seconds: %s', delta_time.seconds)
+        logger.debug('delta time.seconds: %s', delta_time.seconds)
         delta_error = error - self.last_error
         logger.debug('error: CUR %s | DELTA %s', error, delta_error)
 
