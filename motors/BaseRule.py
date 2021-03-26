@@ -16,7 +16,7 @@ class BaseRule:
   def __init__(self):
     """ common things to do in init. """
     self.now = timezone.now()
-    self.DEFAULT_RULE = Rule.objects.get(pk=1)
+    self.DEFAULT_RULE = Rule.objects.filter(name='DEFAULT_RULE')
 
   def setup(self):
     """ stub if subclass does not need it """

@@ -7,16 +7,25 @@ from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
-from .models import Motor, Rule, RuleHistory
+from .models import Motor, Rule, RuleHistory, RuleResultData_01
 from .models import MainValveHistory, WarmwaterPumpHistory
 from .tables import MotorListTable, MainValveListTable, WarmwaterPumpListTable
 from motors.MainValveController import MainValveController
 from motors.WarmwaterPumpController import WarmwaterPumpController
 from motors.RulesController import RulesController
+from cntrl.models import ControlEvent
 
 from datetime import datetime, timedelta
 from django.utils import timezone
 now = timezone.now()
+
+import logging
+logger = logging.getLogger(__name__)
+from plotly.offline import plot
+#import plotly.graph_objs as go
+from plotly.graph_objs import Scatter
+import plotly.express as px
+
 
 class MotorListView(ListView, ViewControllerSupport):
     model = Motor
@@ -125,38 +134,56 @@ class MotorController(Controller):
 
     def graph(self):
       GET = self.request.GET
-      sincehours = int(GET.get('sincehours', default=12))
-      start_date = self.now - timedelta(hours=sincehours)
-      if GET.get('resolution'):
-        revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
-      else:
-        revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
+      sincehours = int(GET.get('sincehours', default=3))
+      #start_date = self.now - timedelta(hours=sincehours)
+      start_date = self.now - timedelta(hours=3)
+      #events = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
 
+      self.lg.debug(self.now)
+      self.lg.debug(start_date)
+      rh = RuleHistory.objects.filter(dtime__range=(start_date, self.now))
+      self.lg.debug(rh)
+      mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
+
+      rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
       info = Motor.objects.order_by('id').all()
-      self.lg.debug(len(revents))
       tempdict = {}
       timedict = {}
       c=0
-      for i in range(4):
+      for i in range(1):
         tempdict[i] = []
         timedict[i] = []
-      for obj in revents:
+
+      i = 0
+      for obj in rh:
         time = obj.dtime
+        timedict[i].append(time)
+        rrd = RuleResultData_01.objects.filter(rule_event=obj).first()
+        self.lg.debug(rrd)
+        tempdict[i].append(rrd.value)
+        """
         for i in range(4):
           sstr = '0'+str(i+1)
-          temp = eval('obj.sid'+sstr+'.temperature')
+          #obj = eval('RuleResultData'+sstr+'objects.filter(rule_event=
+          obj = RuleResultData01.objects.filter(rule_event=obj)
+          temp = obj.value
           tempdict[i].append(temp)
           timedict[i].append(time) #obj.dtime)
-        #c+=1
+        """
+        c+=1
+
+      logger.debug(c)
+      self.context['debug'] = c
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
-
-      for i in range(2):
+      info = { 0: 'RRD', 1: 'RuleResultData_01' }
+      for i in range(1):
+        logger.debug(i)
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
-                        mode='lines', name=sinfo[i].name, \
+                        mode='lines', name=info[i], \
                         opacity=0.8, marker_color=col[i])
 
-      plt_div = plot([sc[0], sc[1]], output_type='div')
+      plt_div = plot([sc[0],], output_type='div')
       #plt_div = plot(sc, output_type='div')
       self.context['plt_div'] = plt_div
       #self.lg.debug(plt_div)
@@ -196,7 +223,7 @@ def rule_edit(request, pk):
 #### Motor
 def action(request, method):
   ctrl = MotorController(request)
-  eval('ctrl.'+method+'()')
+  return eval('ctrl.'+method+'()')
 
 def show(request, pk):
   ctrl = MotorController(request)

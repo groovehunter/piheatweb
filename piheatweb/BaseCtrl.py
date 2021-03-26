@@ -5,9 +5,10 @@ from .settings import BASE_DIR, TMPPATH, MENU_CONF
 import logging
 
 from sensors.models import SensorData_01, SensorData_02
+from piheatweb.LoggingSupport import LoggingSupport
 
 
-class BaseCtrl:
+class BaseCtrl(LoggingSupport):
     """ common methods for gui """
 
     def yaml_load(self):
@@ -45,17 +46,6 @@ class BaseCtrl:
         self.context['menudata'] = menudata
 #        self.lg.debug('menudata %s', menudata)
 
-
-    def init_logging(self):
-        self.lg = logging.getLogger('test')
-        if not getattr(self.lg, 'handler_set', None):
-            fh = logging.handlers.TimedRotatingFileHandler(BASE_DIR+'/log/debug.log', when='midnight')
-            fmt = '%(module)s,%(lineno)d - %(levelname)s - %(message)s'
-            form = logging.Formatter(fmt=fmt)
-            fh.setFormatter(form)
-            self.lg.addHandler(fh)
-            self.lg.setLevel(logging.DEBUG)
-        self.handler_set = True
 
 
     def access_denied(self):
