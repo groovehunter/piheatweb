@@ -113,7 +113,7 @@ class SensorDataView(Controller):
         revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
 
       sinfo = SensorInfo.objects.order_by('id').all()
-      self.lg.debug(len(revents))
+ #     self.lg.debug(len(revents))
       tempdict = {}
       timedict = {}
       c=0

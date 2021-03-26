@@ -88,22 +88,6 @@ DATABASES = {
     }
 }
 
-"""
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
-"""
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Europe/Berlin'
@@ -118,7 +102,8 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
 if IS_PC:
   logfn = os.environ['HOME'] + '/log/debug.log'
 if IS_RPi:
-  logfn = os.environ['HOME'] + '/log/debug.log'
+  #logfn = os.environ['HOME'] + '/log/debug.log'
+  logfn = '/home/pi/pw/log/debug.log'
 
 LOGGING = {
     'version': 1,

@@ -98,9 +98,7 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
     self.now = timezone.now()
 
   def setup(self):
-#    self.klass_list_old = self.get_klasslist(motors.Rules)
     self.klass_list = self.get_klasslist(motors.rules)
-    self.lg.debug(self.klass_list)
     self.load_sensordata()
 
   def initiate_klasses_obj(self):
@@ -109,7 +107,6 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
     for klass_name in self.klass_list:
       constructor = globals()[klass_name]
       self.klass_obj_list[klass_name] = constructor()
-    #self.lg.debug(self.klass_obj_list)
 
   def load_rules_from_db(self):
     self.rules_list_db = {}
@@ -123,7 +120,6 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
       #self.lg.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
-        #self.lg.debug('checking rule: %s ', rule_name)
       else:
         #self.lg.debug("... rule inactive")
         pass
@@ -176,3 +172,5 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
     rule_klass_obj.report()
     if not rule_klass_obj.check():
       rule_klass_obj.action()
+
+

@@ -154,12 +154,8 @@ class MotorController(Controller):
         tempdict[i] = []
         timedict[i] = []
 
-<<<<<<< HEAD
-      for obj in revents:
-=======
       i = 0
       for obj in rh:
->>>>>>> 1b93a6819790395cf894bd53da6a23e5075477e5
         time = obj.dtime
         timedict[i].append(time)
         rrd = RuleResultData_01.objects.filter(rule_event=obj).first()

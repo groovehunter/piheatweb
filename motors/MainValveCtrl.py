@@ -40,11 +40,11 @@ class MainValveCtrl(object):
         steps = int(amount)*100
 
         if direction == 'up':
-            print('waermer')
+            self.lg.debug('waermer')
             GPIO.output(DIR, DIR_Right)
             self.count += steps
         if direction == 'dn':
-            print('kaelter')
+            self.lg.debug('kaelter')
             GPIO.output(DIR, DIR_Left)
             self.count -= steps
 
