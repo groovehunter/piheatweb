@@ -9,7 +9,7 @@ class MainValveCtrl(object):
         self.count = 0
         self.speed = 50
         self.openingdegree_minimum = 4600
-        self.openingdegree_maximum = 20000
+        self.openingdegree_maximum = 22000
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)
@@ -40,11 +40,11 @@ class MainValveCtrl(object):
         steps = int(amount)*100
 
         if direction == 'up':
-            self.lg.debug('waermer')
+            #self.lg.debug('waermer')
             GPIO.output(DIR, DIR_Right)
             self.count += steps
         if direction == 'dn':
-            self.lg.debug('kaelter')
+            #self.lg.debug('kaelter')
             GPIO.output(DIR, DIR_Left)
             self.count -= steps
 

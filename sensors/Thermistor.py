@@ -1,11 +1,10 @@
 from math import log10
 import logging
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 def c2k(c): return c+273
 def k2c(k): return k-273
-
 
 
 class Thermistor:
@@ -75,15 +74,13 @@ class Thermistor:
     if r < 0:
       logger.error('resistance negative !!! MAKE IT ABS')
       r = abs(r)
-    logger.info('resistance : %s', r)
+    #logger.debug('resistance : %s', r)
     
     try:
       kelvin = 1 / (a + b*log10(r) + c*(log10(r)**3))
     except:
       logger.error('resistance_to_temp MATH ERROR')
       kelvin = 273.0
-    #logger.debug('calc kelvin: %s', kelvin)
-    #print(kelvin, "KELVIN")
     celsius = k2c(kelvin)
     return celsius
 

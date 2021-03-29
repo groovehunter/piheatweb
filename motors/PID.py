@@ -2,7 +2,7 @@ import time
 import logging
 from django.utils import timezone
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 class PID:
     """PID Controller """
@@ -16,6 +16,7 @@ class PID:
         self.sample_time = 0.00
         self.current_time = current_time if current_time is not None else timezone.now()
         self.clear()
+        logger.debug(logger)
 
     def clear(self):
         """Clears PID computations and coefficients"""

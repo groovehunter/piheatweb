@@ -4,17 +4,11 @@ GAIN = 1
 
 import os
 import logging
-fn = os.environ['HOME'] + '/log/piheat.log'
-logging.basicConfig(
-  filename=fn,
-  level=logging.INFO,
-)
-# create console handler and set level to debug
-logger = logging.getLogger()
 
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
+logger = logging.getLogger(__name__)
 
 import Adafruit_ADS1x15
 from sensors.models import *
@@ -23,6 +17,7 @@ from sensors.TempCalc import TempCalc
 from cntrl.models import ControlEvent
 
 adc = Adafruit_ADS1x15.ADS1115()
+logging.getLogger("Adafruit_I2C").setLevel(logging.WARNING)
 
 def read_adc():
   from django.utils import timezone 

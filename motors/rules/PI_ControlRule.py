@@ -1,13 +1,11 @@
 from motors.BaseRule import FixedGoalAdjustableActuator
 from sensors.models import *
-from motors.models import WarmwaterPumpHistory, MainValveHistory
-from motors.models import RuleHistory
+from motors.models import MainValveHistory
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
-from piheatweb.settings import TMPPATH
-from os import environ
-from datetime import datetime, timedelta
 from motors.PID import PID
+import logging
+logger = logging.getLogger(__name__)
 
 
 if IS_RPi:
@@ -26,7 +24,7 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
   def setup(self):
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
     goal, pidparam = self.rule.logic.split('__')
-    self.ctrl.lg.debug('PID params: %s', pidparam)
+    logger.debug('PID params: %s', pidparam)
     p,i,d = pidparam.split(',')
     self.pid = PID(int(p), int(i), int(d))
     self.pid.setWindup(300.0)
@@ -46,12 +44,9 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     return super().check()
 
   def action(self):
-    # u_ vorherige stellgroesse
     latest = MainValveHistory.objects.latest('id')
     e_  = self.goal - float(self.ctrl.some_cur_vorlauf[1].temperature)
-    #u_  = latest.change_amount
     last_time = self.ctrl.some_cur_vorlauf[0].dtime
-    #logger.debug('CALL pid with e_=%s', e_)
     #logger.debug('last_time : %s', last_time)
 
     pid = self.pid
@@ -59,14 +54,14 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     pid.setSampleTime(60)
     pid.setLastError(e_)
     pid.setLastTime(last_time)
-
+    # Calc next control value
     pid.update(self.cur)
     ctrl_val = pid.output
-    self.ctrl.lg.debug('pid output: %s', ctrl_val)
+    logger.debug('pid output: %s', ctrl_val)
 
     amount = abs(int(ctrl_val))
     if amount < 10:
-      self.ctrl.lg.debug('TOO SMALL change to apply')
+      logger.debug('TOO SMALL change to apply')
       return True
 
     direction = None
@@ -76,13 +71,11 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
       ctrl = MainValveCtrl()
     if IS_PC:
       ctrl = MainValveCtrlDummy()
-    ctrl.lg = self.ctrl.lg
     ctrl.setup()
 
     if ctrl_val < 0: 
       tmp = latest.result_openingdegree - amount
       if (tmp < ctrl.openingdegree_minimum):
-        self.ctrl.lg.error("WARNING: below minimum opening_degree") 
         return False
       direction = 'dn'
       entry.change_dir = 'Close'
@@ -91,7 +84,6 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     elif ctrl_val > 0:
       tmp = latest.result_openingdegree + amount
       if (tmp > ctrl.openingdegree_maximum):
-        self.ctrl.lg.error("WARNING: above maximum opening_degree") 
         return False
       direction = 'up'
       entry.change_dir = 'Open'
@@ -106,7 +98,7 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     entry.save()
     ### the actual work
     sa = str(amount)
-    self.ctrl.lg.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
+    logger.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
     ctrl.work(direction, amount)
 
     return True

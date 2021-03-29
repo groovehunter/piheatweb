@@ -1,6 +1,4 @@
 
-#from motors.Rules import *
-#import motors.Rules
 import motors.rules
 
 from motors import rules
@@ -13,12 +11,13 @@ from piheatweb.LoggingSupport import LoggingSupport
 from sensors.models import SensorData_01, SensorData_04
 from django.db.models import Avg, Max, Min, Sum
 from datetime import datetime, timedelta
-
+import logging
+logger = logging.getLogger(__name__)
 
 class CalcMethod:
   pass
 
-class CalcVorlaufSoll(CalcMethod, LoggingSupport):
+class CalcVorlaufSoll(CalcMethod):
   def work(self):
     # calc soll by outdoor - heating kennlinie
     self.soll_calc = (( (self.avg24_outdoor+self.cur_outdoor)/2 ) * -1.1) + 52
@@ -27,9 +26,9 @@ class CalcVorlaufSoll(CalcMethod, LoggingSupport):
     now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
-      self.lg.debug('nachtabsenkung!!: %s', absenk)
+      logger.debug('nachtabsenkung!!: %s', absenk)
     self.soll_calc = self.soll_calc + absenk
-    self.lg.debug("calculated final Soll:  %s", self.soll_calc)
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
 
     # XXX save to DB
     #data = RuleResultData_01()
@@ -94,7 +93,6 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
   """ non web controller """
 
   def __init__(self):
-    self.init_logging()
     self.now = timezone.now()
 
   def setup(self):
@@ -126,11 +124,10 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
 
   ### rule = a object of db-entry, so find a better name
   def check_rule(self, rule_db):
-    self.lg.debug("check rule %s", rule_db)
+    logger.debug("check rule %s", rule_db)
     self.create_rule_event(rule_db)
     # get object of initiated rule class
     rule_klass_obj = self.klass_obj_list[rule_db.name]
-    self.lg.debug(rule_klass_obj)
     # this object needs the DB rule entry, so set it
     rule_klass_obj.set_rule(rule_db)
     # rule_klass_obj.create_rule_event() # NOW ctrl method
@@ -162,7 +159,6 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
 
   def test(self):
     name = 'VorlaufRule'
-    self.lg.debug('check Rule %s', name)
     rule = self.rules_list_db[name]
 
     rule_klass_obj = self.klass_obj_list[name]

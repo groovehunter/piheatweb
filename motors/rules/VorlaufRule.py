@@ -9,7 +9,7 @@ import logging
 from os import environ
 from datetime import datetime, timedelta
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 if IS_RPi:
   from motors.MainValveCtrl import MainValveCtrl
@@ -41,7 +41,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     self.goal = float(self.rule.logic)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
-    #self.ctrl.lg.debug('end setup')
+    logger.debug('cur %s', self.cur)
     #self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
 
   def save_logic(self):
@@ -65,12 +65,9 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     return entry
 
   def check(self):
-    self.ctrl.lg.debug('vorlauf - check')
     is_must = eval(self.must)
-    self.ctrl.lg.debug('is_must: %s', is_must)
     if not is_must:
       return True
-    self.ctrl.lg.debug('vorlauf - CP2')
     return super().check()
 
   def action(self):
@@ -84,7 +81,6 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       ctrl = MainValveCtrlDummy()
     ctrl.setup()
 
-    self.ctrl.lg.debug('diff: %s', self.diff)
     diff_int = int(self.diff)
     #diff = abs(int(self.cur) - int(self.goal))
     latest = MainValveHistory.objects.latest('id')
@@ -105,14 +101,13 @@ class VorlaufRule(FixedGoalAdjustableActuator):
       tmp = latest.result_openingdegree + amount
 
     else:
-      self.ctrl.lg.error("WARNING: none of both conditions was matched !??")
       return False
 
     entry.result_openingdegree = tmp
     entry.save()
     ### the actual work
     sa = str(amount)
-    self.ctrl.lg.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
+    logger.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
     ctrl.work(direction, amount)
 
     return True

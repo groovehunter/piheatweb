@@ -2,7 +2,7 @@ import time
 import logging
 from django.utils import timezone
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 class PID:
     """PID Controller """
@@ -43,7 +43,7 @@ class PID:
         error = self.SetPoint - feedback_value
 
         self.current_time = current_time if current_time is not None else timezone.now()
-        #logger.debug('current time: %s', self.current_time)
+        logger.debug('current time: %s', self.current_time)
         delta_time = self.current_time - self.last_time
         #logger.debug('delta time: %s', delta_time)
         #logger.debug('delta time.seconds: %s', delta_time.seconds)
@@ -74,9 +74,10 @@ class PID:
             KiTerm = self.Ki * self.ITerm
             KdTerm = self.Kd * self.DTerm
             self.output = KpTerm + KiTerm + KdTerm
-            logger.debug('P - I - D: %s | %s | %s', self.Kp, self.Ki, self.Kd)
+            logger.debug('Kp Ki Kd - %s | %s | %s', self.Kp, self.Ki, self.Kd)
             logger.debug('P - I - D: %s | %s | %s', self.PTerm, self.ITerm, self.DTerm)
             logger.debug('P - I - D: %s | %s | %s', KpTerm, KiTerm, KdTerm)
+            logger.debug(__name__)
 #            self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
 
     def setKp(self, proportional_gain):

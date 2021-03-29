@@ -1,8 +1,7 @@
 
 import yaml
 from os.path import join
-from .settings import BASE_DIR, TMPPATH, MENU_CONF
-import logging
+from .settings import BASE_DIR, MENU_CONF
 
 from sensors.models import SensorData_01, SensorData_02
 from piheatweb.LoggingSupport import LoggingSupport

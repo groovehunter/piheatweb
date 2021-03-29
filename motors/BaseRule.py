@@ -5,7 +5,7 @@ from motors.models import Rule, RuleHistory
 from django.utils import timezone
 #now = timezone.now() # TZ aware :)
 import logging
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class BaseRule:
@@ -31,7 +31,6 @@ class BaseRule:
         so we can access it;
         And also create a new RuleHistory entry pointing to the rule obj """
     self.rule = rule
-    logger.debug('--- RULE INIT : %s', self.rule.name)
 
   def check(self):
     raise NotImplemented
@@ -49,7 +48,7 @@ class FixedGoalAdjustableActuator(BaseRule):
     """ false only if very near.
     otherwise adjust in some way """
 
-    if self.diff < 1:
+    if self.diff < 0.5:
       logger.debug("conditions are OKAY - no action needed")
       self.ctrl.rule_event.result = 0
       self.ctrl.rule_event.save()
@@ -87,3 +86,5 @@ class ThresholdRule(BaseRule):
 
     else:
       logger.error("threshold check somehow is out any rule!??")
+
+

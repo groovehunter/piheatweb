@@ -1,6 +1,7 @@
 from motors.BaseRule import ThresholdRule 
 from motors.models import WarmwaterPumpHistory
 from motors.models import RuleHistory
+from sensors.models import SensorData_03
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 from piheatweb.settings import TMPPATH
@@ -8,6 +9,7 @@ import logging
 from os import environ
 #from django.utils import timezone
 from datetime import datetime, timedelta
+logger = logging.getLogger(__name__)
 
 
 if IS_RPi:
@@ -75,10 +77,9 @@ class WarmwaterRangeRule(ThresholdRule):
       entry.change_descr = self.MSG_TO_HIGH,
 
     else:
-      logger.error("WARNING: none of both conditions was matched !??")
+      self.ctrl.lg.error("WARNING: none of both conditions was matched !??")
       return False
 
-    logger.info(entry.change_descr)
     entry.save()
     return True
 

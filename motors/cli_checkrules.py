@@ -14,25 +14,8 @@ from motors.RulesCtrl import RulesCliCtrl
 import piheatweb.util
 
 import logging
-fn = os.environ['HOME'] + '/log/piheat.log'
-logging.basicConfig(
-  filename=fn,
-  level=logging.DEBUG,
-#  format='%(asctime)s %(levelname) %(message)s',
-#  datefmt='%H:%M:%S',
-#  style='$',
-)
-# create console handler and set level to debug
-logger = logging.getLogger()
-"""
-ch = logging.FileHandler(fn)
-ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
-"""
-logger.debug('----------------------------------------------')
-logger.debug('START CLI')
+logger = logging.getLogger(__name__)
+logger.debug('---------------------------------------------- START CLI')
 
 if __name__=='__main__':
   ### WORK
