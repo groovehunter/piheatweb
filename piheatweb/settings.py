@@ -66,12 +66,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'motors': {
+        'motors.rules': {
             'handlers': ['file_piheat'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': False,
         },
-        'motors.PID': {
+        'motors.views': {
             'handlers': ['file_debug'],
             'level': 'DEBUG',
             'propagate': False,

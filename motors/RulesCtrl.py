@@ -40,11 +40,10 @@ class Calc:
     # vorlauf temp
     self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
     self.some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
-    #self.lg.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
     if int(self.cur_vorlauf) == 0:
-      self.lg.error('vorlauf was 0.0 - recalc average of latest 5')
+      logger.error('vorlauf was 0.0 - recalc average of latest 5')
       self.cur_vorlauf = float(self.some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
-    #self.lg.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
+    #logger.debug('load_sensordata: cur_vorlauf: %s', self.cur_vorlauf)
 
     # outdoor temp
     some = SensorData_04.objects.order_by('-dtime')[1:30]
@@ -75,9 +74,9 @@ class Calc:
     now = timezone.now()
     if (now.hour > 23 or now.hour < 5):
       absenk = -7
-      self.lg.debug('nachtabsenkung!!: %s', absenk)
+      logger.debug('nachtabsenkung!!: %s', absenk)
     self.soll_calc = int(soll_calc + absenk)
-    self.lg.debug("calculated final Soll:  %s", self.soll_calc)
+    logger.debug("calculated final Soll:  %s", self.soll_calc)
     data = RuleResultData_01()
     data.value = self.soll_calc
     data.dtime = now
@@ -115,11 +114,9 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule_db in self.rules_list_db.items():
-      #self.lg.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
       else:
-        #self.lg.debug("... rule inactive")
         pass
 
   ### rule = a object of db-entry, so find a better name

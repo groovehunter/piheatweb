@@ -16,7 +16,6 @@ class PID:
         self.sample_time = 0.00
         self.current_time = current_time if current_time is not None else timezone.now()
         self.clear()
-        logger.debug(logger)
 
     def clear(self):
         """Clears PID computations and coefficients"""
@@ -49,7 +48,7 @@ class PID:
         #logger.debug('delta time: %s', delta_time)
         logger.debug('delta time.seconds: %s', delta_time.seconds)
         delta_error = error - self.last_error
-        logger.debug('error: CUR %s | DELTA %s', error, delta_error)
+        logger.debug('error: CUR %s | DELTA %s', round(error,3), round(delta_error,3))
 
         if not (delta_time.seconds >= self.sample_time):
             logger.debug('DELTA smaller sample time')
@@ -76,8 +75,12 @@ class PID:
             KdTerm = self.Kd * self.DTerm
             self.output = KpTerm + KiTerm + KdTerm
             logger.debug('P - I - D: %s | %s | %s', self.Kp, self.Ki, self.Kd)
-            logger.debug('P - I - D: %s | %s | %s', self.PTerm, self.ITerm, self.DTerm)
-            logger.debug('P - I - D: %s | %s | %s', KpTerm, KiTerm, KdTerm)
+            logger.debug('P - I - D: %s | %s | %s', 
+              round(self.PTerm, 3), round(self.ITerm, 3), round(self.DTerm, 3))
+            logger.debug('P - I - D: %s | %s | %s', 
+              round(KpTerm, 3), round(KiTerm, 3), round(KdTerm, 3))
+            logger.debug('PID output: %s', self.output)
+
 #            self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
 
     def setKp(self, proportional_gain):

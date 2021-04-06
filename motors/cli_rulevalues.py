@@ -29,10 +29,15 @@ logger.debug('RULE VALUE SET')
 if __name__=='__main__':
   ### WORK
   val = sys.argv[1]
-  print(val)
   ctrl = RulesCliCtrl()
   ctrl.load_rules_from_db()
-  rulename = 'VorlaufRule'
+  #rulename = 'VorlaufRule'
+  rulename = 'PI_ControlRule'
+  rule_db = ctrl.rules_list_db[rulename]
+  logic = rule_db.logic
+  goal, param = logic.split('__')
+  newlogic = '__'.join( [val, param] )
   logger.info('set %s value to %s', rulename, val)
-  ctrl.setval(rulename, val)
+  ctrl.setval(rulename, newlogic)
+
 

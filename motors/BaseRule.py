@@ -35,6 +35,10 @@ class BaseRule:
   def check(self):
     raise NotImplemented
 
+  def extract_logic(self):
+    logic = self.rule.logic
+    self.goal, self.param = logic.split('__')
+
 
 class FixedGoalAdjustableActuator(BaseRule):
   """ try to keep one fixed value
@@ -45,9 +49,14 @@ class FixedGoalAdjustableActuator(BaseRule):
 
   # rename to "check_condition"
   def check(self):
+    """ always False -> always calculate some adjustment 
+        maybe it is too small for the actuator """
+    self.ctrl.rule_event.result = 1
+    self.ctrl.rule_event.save()
+    return False
+
     """ false only if very near.
     otherwise adjust in some way """
-
     if self.diff < 0.5:
       logger.debug("conditions are OKAY - no action needed")
       self.ctrl.rule_event.result = 0

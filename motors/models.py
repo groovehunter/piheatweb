@@ -61,6 +61,12 @@ class RuleResultData_01(models.Model):
   dtime      = models.DateTimeField('action dtime', null=True)
   value      = models.FloatField()
 
+class RuleResultData_02(models.Model):
+  """ calculated PID output """
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  dtime      = models.DateTimeField('action dtime', null=True)
+  value      = models.FloatField()
+
 
 # XXX rename to AktorInfo ?
 class Motor(models.Model):
