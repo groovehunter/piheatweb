@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 
-from .models import Motor, Rule, RuleHistory, RuleResultData_01
+from .models import Motor, Rule, RuleHistory, RuleResultData_01, RuleResultData_02
 from .models import MainValveHistory, WarmwaterPumpHistory
 from .tables import MotorListTable, MainValveListTable, WarmwaterPumpListTable
 from motors.MainValveController import MainValveController
@@ -143,11 +143,12 @@ class MotorController(Controller):
       logger.debug(self.now)
       logger.debug(start_date)
       rh = RuleHistory.objects.filter(dtime__range=(start_date, self.now))
-      logger.debug(rh)
-      mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
+      #logger.debug(count(rh))
+      #logger.debug(rh)
+      #mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
 
-      rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
-      info = Motor.objects.order_by('id').all()
+      #rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
+      #info = Motor.objects.order_by('id').all()
       tempdict = {}
       timedict = {}
       c=0
@@ -156,12 +157,13 @@ class MotorController(Controller):
         timedict[i] = []
 
       i = 0
+      #logger.debug(rh)
       for obj in rh:
         time = obj.dtime
         timedict[i].append(time)
         rrd = RuleResultData_01.objects.filter(rule_event=obj).first()
-        logger.debug(rrd)
-        tempdict[i].append(rrd.value)
+        #logger.debug(rrd)
+        #tempdict[i].append(rrd.value)
         """
         for i in range(4):
           sstr = '0'+str(i+1)
@@ -173,7 +175,7 @@ class MotorController(Controller):
         """
         c+=1
 
-      logger.debug(c)
+      #logger.debug(c)
       self.context['debug'] = c
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
@@ -229,3 +231,5 @@ def action(request, method):
 def show(request, pk):
   ctrl = MotorController(request)
   return ctrl.show(pk)
+
+

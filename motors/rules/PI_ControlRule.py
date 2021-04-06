@@ -1,6 +1,6 @@
 from motors.BaseRule import FixedGoalAdjustableActuator
 from sensors.models import *
-from motors.models import MainValveHistory
+from motors.models import MainValveHistory, RuleResultData_02
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 from motors.PID import PID
@@ -57,6 +57,11 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     # Calc next control value
     pid.update(self.cur)
     ctrl_val = pid.output
+    data = RuleResultData_02()
+    data.value = ctrl_val
+    data.dtime = self.now
+    data.rule_event = self.ctrl.rule_event
+    data.save()
     logger.debug('pid output: %s', ctrl_val)
 
     amount = abs(int(ctrl_val))
@@ -73,10 +78,14 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
       ctrl = MainValveCtrlDummy()
     ctrl.setup()
 
+    logger.debug('latest.result_openingdegree: %s', latest.result_openingdegree)
     if ctrl_val < 0: 
       tmp = latest.result_openingdegree - amount
       if (tmp < ctrl.openingdegree_minimum):
-        return False
+        logger.error('MIN opening degree of valve: %s', ctrl.openingdegree_minimum)
+        amount = latest.result_openingdegree - ctrl.openingdegree_minimum 
+        logger.warning('WARNING: amount set to max possible: %s', amount)
+        tmp = latest.result_openingdegree - amount
       direction = 'dn'
       entry.change_dir = 'Close'
       entry.change_amount = amount
@@ -84,7 +93,10 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     elif ctrl_val > 0:
       tmp = latest.result_openingdegree + amount
       if (tmp > ctrl.openingdegree_maximum):
-        return False
+        logger.error('MAX opening degree of valve: %s', ctrl.openingdegree_maximum)
+        amount = ctrl.openingdegree_maximum - latest.result_openingdegree
+        logger.warning('WARNING: amount set to max possible: %s', amount)
+        tmp = latest.result_openingdegree + amount
       direction = 'up'
       entry.change_dir = 'Open'
       entry.change_amount = amount

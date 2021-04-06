@@ -22,7 +22,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
   def setup(self):
     # prerequisites:
     #1
-    self.must = 'self.main_cur > 4650' # etwa der 0-Strich of valve
+    self.must = 'self.main_cur > 4000' # etwa der 0-Strich of valve
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
     #2 - soll temp ready calculated?!
     #self.rule_event
@@ -42,7 +42,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     # Is Soll to Ist difference more than 2
     if (abs(self.logic - self.vorlauf_soll_calc) > 2):
       logic_new = str(round(self.vorlauf_soll_calc))
-      self.ctrl.lg.debug("ACT: setting rule logic to %s", logic_new)
+      logger.debug("ACT: setting rule logic to %s", logic_new)
       self.rule.logic = logic_new
       self.rule.save()
     else:
@@ -61,6 +61,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
   def check(self):
     is_must = eval(self.must)
     if not is_must:
+      logger.warning('MUST conditions not fulfilled')
       return True
     return super().check()
 
