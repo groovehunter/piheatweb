@@ -4,18 +4,12 @@ import os
 import logging
 import sys
 from time import sleep
-fn = os.environ['HOME'] + '/log/pi_sim.log'
-logging.basicConfig(
-  filename=fn,
-  #level=logging.INFO,
-  level=logging.DEBUG,
-)
 # create console handler and set level to debug
-logger = logging.getLogger()
 
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
+logger = logging.getLogger(__name__)
 from django.utils import timezone
 from sensors.models import *
 from sensors.TempCalc import TempCalc

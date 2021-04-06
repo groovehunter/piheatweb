@@ -21,6 +21,7 @@ now = timezone.now()
 
 import logging
 logger = logging.getLogger(__name__)
+
 from plotly.offline import plot
 #import plotly.graph_objs as go
 from plotly.graph_objs import Scatter
@@ -57,7 +58,7 @@ class MotorDetailView(DetailView, ViewControllerSupport):
 
     def get(self, request, *args, **kwargs):
         self.init_ctrl()
-#        self.lg.debug(kwargs)
+#        logger.debug(kwargs)
         self.object = self.get_object() #labelterm=kwargs['pk'])
         self.template_name = 'motors/show.html'
         self.fields_noshow = []
@@ -139,10 +140,10 @@ class MotorController(Controller):
       start_date = self.now - timedelta(hours=3)
       #events = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
 
-      self.lg.debug(self.now)
-      self.lg.debug(start_date)
+      logger.debug(self.now)
+      logger.debug(start_date)
       rh = RuleHistory.objects.filter(dtime__range=(start_date, self.now))
-      self.lg.debug(rh)
+      logger.debug(rh)
       mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
 
       rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
@@ -159,7 +160,7 @@ class MotorController(Controller):
         time = obj.dtime
         timedict[i].append(time)
         rrd = RuleResultData_01.objects.filter(rule_event=obj).first()
-        self.lg.debug(rrd)
+        logger.debug(rrd)
         tempdict[i].append(rrd.value)
         """
         for i in range(4):
@@ -186,7 +187,7 @@ class MotorController(Controller):
       plt_div = plot([sc[0],], output_type='div')
       #plt_div = plot(sc, output_type='div')
       self.context['plt_div'] = plt_div
-      #self.lg.debug(plt_div)
+      #logger.debug(plt_div)
       self.template = 'motors/graph.html'
       return self.render()
 

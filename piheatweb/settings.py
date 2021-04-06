@@ -71,7 +71,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'motors.PID': {
+        '__main__': {
             'handlers': ['file_debug'],
             'level': 'DEBUG',
             'propagate': False,

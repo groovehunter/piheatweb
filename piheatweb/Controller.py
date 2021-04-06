@@ -13,8 +13,6 @@ class Controller(BaseCtrl):
 
     def __init__(self, request):
         self.context = {}
-        if DEBUG:
-            self.init_logging()
         if DEBUG2:
             self.context['debug2'] = True
         self.request = request
@@ -23,7 +21,6 @@ class Controller(BaseCtrl):
         self.context['now'] = self.now
 
     def init_ctrl(self):
-#        self.lg.debug(self.request.user)
         self.msg = ''
         self.context['logged_in'] = True
         self.context['prefix_static'] = '/static/'
