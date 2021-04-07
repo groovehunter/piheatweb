@@ -7,7 +7,6 @@ from motors.models import Rule, RuleHistory
 from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
 from django.utils import timezone
-from piheatweb.LoggingSupport import LoggingSupport
 from sensors.models import SensorData_01, SensorData_04
 from django.db.models import Avg, Max, Min, Sum
 from datetime import datetime, timedelta
@@ -40,6 +39,7 @@ class Calc:
     # vorlauf temp
     self.cur_vorlauf  = float(SensorData_01.objects.latest('dtime').temperature)
     self.some_cur_vorlauf  = SensorData_01.objects.order_by('-dtime')[1:5]
+    #logger.debug('load_sensordata: cur_vorlauf: %s', int(self.cur_vorlauf))
     if int(self.cur_vorlauf) == 0:
       logger.error('vorlauf was 0.0 - recalc average of latest 5')
       self.cur_vorlauf = float(self.some_cur_vorlauf.aggregate(Avg('temperature'))['temperature__avg'])
@@ -88,7 +88,7 @@ class Calc:
 
 
 
-class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
+class RulesCliCtrl(KlassLoader, Calc):
   """ non web controller """
 
   def __init__(self):
@@ -114,9 +114,11 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule_db in self.rules_list_db.items():
+      #logger.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
       else:
+        #logger.debug("... rule inactive")
         pass
 
   ### rule = a object of db-entry, so find a better name
@@ -165,5 +167,3 @@ class RulesCliCtrl(KlassLoader, Calc, LoggingSupport):
     rule_klass_obj.report()
     if not rule_klass_obj.check():
       rule_klass_obj.action()
-
-

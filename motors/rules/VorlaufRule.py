@@ -1,22 +1,16 @@
 from motors.BaseRule import FixedGoalAdjustableActuator
 from sensors.models import *
-from motors.models import WarmwaterPumpHistory, MainValveHistory
-from motors.models import RuleHistory
+from motors.models import MainValveHistory
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
-from piheatweb.settings import TMPPATH
 import logging
-from os import environ
-from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
 if IS_RPi:
   from motors.MainValveCtrl import MainValveCtrl
-  from motors.WarmwaterPump import WarmwaterPumpCtrl
 if IS_PC:
   from motors.MainValveCtrlDummy import MainValveCtrlDummy
-  from motors.WarmwaterPumpDummy import WarmwaterPumpCtrlDummy
 
 
 
