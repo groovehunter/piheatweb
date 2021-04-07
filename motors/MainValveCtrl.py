@@ -13,7 +13,7 @@ class MainValveCtrl(object):
         self.speed = 100
         self.openingdegree_minimum = 3000
         self.openingdegree_maximum = 32000
-        self.lock_fn = BASE_DIR+'valve.lock'
+        self.lock_fn = BASE_DIR+'/valve.lock'
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)
@@ -37,10 +37,13 @@ class MainValveCtrl(object):
         if os.path.exists(self.lock_fn):
           return True
         return False
+
     def remove_lock(self):
         os.remove(self.lock_fn)
+        logger.debug('CLEARED valve LOCK file: %s', self.lock_fn)
+
     def set_lock(self):
-        logger.debug(self.lock_fn)
+        logger.debug('Write valve LOCK file: %s', self.lock_fn)
         f = open(self.lock_fn, 'w')
         f.write(datetime.now().isoformat())
         f.close()
@@ -48,11 +51,12 @@ class MainValveCtrl(object):
     def work(self, direction, amount):
         if not direction in ('dn', 'up'):
           print("wrong direction: use dn/up")
-          return
+          return False
         if self.is_running():
           logger.error('Valve Engine already running')
-          print('NOT DONE')
-          return 
+          print('LOCKFILE exists - is still running - NOT DONE')
+          return False
+
         self.set_lock()
 
         DIR_Left = GPIO.HIGH
@@ -79,8 +83,13 @@ class MainValveCtrl(object):
             GPIO.output(PUL, GPIO.LOW)
             time.sleep(sl)
 
+        time.sleep(0.5)
+        self.release_motor()
+        self.remove_lock()
+
+        return True   # Success
+
     def release_motor(self):
         ENA_Released = GPIO.HIGH
         GPIO.output(self.pins['ENA'], ENA_Released)
-        self.remove_lock()
 

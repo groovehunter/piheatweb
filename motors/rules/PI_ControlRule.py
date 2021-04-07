@@ -78,25 +78,39 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
       ctrl = MainValveCtrlDummy()
     ctrl.setup()
 
+    ### calculate if valve conditions are met
     logger.debug('latest.result_openingdegree: %s', latest.result_openingdegree)
+
     if ctrl_val < 0: 
-      tmp = latest.result_openingdegree - amount
-      if (tmp < ctrl.openingdegree_minimum):
+      tmp_resulting_degrees = latest.result_openingdegree - amount
+
+      if (tmp_resulting_degrees < ctrl.openingdegree_minimum):
         logger.error('MIN opening degree of valve: %s', ctrl.openingdegree_minimum)
+
+        # change for the maximum possible
         amount = latest.result_openingdegree - ctrl.openingdegree_minimum 
         logger.warning('WARNING: amount set to max possible: %s', amount)
-        tmp = latest.result_openingdegree - amount
+        total_resulting = latest.result_openingdegree - amount
+      else:
+        total_resulting = tmp_resulting_degrees
+
       direction = 'dn'
       entry.change_dir = 'Close'
       entry.change_amount = amount
 
+
     elif ctrl_val > 0:
-      tmp = latest.result_openingdegree + amount
-      if (tmp > ctrl.openingdegree_maximum):
+      tmp_resulting_degrees = latest.result_openingdegree + amount
+
+      if (tmp_resulting_degrees > ctrl.openingdegree_maximum):
         logger.error('MAX opening degree of valve: %s', ctrl.openingdegree_maximum)
+
+        # change for the maximum possible
         amount = ctrl.openingdegree_maximum - latest.result_openingdegree
         logger.warning('WARNING: amount set to max possible: %s', amount)
-        tmp = latest.result_openingdegree + amount
+        total_resulting = latest.result_openingdegree + amount
+      else:
+        total_resulting = tmp_resulting_degrees
       direction = 'up'
       entry.change_dir = 'Open'
       entry.change_amount = amount
@@ -106,12 +120,15 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
       return False
 
 
-    entry.result_openingdegree = tmp
-    entry.save()
+    entry.result_openingdegree = total_resulting
+
     ### the actual work
     sa = str(amount)
-    logger.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
-    ctrl.work(direction, amount)
+
+    logger.info("mainvalve amount %s (total:%s)- %s", sa, total_resulting, direction)
+    succesful_done = ctrl.work(direction, amount)
+    if succesful_done:
+      entry.save()
 
     return True
 
