@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.template import RequestContext
 #from django import forms
 from django.http import HttpResponseRedirect
+from django.db.models.query import prefetch_related_objects
 
 from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
@@ -18,7 +19,7 @@ from cntrl.models import ControlEvent
 from datetime import datetime, timedelta
 from django.utils import timezone
 now = timezone.now()
-
+from random import randint
 import logging
 logger = logging.getLogger(__name__)
 
@@ -136,53 +137,60 @@ class MotorController(Controller):
     def graph(self):
       GET = self.request.GET
       sincehours = int(GET.get('sincehours', default=3))
-      #start_date = self.now - timedelta(hours=sincehours)
       start_date = self.now - timedelta(hours=3)
       #events = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
 
       logger.debug(self.now)
       logger.debug(start_date)
-      rh = RuleHistory.objects.filter(dtime__range=(start_date, self.now))
-      #logger.debug(count(rh))
+      myrule = Rule.objects.get(name='CalcVorlaufSollRule')
+      rh = RuleHistory.objects.filter(rule=myrule, dtime__range=(start_date, self.now)).order_by('dtime')[30:]
+      logger.debug(len(rh))
       #logger.debug(rh)
       #mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
-
-      #rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
       #info = Motor.objects.order_by('id').all()
       tempdict = {}
       timedict = {}
       c=0
-      for i in range(1):
+      """
+      for i in range(len(rh)):
         tempdict[i] = []
         timedict[i] = []
-
+      """
       i = 0
-      #logger.debug(rh)
+      tempdict[i] = []
+      timedict[i] = []
+
       for obj in rh:
         time = obj.dtime
+#        logger.debug("object in looping : %s", obj)
         timedict[i].append(time)
-        rrd = RuleResultData_01.objects.filter(rule_event=obj).first()
-        #logger.debug(rrd)
+        rrd = obj.ruleresultdata_01_set.first()
+
+        if rrd == None:
+          logger.debug(rrd)
+          tempdict[i].append(50)
+        else:
+          tempdict[i].append(rrd.value)
         #tempdict[i].append(rrd.value)
-        """
-        for i in range(4):
-          sstr = '0'+str(i+1)
-          #obj = eval('RuleResultData'+sstr+'objects.filter(rule_event=
-          obj = RuleResultData01.objects.filter(rule_event=obj)
-          temp = obj.value
-          tempdict[i].append(temp)
-          timedict[i].append(time) #obj.dtime)
-        """
         c+=1
 
-      #logger.debug(c)
+      logger.debug(tempdict[i])
+      logger.debug(timedict[i])
+      logger.debug(len(tempdict[i]))
+      logger.debug(len(timedict[i]))
       self.context['debug'] = c
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
       info = { 0: 'RRD', 1: 'RuleResultData_01' }
+      """
       for i in range(1):
         logger.debug(i)
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
+                        mode='lines', name=info[i], \
+                        opacity=0.8, marker_color=col[i])
+      """
+      i = 0
+      sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
                         mode='lines', name=info[i], \
                         opacity=0.8, marker_color=col[i])
 
@@ -231,5 +239,3 @@ def action(request, method):
 def show(request, pk):
   ctrl = MotorController(request)
   return ctrl.show(pk)
-
-
