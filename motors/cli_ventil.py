@@ -25,10 +25,11 @@ if __name__=='__main__':
     vt.setup()
     vt.speed = 50
     ### WORK
-    vt.work(direction, amount)
+    success = vt.work(direction, amount)
 
-    # Motor freigeben
-    vt.release_motor()
+    if not success:
+      print("ERROR occurred, valve work not done")
+      sys.exit()
     cur = MainValveHistory.objects.latest('id')
 
     change2db(direction, amount, cur)

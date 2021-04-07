@@ -76,6 +76,8 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'asyncio': { 'level': 'WARNING', },
+        'factory': { 'level': 'WARNING', },
     },
 }
 """
