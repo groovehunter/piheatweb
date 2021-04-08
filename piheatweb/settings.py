@@ -77,7 +77,7 @@ LOGGING = {
             'propagate': False,
         },
         'asyncio': { 'level': 'WARNING', },
-        'factory': { 'level': 'WARNING', },
+        'faker.factory': { 'level': 'WARNING', },
     },
 }
 """
