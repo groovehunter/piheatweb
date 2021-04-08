@@ -6,6 +6,7 @@ from motors.rules import *
 from motors.models import Rule, RuleHistory
 from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
+from cntrl.models import ControlEvent
 from django.utils import timezone
 from sensors.models import SensorData_01, SensorData_04
 from django.db.models import Avg, Max, Min, Sum
@@ -22,6 +23,7 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   def __init__(self):
     self.now = timezone.now()
+    self.latest_ctrl_event()
 
   def setup(self):
     self.klass_list = self.get_klasslist(motors.rules)
@@ -71,14 +73,17 @@ class RulesCliCtrl(KlassLoader, Calc):
     if not rule_klass_obj.check():
       rule_klass_obj.action()
 
+  def latest_ctrl_event(self):
+    self.ctrl_event = ControlEvent.objects.latest('dtime')
 
   # XXX create OR get existing rule_event
   def create_rule_event(self, rule_db):
     rule_event = RuleHistory()
     rule_event.dtime = self.now
     rule_event.rule = rule_db
+    rule_event.ctrl_event = self.ctrl_event
     self.rule_event = rule_event
-
+    ### XXX when is this saved?? 
 
   def setval(self, rulename, val):
     rule_db = self.rules_list_db[rulename]
