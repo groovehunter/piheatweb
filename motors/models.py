@@ -1,4 +1,5 @@
 from django.db import models
+from cntrl.models import ControlEvent, DEFAULT_EVENT
 from django.utils.translation import gettext_lazy as _
 
 # default Rule
@@ -47,6 +48,9 @@ class Rule(models.Model):
 
 class RuleHistory(models.Model):
   """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
+  ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
   dtime   = models.DateTimeField('rule check and action dtime', null=True)
   rule = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
   result = models.CharField(max_length=20, null=True)

@@ -16,6 +16,8 @@
         href:   /actors/ww
       - name:   Warmwasserpumpe steuern
         href:   /actors/ww/control
+      - name:   RulesResultData Graph
+        href:   /actors/view/graph
 
 - sensors:
     id:     sensors

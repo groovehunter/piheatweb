@@ -2,10 +2,12 @@ from django.shortcuts import render
 from django.template import RequestContext
 #from django import forms
 from django.http import HttpResponseRedirect
+from django.db.models.query import prefetch_related_objects
 
 from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
+from piheatweb.forms import GraphAttributesForm
 
 from .models import Motor, Rule, RuleHistory, RuleResultData_01, RuleResultData_02
 from .models import MainValveHistory, WarmwaterPumpHistory
@@ -18,7 +20,7 @@ from cntrl.models import ControlEvent
 from datetime import datetime, timedelta
 from django.utils import timezone
 now = timezone.now()
-
+from random import randint
 import logging
 logger = logging.getLogger(__name__)
 
@@ -136,60 +138,110 @@ class MotorController(Controller):
     def graph(self):
       GET = self.request.GET
       sincehours = int(GET.get('sincehours', default=3))
-      #start_date = self.now - timedelta(hours=sincehours)
-      start_date = self.now - timedelta(hours=3)
-      #events = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
+      start_date = self.now - timedelta(hours=sincehours)
 
-      logger.debug(self.now)
-      logger.debug(start_date)
-      rh = RuleHistory.objects.filter(dtime__range=(start_date, self.now))
-      #logger.debug(count(rh))
-      #logger.debug(rh)
-      #mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
-
-      #rr = RuleResultData_01.objects.filter(dtime__range=(start_date, self.now))
-      #info = Motor.objects.order_by('id').all()
+      logger.debug('graph start date: %s', start_date)
+      myrule = Rule.objects.get(name='CalcVorlaufSollRule')
+#      rh = RuleHistory.objects.filter(rule=myrule, dtime__range=(start_date, self.now)).order_by('dtime')[30:]
+      ### query all CE, I guess those without corresponding RH
+      # we need to skip later
+      ce = ControlEvent.objects.filter(dtime__range=(start_date, self.now)).order_by('dtime')
+#      logger.debug('RH len %s', len(rh))
+      logger.debug('CE len: %s', len(ce))
+#      mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
       tempdict = {}
       timedict = {}
-      c=0
-      for i in range(1):
+      rrd = {}
+      l = 2
+      for i in range(l):
         tempdict[i] = []
         timedict[i] = []
 
-      i = 0
-      #logger.debug(rh)
-      for obj in rh:
-        time = obj.dtime
-        timedict[i].append(time)
-        rrd = RuleResultData_01.objects.filter(rule_event=obj).first()
-        #logger.debug(rrd)
-        #tempdict[i].append(rrd.value)
-        """
-        for i in range(4):
-          sstr = '0'+str(i+1)
-          #obj = eval('RuleResultData'+sstr+'objects.filter(rule_event=
-          obj = RuleResultData01.objects.filter(rule_event=obj)
-          temp = obj.value
-          tempdict[i].append(temp)
-          timedict[i].append(time) #obj.dtime)
-        """
-        c+=1
+      tz = timezone.get_current_timezone()
 
-      #logger.debug(c)
-      self.context['debug'] = c
+      for obj in ce:
+
+        time = obj.dtime.astimezone(tz=tz)
+        logger.debug('=== NEXT: %s', time)
+        rhs = obj.rulehistory_set
+        if rhs.count() == 0:
+          logger.debug('Rhs count==0 for this ce %s -- skipping!', obj)
+          continue
+
+        for i in range(l):
+          timedict[i].append(time)
+
+        val = 0
+        rh = rhs.filter(rule_id=9).first()
+        if rh:
+          rrd = rh.ruleresultdata_01_set.first()
+          if rrd:
+            val = rrd.value
+        tempdict[0].append(val)
+
+        val = 0
+        rh = rhs.filter(rule_id=4).first()
+        if rh:
+          res = rh.mainvalvehistory_set.first()
+          if res:
+            val = res.result_openingdegree
+            val = val / 1000
+            logger.debug("val: %s", val)
+            if val > 3000:
+              val = val / 100
+          else:
+            logger.debug('NO mv entry')
+        tempdict[1].append(val)
+
+        """
+        rule_ids = [4, 9] # len must match "l"
+        i = 0
+        for rid in rule_ids:
+          rh = rhs.filter(rule_id=rid).first()
+          logger.debug('rh %s', rh)
+          if rh == None:
+            tempdict[i].append(20) #dummy
+            i += 1
+            continue
+          if rid == 4:
+            rrd = rh.ruleresultdata_01_set.first()
+          if rid == 9:
+            rrd = None
+
+          if rrd == None:
+            logger.debug("RRD: %s", rrd)
+            tempdict[i].append(50)
+          else:
+            tempdict[i].append(rrd.value)
+            logger.debug("RRD: %s", i, rrd.value)
+          i += 1
+        """
+
+      for i in range(l):
+        logger.debug('len tempdict: %s', len(tempdict[i]))
+        logger.debug('len timedict: %s', len(timedict[i]))
+#      logger.debug('tempdict-1: %s', tempdict[1])
+#      logger.debug('len timedict: %s', len(timedict[i]))
+
+#      self.context['debug'] = c
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
-      info = { 0: 'RRD', 1: 'RuleResultData_01' }
-      for i in range(1):
+      info = {
+        0: 'RRD1 / CalcSoll', 1: 'RRD2 / ANY', 2: 'RRD3',
+      }
+
+      for i in range(l):
         logger.debug(i)
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
                         mode='lines', name=info[i], \
                         opacity=0.8, marker_color=col[i])
 
-      plt_div = plot([sc[0],], output_type='div')
+      plt_div = plot([sc[0], sc[1]], output_type='div')
       #plt_div = plot(sc, output_type='div')
       self.context['plt_div'] = plt_div
       #logger.debug(plt_div)
+      form = GraphAttributesForm()
+      self.context['form'] = form
       self.template = 'motors/graph.html'
       return self.render()
 
@@ -231,5 +283,3 @@ def action(request, method):
 def show(request, pk):
   ctrl = MotorController(request)
   return ctrl.show(pk)
-
-

@@ -11,6 +11,7 @@ from .tables import SensorDetailTable, SensorListTable, \
 SensorDataTable, AllSensorTable
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
+from piheatweb.forms import GraphAttributesForm
 
 import datetime
 from plotly.offline import plot
@@ -104,10 +105,18 @@ class SensorDataView(Controller):
       return self.render()
 
     def graph(self):
-      GET = self.request.GET
-      sincehours = int(GET.get('sincehours', default=3))
-      start_date = self.now - datetime.timedelta(hours=sincehours)
-      if GET.get('resolution'):
+      sincehours = 3
+      resolution = False
+      if self.request.GET.get('go'):
+        form = GraphAttributesForm(self.request.GET)
+        if form.is_valid():
+          sincehours = form.cleaned_data['sincehours']
+          resolution = form.cleaned_data['resolution']
+      else:
+        form = GraphAttributesForm()
+
+      start_date = self.now - datetime.timedelta(hours=int(sincehours))
+      if resolution:
         revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
       else:
         revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
@@ -147,6 +156,7 @@ class SensorDataView(Controller):
       self.context['plt_div'] = plt_div
       #self.context['plt_div2'] = plt_div2
       #self.lg.debug(plt_div)
+      self.context['form'] = form
       self.template = 'sensors/graph.html'
       #self.somedata()
       return self.render()
