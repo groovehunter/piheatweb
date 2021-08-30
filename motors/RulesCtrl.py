@@ -3,20 +3,18 @@ import motors.rules
 
 from motors import rules
 from motors.rules import *
-from motors.models import Rule, RuleHistory
-from motors.models import RuleResultData_01
+from motors.models import Rule, RuleHistory, Mode
 from motors.KlassLoader import KlassLoader
 from cntrl.models import ControlEvent
 from django.utils import timezone
-from sensors.models import SensorData_01, SensorData_04
-from django.db.models import Avg, Max, Min, Sum
+from django.db.models import Avg
 from datetime import datetime, timedelta
 import logging
 logger = logging.getLogger(__name__)
 
 
 from motors.Calc import Calc
-
+DEFAULT_MODE = 'WarmwaterOnly'
 
 class RulesCliCtrl(KlassLoader, Calc):
   """ non web controller """
@@ -28,6 +26,12 @@ class RulesCliCtrl(KlassLoader, Calc):
   def setup(self):
     self.klass_list = self.get_klasslist(motors.rules)
     self.load_sensordata()
+    m = Mode.objects.filter(active=True).first()
+    if m:
+      self.mode = m
+    else:
+      self.mode = Mode.objects.get(name=DEFAULT_MODE)
+    logger.debug('Mode was loaded: %s', self.mode.name)
 
   def initiate_klasses_obj(self):
     """ initiate all classes of Rules.py module """

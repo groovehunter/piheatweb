@@ -13,4 +13,6 @@ urlpatterns = [
     path('motors/', include('motors.urls')),
 #    path('rules/', include('rules.urls')),
     path('users/', include('users.urls')),
+    path('cntrl/', include('cntrl.urls')),
+
 ]

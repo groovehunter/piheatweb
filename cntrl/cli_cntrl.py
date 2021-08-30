@@ -16,15 +16,10 @@ from cntrl.CntrlCliCtrl import CntrlCliCtrl
 import piheatweb.util
 
 import logging
-fn = os.environ['HOME'] + '/log/piheat.log'
-logging.basicConfig(
-  filename=fn,
-  level=logging.DEBUG,
-)
 # create console handler and set level to debug
-logger = logging.getLogger()
-logger.debug('----------------------------------------------')
-logger.debug('START CLI CNTRL')
+logger = logging.getLogger(__name__)
+#logger.debug('----------------------------------------------')
+#logger.debug('START CLI CNTRL')
 
 if __name__=='__main__':
   ### WORK

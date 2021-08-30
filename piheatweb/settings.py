@@ -4,8 +4,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = BASE_DIR + '/log'
 TMPPATH = BASE_DIR + '/tmp/'
 
-DEBUG =True
-#DEBUG =False
+#DEBUG =True
+DEBUG =False
 DEBUG2=False
 logfn_debug = LOG_DIR + '/debug.log'
 logfn_piheat= LOG_DIR + '/piheat.log'
@@ -73,7 +73,7 @@ LOGGING = {
         },
         'motors.views': {
             'handlers': ['file_debug'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False,
         },
         'asyncio': { 'level': 'WARNING', },

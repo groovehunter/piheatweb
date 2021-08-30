@@ -1,8 +1,6 @@
 from motors.BaseRule import FixedGoalAdjustableActuator
-from sensors.models import *
 from motors.models import MainValveHistory
 from piheatweb.util import *
-from django.db.models import Avg, Max, Min, Sum
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,28 +13,24 @@ if IS_PC:
 
 
 class VorlaufRule(FixedGoalAdjustableActuator):
-  multipli = 5
-  min_base = 10
-  depends_on = ('CalcVorlaufSoll')
+  multipli = 8.0
+  min_base = 10.0
+  diff_exp = 1.5
 
   def setup(self):
     # prerequisites:
     #1
     self.must = 'self.main_cur > 4000' # etwa der 0-Strich of valve
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
-    #2 - soll temp ready calculated?!
-    #self.rule_event
-    #RuleResultData_01.objects.filter(rule_event
 
-    self.logic = float(self.rule.logic)
-    #self.ctrl.vorlauf_soll_temp()
+    #self.logic = float(self.rule.logic)
     self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
-    self.save_logic()
-    self.goal = float(self.rule.logic)
+    #self.save_logic()
+    #self.goal = float(self.rule.logic)
+    self.goal = self.vorlauf_soll_calc 
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
     logger.debug('cur %s', self.cur)
-    #self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
 
   def save_logic(self):
     # Is Soll to Ist difference more than 2
@@ -77,11 +71,13 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     ctrl.setup()
 
     diff_int = int(self.diff)
+    diff = self.diff
     #diff = abs(int(self.cur) - int(self.goal))
     latest = MainValveHistory.objects.latest('id')
-    if diff_int <3:
-      diff_int = 0  # dont change too much if come near goal
-    amount = self.min_base + (self.multipli * diff_int)
+    if diff < 1.5:
+      diff = 0  # dont change too much if come near goal
+    amount_f = self.min_base + (self.multipli * diff**self.diff_exp)
+    amount = int(amount_f)
 
     if (self.cur - self.goal) > 0:
       direction = 'dn'

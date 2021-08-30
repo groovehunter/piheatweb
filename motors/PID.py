@@ -52,6 +52,8 @@ class PID:
 
         if not (delta_time.seconds >= self.sample_time):
             logger.debug('DELTA smaller sample time')
+            return None
+
         else:
             self.PTerm = error
 
@@ -82,6 +84,7 @@ class PID:
             logger.debug('PID output: %s', self.output)
 
 #            self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+        return (KpTerm, KiTerm, KdTerm)
 
     def setKp(self, proportional_gain):
         self.Kp = proportional_gain

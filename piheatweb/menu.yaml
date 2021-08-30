@@ -1,6 +1,14 @@
 # used for init. of menu
 # and permission system
 
+- cntrl:
+    id: cntrl
+    name: Control HQ
+    href: cntrl/
+    links:
+      - name: Graphen und controlling
+        href: /cntrl/view/graph
+
 - actors:
     id:     actors
     name:   Aktoren

@@ -19,6 +19,8 @@ from plotly.offline import plot
 from plotly.graph_objs import Scatter
 import plotly.express as px
 
+import logging
+logger = logging.getLogger(__name__)
 
 
 class SensorListView(ListView, ViewControllerSupport):
@@ -117,7 +119,9 @@ class SensorDataView(Controller):
 
       start_date = self.now - datetime.timedelta(hours=int(sincehours))
       if resolution:
-        revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+        logger.debug('resolution of graph: %s', resolution)
+        revents = ReadingEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(start_date, self.now))
+        #revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
       else:
         revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
 
@@ -127,12 +131,13 @@ class SensorDataView(Controller):
       timedict = {}
       c=0
       tz = timezone.get_current_timezone()
-      for i in range(4):
+      li = 3              # number of graphs
+      for i in range(li):
         tempdict[i] = []
         timedict[i] = []
       for obj in revents:
         time = obj.dtime.astimezone(tz=tz)
-        for i in range(4):
+        for i in range(li):
           sstr = '0'+str(i+1)
           temp = eval('obj.sid'+sstr+'.temperature')
           tempdict[i].append(temp)
@@ -141,21 +146,16 @@ class SensorDataView(Controller):
       sc = {}
       col = {0:'red', 1:'blue', 2:'green', 3:'orange'}
 
-
-      for i in range(4):
+      sc_list = []
+      for i in range(li):
         sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
                         mode='lines', name=sinfo[i].name, \
                         opacity=0.8, marker_color=col[i])
 #        sc[i].update_yaxes(range=[40, 80])
-
-      #plt_div = plot([sc[0], sc[1], sc[2]], output_type='div')
-      #plt_div2 = plot([sc[3]], output_type='div')
-      plt_div = plot([sc[0], sc[1], sc[2], sc[3]], output_type='div')
-      #plt_div = plot(sc, output_type='div')
+        sc_list.append(sc[i])
+      plt_div = plot(sc_list, output_type='div')
 
       self.context['plt_div'] = plt_div
-      #self.context['plt_div2'] = plt_div2
-      #self.lg.debug(plt_div)
       self.context['form'] = form
       self.template = 'sensors/graph.html'
       #self.somedata()

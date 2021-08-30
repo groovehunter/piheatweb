@@ -33,10 +33,15 @@ sensoren und aktoren erzeugt werden.
 #class ActionEvent(models.Model):
 #  dtime   = models.DateTimeField('datetime of rule check and actions')
 
+class Mode(models.Model):
+  name = models.CharField(max_length=32)
+  descr= models.CharField(max_length=255)
+  active = models.BooleanField(default=False)
+  
 
 class Rule(models.Model):
   """ Regel in der Gesamtlogik des Regelunssystems """
-  name = models.CharField(max_length=32)
+  name = models.CharField(max_length=32, unique=True)
   descr= models.CharField(max_length=255)
   logic= models.CharField(max_length=255)
   count= models.PositiveIntegerField()
@@ -69,6 +74,16 @@ class RuleResultData_02(models.Model):
   """ calculated PID output """
   rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
   dtime      = models.DateTimeField('action dtime', null=True)
+  value      = models.FloatField()
+
+class RuleResultData_03(models.Model):
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  value      = models.FloatField()
+class RuleResultData_04(models.Model):
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
+  value      = models.FloatField()
+class RuleResultData_05(models.Model):
+  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
   value      = models.FloatField()
 
 

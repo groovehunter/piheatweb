@@ -23,13 +23,14 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
   """
   def setup(self):
     self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
-    goal, pidparam = self.rule.logic.split('__')
+    self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
+    self.goal = self.vorlauf_soll_calc
+    pidparam = self.rule.logic
     logger.debug('PID params: %s', pidparam)
     p,i,d = pidparam.split(',')
     self.pid = PID(int(p), int(i), int(d))
     self.pid.setWindup(300.0)
-    self.goal = float(goal)
-    self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
+    self.diff = abs(self.ctrl.cur_vorlauf - self.vorlauf_soll_calc)
     self.cur = self.ctrl.cur_vorlauf
 
   def history_entry(self):

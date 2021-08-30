@@ -7,13 +7,13 @@ dummy:
 warmwater_range:
   name: WarmwasserRangeRule
   descr: Keep warm water between thresholds
-  logic: logogogog
+  logic: 48.0__50.0
   count: 0
   
 vorlauf_grenzwert:
   name: VorlaufGrenzwertRule
   descr: VorlaufGrenzwertRule check limits of vorlauf temp
-  logic: asdadssa
+  logic: see VorlaufSollCalcRule
   count: 0
 
 

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 from plotly.offline import plot
 #import plotly.graph_objs as go
-from plotly.graph_objs import Scatter
+from plotly.graph_objs import Scatter, Figure
 import plotly.express as px
 
 
@@ -146,33 +146,35 @@ class MotorController(Controller):
       ### query all CE, I guess those without corresponding RH
       # we need to skip later
       ce = ControlEvent.objects.filter(dtime__range=(start_date, self.now)).order_by('dtime')
-#      logger.debug('RH len %s', len(rh))
-      logger.debug('CE len: %s', len(ce))
-#      mv = MainValveHistory.objects.filter(dtime__range=(start_date, self.now))
+      #logger.debug('CE len: %s', len(ce))
+      # init graph data dict
       tempdict = {}
       timedict = {}
       rrd = {}
       l = 2
-      for i in range(l):
+      nl = 5
+      for i in range(nl):
         tempdict[i] = []
         timedict[i] = []
 
       tz = timezone.get_current_timezone()
+      rule0 = Rule.objects.filter(name='CalcVorlaufSollRule').first()
+      rule1 = Rule.objects.filter(name='CalcPI_ControlRule').first()
 
       for obj in ce:
-
         time = obj.dtime.astimezone(tz=tz)
-        logger.debug('=== NEXT: %s', time)
         rhs = obj.rulehistory_set
+        skipped = 0
         if rhs.count() == 0:
-          logger.debug('Rhs count==0 for this ce %s -- skipping!', obj)
+          skipped += 1
           continue
 
-        for i in range(l):
+        for i in range(nl):
           timedict[i].append(time)
 
-        val = 0
-        rh = rhs.filter(rule_id=9).first()
+        val = 13 #dummy
+        rh = rhs.filter(rule=rule0).first()
+        #logger.debug(rh)
         if rh:
           rrd = rh.ruleresultdata_01_set.first()
           if rrd:
@@ -180,66 +182,48 @@ class MotorController(Controller):
         tempdict[0].append(val)
 
         val = 0
-        rh = rhs.filter(rule_id=4).first()
+        rh = rhs.filter(rule=rule1).first()
         if rh:
-          res = rh.mainvalvehistory_set.first()
-          if res:
-            val = res.result_openingdegree
-            val = val / 1000
-            logger.debug("val: %s", val)
-            if val > 3000:
-              val = val / 100
-          else:
-            logger.debug('NO mv entry')
-        tempdict[1].append(val)
+          for i in range(1,5):
+            si = '0'+str(i+1)
+            evalstr = 'rh.ruleresultdata_'+si+'_set.first()'
+            rrd = eval(evalstr)
+            if rrd:
+              tempdict[i].append(rrd.value)
 
-        """
-        rule_ids = [4, 9] # len must match "l"
-        i = 0
-        for rid in rule_ids:
-          rh = rhs.filter(rule_id=rid).first()
-          logger.debug('rh %s', rh)
-          if rh == None:
-            tempdict[i].append(20) #dummy
-            i += 1
-            continue
-          if rid == 4:
-            rrd = rh.ruleresultdata_01_set.first()
-          if rid == 9:
-            rrd = None
+      logger.debug('Rhs count==0 so skipped  %s events', skipped)
 
-          if rrd == None:
-            logger.debug("RRD: %s", rrd)
-            tempdict[i].append(50)
-          else:
-            tempdict[i].append(rrd.value)
-            logger.debug("RRD: %s", i, rrd.value)
-          i += 1
-        """
-
-      for i in range(l):
-        logger.debug('len tempdict: %s', len(tempdict[i]))
-        logger.debug('len timedict: %s', len(timedict[i]))
-#      logger.debug('tempdict-1: %s', tempdict[1])
+#      logger.debug('len tempdict: %s', len(tempdict[i]))
+        #logger.debug('tempdict: %s', tempdict[i])
 #      logger.debug('len timedict: %s', len(timedict[i]))
 
-#      self.context['debug'] = c
       sc = {}
-      col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
+      col = {0:'green', 1:'blue', 2:'red', 3:'orange', 4:'black'}
       info = {
-        0: 'RRD1 / CalcSoll', 1: 'RRD2 / ANY', 2: 'RRD3',
+        0: 'RRD1 / CalcSoll', 
+        1: 'PID output ---------', 
+        2: 'P-faktor',
+        3: 'I-faktor',
+        4: 'D-faktor',
       }
 
-      for i in range(l):
-        logger.debug(i)
-        sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
-                        mode='lines', name=info[i], \
-                        opacity=0.8, marker_color=col[i])
+      fig = Figure()
+      for i in range(5):
+        sc[i] = Scatter(
+                    #title = 'PID values',
+                    x=timedict[i], y=tempdict[i],
+                    mode='lines+markers', 
+                    name=info[i],
+                    opacity=0.99, 
+                    #marker_color=col[i],
+                    #marker=dict(size=[40, 60], color=[0, 1,])
+        )
+      fig.add_trace(sc[1])
 
-      plt_div = plot([sc[0], sc[1]], output_type='div')
+      plt_div = plot([ sc[1], sc[2], sc[3], sc[4]], output_type='div')
       #plt_div = plot(sc, output_type='div')
       self.context['plt_div'] = plt_div
-      #logger.debug(plt_div)
+
       form = GraphAttributesForm()
       self.context['form'] = form
       self.template = 'motors/graph.html'

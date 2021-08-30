@@ -26,8 +26,9 @@ def read_adc():
   tz_now = timezone.now() # TZ aware :)
 
   event = ReadingEvent(dtime=tz_now)
-  ctrl_event = ControlEvent(dtime=tz_now)
-  ctrl_event.save()
+  #ctrl_event = ControlEvent(dtime=tz_now)
+  #ctrl_event.save()
+  ctrl_event = ControlEvent.objects.latest('dtime')
 
   for i in range(4):
     values[i] = adc.read_adc(i, gain=GAIN, data_rate=128)

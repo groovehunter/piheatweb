@@ -1,9 +1,6 @@
 
-from datetime import datetime
-from motors.models import Rule, RuleHistory
-
+from motors.models import Rule
 from django.utils import timezone
-#now = timezone.now() # TZ aware :)
 import logging
 logger = logging.getLogger(__name__)
 
@@ -33,7 +30,7 @@ class BaseRule:
     self.rule = rule
 
   def check(self):
-    raise NotImplemented
+    raise NotImplementedError("Function 'check' must be implemented in subclass")
 
   def extract_logic(self):
     logic = self.rule.logic
@@ -89,6 +86,7 @@ class ThresholdRule(BaseRule):
       return True
 
     elif (cur < self.lower or cur > self.upper):
+      logger.debug("--> action needed")
       self.ctrl.rule_event.result = 1
       self.ctrl.rule_event.save()
       return False
