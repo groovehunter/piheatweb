@@ -11,6 +11,7 @@ Ist Sensor-Temperatur > threshhold_upper-limit => steuere Ventiltrieb 1000 punkt
 
 ### TODO mixed
 * remove microsecond and milliseconds precision in all datetime fields
+* async framework, remove time.sleep idle stuff
 
 
 

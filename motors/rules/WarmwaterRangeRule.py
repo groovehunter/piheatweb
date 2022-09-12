@@ -49,6 +49,14 @@ class WarmwaterRangeRule(ThresholdRule):
 
   def action(self):
     """ act because rule was not fulfilled """
+    # wenn kessel warm genug OK return
+    # wenn kessel lower, dann check ob vorlauf höher als kessel
+    # nur dann pumpe an
+    # Ansonsten calc vorlauf entsprechend PI regelung zb 
+    # 
+    # also vllt, eine rule fuer pumpe an und aus wie hier schon 
+    # und eine andere rule für vorlauf, wenn mode fuer nur warmwater
+
     self.ctrl.rule_event.result = 1
 
     entry = self.history_entry()

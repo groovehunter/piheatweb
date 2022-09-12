@@ -26,8 +26,9 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     #self.logic = float(self.rule.logic)
     self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
     #self.save_logic()
-    #self.goal = float(self.rule.logic)
     self.goal = self.vorlauf_soll_calc 
+    # QUICK FIX 21-10-04 
+    self.goal = float(self.rule.logic)
     self.diff = abs(self.ctrl.cur_vorlauf - self.goal)
     self.cur = self.ctrl.cur_vorlauf
     logger.debug('cur %s', self.cur)

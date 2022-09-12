@@ -28,10 +28,10 @@ class CalcVorlaufSollRule(CalcMethod, Calc):
     #vl= 0.5 * 1.8317984 * (21.0 - temp)**0.8281902 + 1.0 + 21.0
 #    logger.debug('vl %s', vl)
 
-#    logger.debug('outdoor avg %s', temp)
-#    logger.debug('temp - 20 %s', temp-20)
+    logger.debug('outdoor avg %s', temp)
+    logger.debug('temp - 20 %s', temp-20)
     w = ((temp-20) * self.charac_fac)
-#    logger.debug('after fac %s', w)
+    logger.debug('after fac %s', w)
     self.soll_calc = w + 32
     #self.soll_calc = ((temp-20) * self.charac_fac) + 25
 

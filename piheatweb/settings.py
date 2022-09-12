@@ -73,7 +73,7 @@ LOGGING = {
         },
         'motors.views': {
             'handlers': ['file_debug'],
-            'level': 'INFO',
+            'level': 'DEBUG',
             'propagate': False,
         },
         'asyncio': { 'level': 'WARNING', },

@@ -146,7 +146,7 @@ class MotorController(Controller):
       ### query all CE, I guess those without corresponding RH
       # we need to skip later
       ce = ControlEvent.objects.filter(dtime__range=(start_date, self.now)).order_by('dtime')
-      #logger.debug('CE len: %s', len(ce))
+      logger.debug('CE len: %s', len(ce))
       # init graph data dict
       tempdict = {}
       timedict = {}
@@ -161,14 +161,20 @@ class MotorController(Controller):
       rule0 = Rule.objects.filter(name='CalcVorlaufSollRule').first()
       rule1 = Rule.objects.filter(name='CalcPI_ControlRule').first()
 
+      ce = []
+      logger.debug('ce', ce)
       for obj in ce:
-        time = obj.dtime.astimezone(tz=tz)
+        #time = obj.dtime.astimezone(tz=tz)
+        #logger.debug('X')
+        #logger.debug('time', type(time))
+        """
         rhs = obj.rulehistory_set
+        logger.debug('rhs', rhs)
         skipped = 0
         if rhs.count() == 0:
           skipped += 1
           continue
-
+        """
         for i in range(nl):
           timedict[i].append(time)
 
@@ -183,19 +189,21 @@ class MotorController(Controller):
 
         val = 0
         rh = rhs.filter(rule=rule1).first()
+        logger.debug('rh', rh)
         if rh:
           for i in range(1,5):
             si = '0'+str(i+1)
             evalstr = 'rh.ruleresultdata_'+si+'_set.first()'
             rrd = eval(evalstr)
             if rrd:
+              logger.debug('rrd.value', rrd.value)
               tempdict[i].append(rrd.value)
 
       logger.debug('Rhs count==0 so skipped  %s events', skipped)
 
-#      logger.debug('len tempdict: %s', len(tempdict[i]))
-        #logger.debug('tempdict: %s', tempdict[i])
-#      logger.debug('len timedict: %s', len(timedict[i]))
+      logger.debug('len tempdict: %s', len(tempdict[i]))
+      logger.debug('tempdict: %s', tempdict[i])
+      logger.debug('len timedict: %s', len(timedict[i]))
 
       sc = {}
       col = {0:'green', 1:'blue', 2:'red', 3:'orange', 4:'black'}
@@ -261,9 +269,15 @@ def rule_edit(request, pk):
 
 #### Motor
 def action(request, method):
+  logger.debug('views action', method)
   ctrl = MotorController(request)
   return eval('ctrl.'+method+'()')
 
 def show(request, pk):
   ctrl = MotorController(request)
   return ctrl.show(pk)
+
+def graph(request):
+  ctrl = MotorController(request)
+  return ctrl.graph()
+

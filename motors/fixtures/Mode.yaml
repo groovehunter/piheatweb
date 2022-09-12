@@ -1,3 +1,7 @@
+heating_only:
+  name: HeatingOnlyMode
+  descr: Heating only, no warm usage water
+
 heating:
   name: HeatingMode
   descr: heating normal power plus warmwater
