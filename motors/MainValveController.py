@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
 from datetime import datetime
 from motors.models import MainValveHistory
 from motors.forms import MVControlForm
@@ -40,7 +40,7 @@ def change2db(direction, amount, cur):
   entry.save()
 
 
-class MainValveController(Controller):
+class MainValveController(ViewControllerSupport):
   def __init__(self, request):
     Controller.__init__(self, request)
     self.template = 'motors/mainvalvectrl.html'
@@ -79,4 +79,3 @@ class MainValveController(Controller):
     self.context['cur'] = cur
     self.context['form'] = form
     return render(self.request, self.template, self.context)
-

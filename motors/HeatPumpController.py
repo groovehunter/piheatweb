@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
 from datetime import datetime
 from motors.forms import MotorControlGenericForm
 from django.utils.timezone import now
@@ -19,7 +19,7 @@ def change2db(status, cur):
   entry.save()
 
 
-class HeatPumpController(Controller):
+class HeatPumpController(ViewControllerSupport):
   def __init__(self, request):
     Controller.__init__(self, request)
     self.template = 'motors/heatpumpctrl.html'

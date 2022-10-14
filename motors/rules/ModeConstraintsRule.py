@@ -2,12 +2,19 @@
 import logging
 logger = logging.getLogger(__name__)
 
+from piheatweb.util import IS_PC, IS_RPi
 from motors.BaseRule import BaseRule
-from motors.HeatPump import HeatPumpCtrl
-from motors.WarmwaterPump import WarmwaterPumpCtrl
+if IS_PC:   #
+  from motors.HeatPumpDummy import HeatPumpCtrlDummy
+  from motors.WarmwaterPumpDummy import WarmwaterPumpCtrlDummy
+if IS_RPi:
+  from motors.HeatPumpCtrl import HeatPumpCtrl
+  from motors.HeatPump import HeatPumpCtrl
+  from motors.WarmwaterPump import WarmwaterPumpCtrl
 
 from motors.models import Mode  #, HeatPumpHistory, WarmwaterPump
 from datetime import datetime
+
 
 class ModeExecutionRule(BaseRule): pass
 
