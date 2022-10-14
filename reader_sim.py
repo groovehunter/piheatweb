@@ -203,3 +203,4 @@ if __name__ == '__main__':
   logger.debug('START READER ======================')
   read_adc()
   tempcalc()
+

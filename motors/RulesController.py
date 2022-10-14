@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from motors.rules import *
 
 import motors.rules
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
 from motors.models import Rule, RuleHistory
 from motors.tables import RulesListTable
 
@@ -10,7 +10,7 @@ from motors.KlassLoader import KlassLoader
 from motors.forms import RuleEditForm
 
 
-class RulesController(Controller, KlassLoader):
+class RulesController(ViewControllerSupport, KlassLoader):
   """ web ui controller """
   def __init__(self, request):
     Controller.__init__(self, request)
@@ -52,7 +52,7 @@ class RulesController(Controller, KlassLoader):
     else:
       form = RuleEditForm(self.request.POST)
       form.save()
-      
+
     self.context['form'] = form.as_table()
     self.template = 'rules/edit.html'
     return self.render()

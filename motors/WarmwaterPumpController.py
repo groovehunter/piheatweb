@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
 from datetime import datetime
 from motors.models import WarmwaterPumpHistory
 from motors.forms import MotorControlGenericForm
@@ -21,7 +21,7 @@ def change2db(status, cur):
   entry.save()
 
 
-class WarmwaterPumpController(Controller):
+class WarmwaterPumpController(ViewControllerSupport):
   def __init__(self, request):
     Controller.__init__(self, request)
     self.template = 'motors/warmwaterctrl.html'

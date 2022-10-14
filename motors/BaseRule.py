@@ -4,6 +4,19 @@ from django.utils import timezone
 import logging
 logger = logging.getLogger(__name__)
 
+class CalcMethod:
+  def __init__(self):
+    self.now = timezone.now()
+  def setup(self):
+    self.load_sensordata()
+  def report(self):
+    pass
+  def set_rule(self, rule):
+    """ just need to set rule obj as a member of the subclass
+        so we can access it;
+        And also create a new RuleHistory entry pointing to the rule obj """
+    self.rule = rule
+
 
 class BaseRule:
   """ maybe:

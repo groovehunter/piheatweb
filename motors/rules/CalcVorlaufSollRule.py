@@ -66,3 +66,4 @@ class CalcVorlaufSollRule(CalcMethod, Calc):
     # XXX only AVAIL. when Rule object running
     #data.rule_event = self.
     data.save()
+

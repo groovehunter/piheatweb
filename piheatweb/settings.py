@@ -108,6 +108,7 @@ INSTALLED_APPS = [
     'django_tables2',
     'tailwind',
     'theme',
+    'djflow',
     'py_yaml_fixtures',
 ]
 
