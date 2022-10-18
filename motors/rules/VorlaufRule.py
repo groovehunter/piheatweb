@@ -21,7 +21,7 @@ class VorlaufRule(FixedGoalAdjustableActuator):
     # prerequisites:
     #1
     self.must = 'self.main_cur > 4000' # etwa der 0-Strich of valve
-    self.main_cur = MainValveHistory.objects.latest('dtime').result_openingdegree
+    self.main_cur = MainValveHistory.objects.latest('id').result_openingdegree
 
     #self.logic = float(self.rule.logic)
     self.vorlauf_soll_calc = self.ctrl.getVorlaufSollCalc()
@@ -47,7 +47,6 @@ class VorlaufRule(FixedGoalAdjustableActuator):
 
   def history_entry(self):
     entry = MainValveHistory(
-      dtime = self.now,
       change_amount = 0,
       rule_event = self.ctrl.rule_event,
     )

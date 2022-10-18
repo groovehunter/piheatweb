@@ -34,13 +34,12 @@ class WarmwaterRangeRule(ThresholdRule):
       self.upper = 48.0
     self.MSG_TO_LOW  = 'Temp. ist unter %s, Pumpe wird/bleibt aktiviert.' %self.lower
     self.MSG_TO_HIGH = 'Temp. ist über %s, Pumpe wird/bleibt deaktiviert.' %self.upper
-    some = SensorData_03.objects.order_by('-dtime')[1:5]
+    some = SensorData_03.objects.order_by('-id')[1:5]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur = float(cur)
 
   def history_entry(self):
       entry = WarmwaterPumpHistory(
-        dtime = self.now,
         change_status = 'UNDEFINED',
         rule_event = self.ctrl.rule_event,
       )

@@ -2,9 +2,9 @@
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 from django.views.generic.edit import CreateView
-from users.models import CustomUser
+#from users.models import CustomUser
 
-from .forms import CustomUserCreationForm, CustomUserEditForm
+#from .forms import CustomUserCreationForm, CustomUserEditForm
 from .UserController import UserController
 
 
@@ -17,7 +17,7 @@ def logout(request):
     return ctrl.logout_user()
 
 class SignUpView(CreateView):
-    form_class = CustomUserCreationForm
+#    form_class = CustomUserCreationForm
     success_url = reverse_lazy('login')
     template_name = 'signup.html'
 

@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+""" create random temperature entries in sensordata table 
+    for debugging and testing
+"""
+
 import os
 import logging
 from time import sleep
@@ -57,7 +61,7 @@ def sensor_data_around(d1, diff, smin, smax):
     logger.debug('tendkeep is 0: %s', tendkeep)
     change = -change
 
-  logger.debug('change : %s', change)
+  #logger.debug('change : %s', change)
   newd = d1 + change
 
   # keep between a min and max  
@@ -65,56 +69,54 @@ def sensor_data_around(d1, diff, smin, smax):
   if newd > smax: newd = smax
   return newd
 
+
 def read_adc():
-  #last_ce = ControlEvent.objects.latest('id')
   last = ControlEvent.objects.all().order_by('-id')[:4]
   last_ce     = last[0]
   secondlast_ce  = last[1]
   logger.debug("last ce: %s", last_ce.id)
   logger.debug("secondlast ce: %s", secondlast_ce.id)
-  
   tz_now = timezone.now() # TZ aware :)
 
-  event = ReadingEvent(dtime=tz_now)
-  #ctrl_event = ControlEvent(dtime=tz_now)
-  #ctrl_event.save()
+  ctrl_event = ControlEvent(dtime=tz_now)
+  ctrl_event.save()
 
   for i in range(4):
     sid = '0'+str(i+1)
 
-    evalstr = 'SensorData_'+sid+'.objects.filter(ctrl_event__pk=last[1].id)'
+    evalstr = 'sd = ctrl_event.sensordata_'+sid
     try:
-      last_adc_out = eval(evalstr).first().adc_out
+      last_adc_out = sd.adc_out
     except:
       last_adc_out = (smax[i] + smin[i]) / 2
-      logger.debug("last[1] ### using mean value")
+      #logger.debug("last[1] ### using mean value")
 
-    evalstr = 'SensorData_'+sid+'.objects.filter(ctrl_event__pk=last[2].id)'
+    evalstr = 'sd = ctrl_event.sensordata_'+sid
     try:
       seclast_adc_out = eval(evalstr).first().adc_out
     except:
       seclast_adc_out = last_adc_out
-      logger.debug("last[2] ### using last[1]")
+      #logger.debug("last[2] ### using last[1]")
 
-    logger.debug(" last: %s", last_adc_out)
-    logger.debug("slast: %s", seclast_adc_out)
+    #logger.debug(" last: %s", last_adc_out)
+    #logger.debug("slast: %s", seclast_adc_out)
     diff = seclast_adc_out - last_adc_out 
-    logger.debug('diff : %s', diff)
+    #logger.debug('diff : %s', diff)
     value = sensor_data_around(last_adc_out, diff, smin[i], smax[i])
-    logger.debug('NEW: %s', value)
-    logger.debug('-----------------------------')
+    #logger.debug('NEW: %s', value)
+    #logger.debug('-----------------------------')
 
     obj = eval('SensorData_'+sid+'()')
-    obj.dtime = tz_now
     obj.adc_out = value
     obj.temperature = 0
     obj.resistance = 0
     obj.ctrl_event = last_ce
     obj.save()
-    evalstr = 'event.sid'+sid+'=obj'
-    exec(evalstr)
+    #evalstr = 'event.sid'+sid+'=obj'
+    #logger.debug(evalstr)
+    #eval(evalstr)
  
-  event.save()
+  ctrl_event.save()
 
 
 

@@ -24,6 +24,7 @@
     "webpack-manifest-plugin": "^2.2.0"
   },
   "dependencies": {
+    "caniuse-lite": "^1.0.30001420",
     "npm-run-all": "^4.1.5",
     "plotly": "^1.0.6",
     "plotly.js-dist": "^1.58.4"

@@ -60,10 +60,13 @@ class CalcVorlaufSollRule(CalcMethod, Calc):
 
   def save(self):
     data = RuleResultData_01()
-    data.value = round(self.soll_calc, 2)
+    value = round(self.soll_calc, 2)
+    data.value = value
     data.dtime = self.now
     data.rule_event = self.ctrl.rule_event
     # XXX only AVAIL. when Rule object running
     #data.rule_event = self.
     data.save()
-
+    ### 2022-10 
+    self.ctrl.rule_event.result = value
+    self.ctrl.rule_event.save()

@@ -4,8 +4,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = BASE_DIR + '/log'
 TMPPATH = BASE_DIR + '/tmp/'
 
-#DEBUG =True
-DEBUG =False
+DEBUG =True
+#DEBUG =False
 DEBUG2=False
 logfn_debug = LOG_DIR + '/debug.log'
 logfn_piheat= LOG_DIR + '/piheat.log'
@@ -85,7 +85,7 @@ LOGGING = {
 
 SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
-AUTH_USER_MODEL = "users.CustomUser"
+#AUTH_USER_MODEL = "users.CustomUser"
 TAILWIND_APP_NAME = 'theme'
 DJANGO_TABLES2_TEMPLATE = "table.html"
 
@@ -163,6 +163,8 @@ DATABASES = {
         'PORT': '3306'
     }
 }
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 
 LANGUAGE_CODE = 'en-us'

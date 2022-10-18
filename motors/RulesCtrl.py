@@ -25,6 +25,7 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   def setup(self):
     self.klass_list = self.get_klasslist(motors.rules)
+    logger.debug(self.klass_list)
     self.load_sensordata()
     m = Mode.objects.filter(active=True).first()
     if m:
@@ -45,11 +46,12 @@ class RulesCliCtrl(KlassLoader, Calc):
     rules = Rule.objects.all()
     for rule in rules:
       self.rules_list_db[rule.name] = rule
+    logger.debug(self.rules_list_db)
 
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule_db in self.rules_list_db.items():
-      #logger.debug('checking rule: %s ', rule_name)
+      logger.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
       else:
@@ -87,7 +89,7 @@ class RulesCliCtrl(KlassLoader, Calc):
     rule_event.rule = rule_db
     rule_event.ctrl_event = self.ctrl_event
     self.rule_event = rule_event
-    ### XXX when is this saved?? 
+    ### XXX when is this saved??
 
   def setval(self, rulename, val):
     rule_db = self.rules_list_db[rulename]

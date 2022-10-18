@@ -29,7 +29,7 @@ class Sim:
   def setup(self):
     self.last = ControlEvent.objects.all().order_by('-id')[:4]
     self.last_ce     = self.last[0]
-    self.readingevent = ReadingEvent(dtime=self.tz_now)
+    self.ctrl_event = ControlEvent(dtime=self.tz_now)
     logger.debug(self.last_ce)
 
   def all(self):
@@ -171,15 +171,11 @@ class Sim:
     # link key to controlevent
     obj.ctrl_event = self.last_ce
     obj.save()
-    # legacy readingevent
-    evalstr = 'self.readingevent.sid'+str_sid+'=obj'
-    exec(evalstr)
-    self.readingevent.save()
 
   def load_latest_adc(self, sid):
     str_sid = '0'+str(sid)
     evalstr = 'SensorData_'+str_sid+".objects.latest('-id')"
-    logger.debug(evalstr)
+    #logger.debug(evalstr)
     obj = eval(evalstr)
     return obj.adc_out
 

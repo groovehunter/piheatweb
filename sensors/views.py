@@ -6,7 +6,8 @@ from django.utils import timezone
 
 from .models import SensorData_01, SensorData_02, \
 SensorData_03, SensorData_04
-from .models import SensorInfo, ReadingEvent
+from cntrl.models import ControlEvent
+from .models import SensorInfo
 from .tables import SensorDetailTable, SensorListTable, \
 SensorDataTable, AllSensorTable
 from piheatweb.ViewController import ViewControllerSupport
@@ -79,20 +80,41 @@ class SensorDataView(Controller):
       """ all sensors temp next to each other
           parameter daterange
       """
-#      SensorData_01.obj
       start_date = datetime.date(2021, 1, 2)
       end_date = datetime.date(2021, 1, 5)
-      revents = ReadingEvent.objects.filter(dtime__minute=0).order_by('-id')  #, dtime__range=(start_date, end_date))
+      cevents = ControlEvent.objects.all().order_by('-id').select_related()
+      #cevents = ControlEvent.objects.filter(dtime__minute=0).order_by('-id').select_related()
       object_list = []
-      #self.lg.debug(len(revents))
+      logger.debug(len(cevents))
       line = []
-      for obj in revents:
+      for obj in cevents:
+        logger.debug(obj.id)
+        try:
+          s01 = obj.sensordata_01.temperature
+        except ControlEvent.sensordata_01.RelatedObjectDoesNotExist:
+          logger.debug('s01 not found')
+          s01 = 77.7
+        try:
+          s02 = obj.sensordata_02.temperature
+        except ControlEvent.sensordata_02.RelatedObjectDoesNotExist:
+          s02 = None
+          logger.debug('s02 not found')
+        try:
+          s03 = obj.sensordata_03.temperature
+        except ControlEvent.sensordata_03.RelatedObjectDoesNotExist:
+          s03 = None
+          logger.debug('s03 not found')
+        try:
+          s04 = obj.sensordata_04.temperature
+        except ControlEvent.sensordata_04.RelatedObjectDoesNotExist:
+          s04 = None
+          logger.debug('s04 not found')
         d = {
           'dtime':obj.dtime,
-          'sid01':obj.sid01.temperature,
-          'sid02':obj.sid02.temperature,
-          'sid03':obj.sid03.temperature,
-          'sid04':obj.sid04.temperature,
+          'sid01':s01,
+          'sid02':s02,
+          'sid03':s03,
+          'sid04':s04,
               }
         line.append(d)
       object_list = line
@@ -120,10 +142,9 @@ class SensorDataView(Controller):
       start_date = self.now - datetime.timedelta(hours=int(sincehours))
       if resolution:
         logger.debug('resolution of graph: %s', resolution)
-        revents = ReadingEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(start_date, self.now))
-        #revents = ReadingEvent.objects.filter(dtime__minute=0, dtime__range=(start_date, self.now))
+        revents = ControlEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(start_date, self.now))
       else:
-        revents = ReadingEvent.objects.filter(dtime__range=(start_date, self.now))
+        revents = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
 
       sinfo = SensorInfo.objects.order_by('id').all()
  #     self.lg.debug(len(revents))
@@ -139,10 +160,12 @@ class SensorDataView(Controller):
         time = obj.dtime.astimezone(tz=tz)
         for i in range(li):
           sstr = '0'+str(i+1)
-          temp = eval('obj.sid'+sstr+'.temperature')
-          tempdict[i].append(temp)
-          timedict[i].append(time) #obj.dtime)
-        #c+=1
+          ss = 'sensordata_'+sstr
+          s = getattr(obj, ss, None)
+          if s:
+            temp = s.temperature
+            tempdict[i].append(temp)
+            timedict[i].append(time)
       sc = {}
       col = {0:'red', 1:'blue', 2:'green', 3:'orange'}
 

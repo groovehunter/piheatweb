@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from piheatweb import views
+#from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
 #    path('', views.index, name='index'),
@@ -16,3 +17,4 @@ urlpatterns = [
     path('cntrl/', include('cntrl.urls')),
 
 ]
+#urlpatterns += staticfiles_urlpatterns()

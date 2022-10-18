@@ -5,14 +5,14 @@ dummy:
   count: 0
 
 warmwater_range:
-  name: WarmwasserRangeRule
+  name: WarmwaterRangeRule
   descr: Keep warm water between thresholds
   logic: 48.0__50.0
   count: 0
   
-vorlauf_grenzwert:
-  name: VorlaufGrenzwertRule
-  descr: VorlaufGrenzwertRule check limits of vorlauf temp
+vorlauf:
+  name: VorlaufRule
+  descr: VorlaufRule check limits of vorlauf temp
   logic: see VorlaufSollCalcRule
   count: 0
 

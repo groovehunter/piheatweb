@@ -37,7 +37,7 @@ class Mode(models.Model):
   name = models.CharField(max_length=32)
   descr= models.CharField(max_length=255)
   active = models.BooleanField(default=False)
-  
+
 
 class Rule(models.Model):
   """ Regel in der Gesamtlogik des Regelunssystems """
@@ -56,7 +56,6 @@ class RuleHistory(models.Model):
   ctrl_event = models.ForeignKey(ControlEvent,
       on_delete=models.CASCADE,
       default = DEFAULT_EVENT)
-  dtime   = models.DateTimeField('rule check and action dtime', null=True)
   rule = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
   result = models.CharField(max_length=20, null=True)
   def get_absolute_url(self):
@@ -102,7 +101,6 @@ class Motor(models.Model):
 
 
 class WarmwaterPumpHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_status = models.CharField(null=True, max_length=40,
     choices=PumpStatus.choices,
     default=PumpStatus.UNDEFINED,
@@ -111,7 +109,6 @@ class WarmwaterPumpHistory(models.Model):
   rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
 class HeatPumpHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_status = models.CharField(null=True, max_length=40,
     choices=PumpStatus.choices,
     default=PumpStatus.UNDEFINED,
@@ -119,9 +116,7 @@ class HeatPumpHistory(models.Model):
   change_descr  = models.CharField(max_length=255)
   rule_event    = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
-
 class MainValveHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_amount = models.IntegerField(null=True)
   change_dir    = models.CharField(
     max_length=12,
