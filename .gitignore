@@ -49,3 +49,4 @@ nohup.out
 # tailwind master generated css
 index.css
 djflow/
+output.html

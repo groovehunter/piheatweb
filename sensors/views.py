@@ -13,11 +13,12 @@ SensorDataTable, AllSensorTable
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 from piheatweb.forms import GraphAttributesForm
+from piheatweb.graphutils import GraphMixin
 
 import datetime
 from plotly.offline import plot
 #import plotly.graph_objs as go
-from plotly.graph_objs import Scatter
+from plotly.graph_objs import Scatter, Figure
 import plotly.express as px
 
 import logging
@@ -68,10 +69,9 @@ class SensorDetailView(DetailView, ViewControllerSupport):
         return self.render()
 
 
-class SensorDataView(Controller):
-    """ data of sensor 01 only """
+class SensorDataView(Controller, GraphMixin):
+    """ data of sensor """
 
-    # generalize later
     def __init__(self, request):
         Controller.__init__(self, request)
         self.now = timezone.now()
@@ -80,8 +80,8 @@ class SensorDataView(Controller):
       """ all sensors temp next to each other
           parameter daterange
       """
-      start_date = datetime.date(2021, 1, 2)
-      end_date = datetime.date(2021, 1, 5)
+      self.graph_form()
+
       cevents = ControlEvent.objects.all().order_by('-id').select_related()
       #cevents = ControlEvent.objects.filter(dtime__minute=0).order_by('-id').select_related()
       object_list = []
@@ -128,34 +128,33 @@ class SensorDataView(Controller):
       self.context['keys'] = keys
       return self.render()
 
-    def graph(self):
-      sincehours = 3
-      resolution = False
-      if self.request.GET.get('go'):
-        form = GraphAttributesForm(self.request.GET)
-        if form.is_valid():
-          sincehours = form.cleaned_data['sincehours']
-          resolution = form.cleaned_data['resolution']
-      else:
-        form = GraphAttributesForm()
+    def dict_for_ces(self, ces):
+      for obj in ces:
+        time = obj.dtime.astimezone(tz=tz)
+        li = 3
+        for i in range(li):
+          sstr = '0'+str(i+1)
+          ss = 'sensordata_'+sstr
+          s = getattr(obj, ss, None)
+          if s:
+            temp = s.temperature
+            self.tempdict[i].append(temp)
+            self.timedict[i].append(time)
 
-      start_date = self.now - datetime.timedelta(hours=int(sincehours))
-      if resolution:
-        logger.debug('resolution of graph: %s', resolution)
+    def graph(self):
+      self.graph_form()
+
+      if self.resolution:
+        logger.debug('resolution of graph: %s', self.resolution)
         revents = ControlEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(start_date, self.now))
       else:
-        revents = ControlEvent.objects.filter(dtime__range=(start_date, self.now))
+        revents = ControlEvent.objects.filter(dtime__range=(self.start_date, self.now))
 
       sinfo = SensorInfo.objects.order_by('id').all()
- #     self.lg.debug(len(revents))
-      tempdict = {}
-      timedict = {}
-      c=0
       tz = timezone.get_current_timezone()
       li = 3              # number of graphs
-      for i in range(li):
-        tempdict[i] = []
-        timedict[i] = []
+      self.setup_graph(li)
+
       for obj in revents:
         time = obj.dtime.astimezone(tz=tz)
         for i in range(li):
@@ -164,31 +163,13 @@ class SensorDataView(Controller):
           s = getattr(obj, ss, None)
           if s:
             temp = s.temperature
-            tempdict[i].append(temp)
-            timedict[i].append(time)
-      sc = {}
-      col = {0:'red', 1:'blue', 2:'green', 3:'orange'}
+            self.tempdict[i].append(temp)
+            self.timedict[i].append(time)
 
-      sc_list = []
-      for i in range(li):
-        sc[i] = Scatter(x=timedict[i], y=tempdict[i], \
-                        mode='lines', name=sinfo[i].name, \
-                        opacity=0.8, marker_color=col[i])
-#        sc[i].update_yaxes(range=[40, 80])
-        sc_list.append(sc[i])
-      plt_div = plot(sc_list, output_type='div')
+      self.plotter(li)
 
-      self.context['plt_div'] = plt_div
-      self.context['form'] = form
       self.template = 'sensors/graph.html'
-      #self.somedata()
       return self.render()
-
-
-    def daterange(self):
-      start_date = datetime.date(2021, 1, 1)
-      end_date = datetime.date(2021, 1, 2)
-      return SensorData_01.objects.filter(dtime__range=(start_date, end_date))
 
     def list(self, sid):
         sensorinfo = SensorInfo.objects.get(pk=sid)
@@ -205,7 +186,6 @@ class SensorDataView(Controller):
 #        object_list = SensorData_01.objects.filter(resistance__gt=6500).order_by("-dtime")
 #        object_list = SensorData_01.objects.dates('dtime', 'day')
         self.lg.debug(len(object_list))
-        #object_list = self.daterange()
 
         table = SensorDataTable(object_list)
         self.context['table'] = table

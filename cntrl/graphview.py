@@ -1,108 +1,88 @@
-from django.db.models.query import prefetch_related_objects
+#from django.db.models.query import prefetch_related_objects
 
 from piheatweb.ViewController import ViewControllerSupport
-from piheatweb.Controller import Controller
-from piheatweb.forms import GraphAttributesForm
+#from piheatweb.forms import GraphAttributesForm
 
-from motors.models import Rule, RuleHistory, RuleResultData_01, RuleResultData_02
-from cntrl.models import ControlEvent
+#from cntrl.models import ControlEvent
 
-from datetime import datetime, timedelta
+#from datetime import datetime, timedelta
 from django.utils import timezone
-from random import randint
+#from random import randint
 import logging
 logger = logging.getLogger(__name__)
-
+from piheatweb.graphutils import GraphMixin
+from motors.models import RuleHistory
+from django.db.models import OuterRef, Exists
+from .models import ControlEvent
+"""
 from plotly.offline import plot
 #import plotly.graph_objs as go
 from plotly.graph_objs import Scatter, Figure
 import plotly.express as px
+"""
 
 
-class CntrlController(Controller):
-    def __init__(self, request):
-      Controller.__init__(self, request)
-      self.now = timezone.now()
 
-    def graph(self):
-      GET = self.request.GET
-      sincehours = int(GET.get('sincehours', default=3))
-      resolution = int(GET.get('resolution', default=False))
-      start_date = self.now - timedelta(hours=sincehours)
+class CntrlController(ViewControllerSupport, GraphMixin):
+  def __init__(self, request):
+    self.request = request
+    self.now = timezone.now()
+    self.init_ctrl()
 
-      logger.debug('graph start date: %s', start_date)
-      myrule = Rule.objects.get(name='CalcVorlaufSollRule')
-      ### query all CE, I guess those without corresponding RH
-      # we need to skip later
-      if resolution:
-        ce = ControlEvent.objects.filter(dtime_minute__endswith=0, dtime__range=(start_date, self.now)).order_by('dtime')
-      else:
-        ce = ControlEvent.objects.filter(dtime__range=(start_date, self.now)).order_by('dtime')
-      logger.debug('CE len: %s', len(ce))
-      # init graph data dict
-      tempdict = {}
-      timedict = {}
-      rrd = {}
-      l = 2
-      for i in range(l):
-        tempdict[i] = []
-        timedict[i] = []
+  def home(self):
+    self.template_name = 'motors/graph.html'
+    return self.render()
 
-      tz = timezone.get_current_timezone()
+  # combo plot. for sensors, actors
+  # Needs same timedict for all Scatters
+  # so use only ControlEvents which have rule_event associated
+  def combined_graph(self):
+    self.graph_form()
+    ces = self.get_latest_ce_of_rh(self.start_date)
+    nl = 5 # 3xsensor, 2xactor
+    self.setup_graph(nl)
+    # populate all timedicts at once
+    for obj in ces:
+      for i in range(nl):
+        self.timedict[i].append(obj.dtime)
 
-      for obj in ce:
-        time = obj.dtime.astimezone(tz=tz)
-        #logger.debug('=== NEXT: %s', time)
-        rhs = obj.rulehistory_set
-        skipped = 0
-        if rhs.count() == 0:
-          skipped += 1
-          continue
+    # collect all values for ces
+    self.dict_for_ces(ces, [0,1,2])
+    self.motor_dict_for_ces(ces, [3,4])
+    # call GraphMixin.pl2()
+    self.pl2(4)
+    self.template_name = 'motors/graph.html'
+    return self.render()
 
-        for i in range(l):
-          timedict[i].append(time)
+  def get_latest_ce_of_rh(self, start_date):
+    rh = RuleHistory.objects.filter(ctrl_event=OuterRef('id'))
+    ces = ControlEvent.objects.filter(Exists(rh), dtime__range=(start_date, self.now)).order_by('-dtime')
+    return ces
 
-          val = randint(1,20)
-          tempdict[1].append(val)
+  def dict_for_ces(self, ces, li_list):
+    for obj in ces:
+      #time = obj.dtime.astimezone(tz=tz)
+      #li = 3
+      for i in li_list:
+        sstr = '0'+str(i+1)
+        ss = 'sensordata_'+sstr
+        s = getattr(obj, ss, None)
+        if s:
+          temp = s.temperature
+          self.tempdict[i].append(temp)
+          #self.timedict[i].append(time)
 
-      logger.debug('Rhs count==0 so skipped  %s events', skipped)
-
-      N = 1000
-      t = np.linspace(0, 10, 100)
-      y = {}
-      y[0] = np.sin(t)
-      y[1] = np.cos(t)
-
-      sc = {}
-      col = {0:'green', 1:'blue', 2:'red', 3:'orange'}
-      info = {
-        0: 'RRD1 / CalcSoll', 
-        1: 'RRD2 / ANY', 
-      }
-
-
-      for i in range(l):
-        sc[i] = Scatter(
-                    x=t, y=y[i],
-                    #x=timedict[i], y=tempdict[i],
-                    mode='markers', 
-                    name=info[i],
-                    opacity=0.8, 
-                    marker_color=col[i],
-                    marker_size=20,
-        )
-
-      plt_div = plot([sc[0], sc[1]], output_type='div')
-      self.context['plt_div'] = plt_div
-
-      form = GraphAttributesForm()
-      self.context['form'] = form
-      self.template = 'motors/graph.html'
-      return self.render()
-
-    def home(self):
-      self.template = 'motors/graph.html'
-      return self.render()
+  def motor_dict_for_ces(self, ces, li_list):
+    for obj in ces:
+      rh = obj.rulehistory_set.first()
+      if hasattr(rh, 'warmwaterpumphistory_set'):
+        val = rh.warmwaterpumphistory_set.first()
+        if val:
+          self.tempdict[li_list[0]].append(val.change_status)
+      if hasattr(rh, 'mainvalvehistory_set'):
+        val = rh.mainvalvehistory_set.first()
+        if val:
+          self.tempdict[li_list[1]].append(val.result_openingdegree)
 
 
 
@@ -114,5 +94,6 @@ def home(request):
   ctrl = CntrlController(request)
   return ctrl.home()
 
-
-
+def combined_graph(request):
+  ctrl = CntrlController(request)
+  return ctrl.combined_graph()

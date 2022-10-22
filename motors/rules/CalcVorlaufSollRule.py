@@ -4,7 +4,6 @@ logger = logging.getLogger(__name__)
 
 from motors.Calc import Calc
 from motors.CalcMethod import CalcMethod
-from motors.models import RuleResultData_01
 from datetime import datetime
 
 
@@ -59,14 +58,8 @@ class CalcVorlaufSollRule(CalcMethod, Calc):
     return self.night_base
 
   def save(self):
-    data = RuleResultData_01()
     value = round(self.soll_calc, 2)
-    data.value = value
-    data.dtime = self.now
-    data.rule_event = self.ctrl.rule_event
     # XXX only AVAIL. when Rule object running
-    #data.rule_event = self.
-    data.save()
     ### 2022-10 
     self.ctrl.rule_event.result = value
     self.ctrl.rule_event.save()

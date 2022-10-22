@@ -48,6 +48,5 @@ class ModeConstraintsRule(ModeExecutionRule):
       #self.hp_ctrl.disable()
       pass
 
-
   def save(self):
     pass

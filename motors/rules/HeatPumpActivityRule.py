@@ -26,20 +26,17 @@ class HeatPumpActivityRule(ThresholdRule): #BaseRule):
     self.upper = float(p[1])
     self.MSG_TO_LOW  = 'outdoor temp ist unter %s, Pumpe wird/bleibt deaktiviert.' %self.lower
     self.MSG_TO_HIGH = 'outdoor Temp. ist über %s, Pumpe wird/bleibt aktiviert.' %self.upper
-    some = SensorData_04.objects.order_by('-dtime')[1:5]
+    some = SensorData_04.objects.order_by('-id')[1:5]
     cur = some.aggregate(Avg('temperature'))['temperature__avg']
     self.cur = float(cur)
 
 
-
   def history_entry(self):
       entry = HeatPumpHistory(
-        dtime = self.now,
         change_status = 'UNDEFINED',
         rule_event = self.ctrl.rule_event,
       )
       return entry
-
 
   def action(self):
     """ act because rule was not fulfilled """
@@ -79,5 +76,3 @@ class HeatPumpActivityRule(ThresholdRule): #BaseRule):
 
     entry.save()
     return True
-
-

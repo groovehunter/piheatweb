@@ -40,11 +40,12 @@ class Mode(models.Model):
 
 
 class Rule(models.Model):
-  """ Regel in der Gesamtlogik des Regelunssystems """
+  """ Regel in der Gesamtlogik des Regelungssystems """
   name = models.CharField(max_length=32, unique=True)
   descr= models.CharField(max_length=255)
   logic= models.CharField(max_length=255)
-  count= models.PositiveIntegerField()
+  #count= models.PositiveIntegerField()
+  with_result = models.BooleanField(default=True)
   active = models.BooleanField(default=True)
   def get_absolute_url(self):
     return self.id
@@ -58,32 +59,11 @@ class RuleHistory(models.Model):
       default = DEFAULT_EVENT)
   rule = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
   result = models.CharField(max_length=20, null=True)
+  rule_matched = models.BooleanField(null=True)
   def get_absolute_url(self):
     return self.id
   def __str__(self):
-    return self.rule.name + ' - ' + self.dtime.strftime('%H-%M-%S')
-
-class RuleResultData_01(models.Model):
-  """ calculated Vorlauf-Soll """
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  dtime      = models.DateTimeField('action dtime', null=True)
-  value      = models.FloatField()
-
-class RuleResultData_02(models.Model):
-  """ calculated PID output """
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  dtime      = models.DateTimeField('action dtime', null=True)
-  value      = models.FloatField()
-
-class RuleResultData_03(models.Model):
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  value      = models.FloatField()
-class RuleResultData_04(models.Model):
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  value      = models.FloatField()
-class RuleResultData_05(models.Model):
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  value      = models.FloatField()
+    return self.rule.name + ' - ' + self.ctrl_event.dtime.strftime('%H-%M-%S')
 
 
 # XXX rename to AktorInfo ?

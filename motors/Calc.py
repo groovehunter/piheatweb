@@ -1,7 +1,6 @@
 
 
 from motors.models import Rule, RuleHistory
-from motors.models import RuleResultData_01
 from motors.KlassLoader import KlassLoader
 from django.utils import timezone
 from sensors.models import SensorData_01, SensorData_04

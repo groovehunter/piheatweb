@@ -3,6 +3,7 @@ from piheatweb.util import *
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = BASE_DIR + '/log'
 TMPPATH = BASE_DIR + '/tmp/'
+MENU_FILE = BASE_DIR + '/piheatweb/menu.yaml'
 
 DEBUG =True
 #DEBUG =False

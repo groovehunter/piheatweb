@@ -1,6 +1,6 @@
 from motors.BaseRule import FixedGoalAdjustableActuator
 from sensors.models import *
-from motors.models import MainValveHistory, RuleResultData_02
+from motors.models import MainValveHistory
 from piheatweb.util import *
 from django.db.models import Avg, Max, Min, Sum
 from motors.PID import PID
@@ -58,7 +58,8 @@ class PI_ControlRule(FixedGoalAdjustableActuator):
     # Calc next control value
     pid.update(self.cur)
     ctrl_val = pid.output
-    data = RuleResultData_02()
+    #data = RuleResultData_02()
+    # XXX get data from rulehistory.result
     data.value = ctrl_val
     data.dtime = self.now
     data.rule_event = self.ctrl.rule_event

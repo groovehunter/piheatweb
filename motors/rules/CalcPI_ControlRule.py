@@ -1,6 +1,5 @@
 from motors.CalcMethod import CalcMethod
 from motors.models import MainValveHistory 
-from motors.models import RuleResultData_02, RuleResultData_03, RuleResultData_04, RuleResultData_05
 from piheatweb.util import *
 from motors.PID import PID
 import logging
@@ -43,6 +42,7 @@ class CalcPI_ControlRule(CalcMethod):
     self.save()
 
   def save(self):
+    """
     data = RuleResultData_02()
     data.value = self.result
     data.dtime = self.now
@@ -63,4 +63,4 @@ class CalcPI_ControlRule(CalcMethod):
     data.value = self.pid_terms[2]
     data.rule_event = self.ctrl.rule_event
     data.save()
-
+    """

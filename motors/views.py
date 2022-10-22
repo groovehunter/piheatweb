@@ -3,31 +3,29 @@ from django.template import RequestContext
 #from django import forms
 from django.http import HttpResponseRedirect
 from django.db.models.query import prefetch_related_objects
+from django.db.models import Exists, OuterRef
 
 from django.views.generic import ListView, DetailView, CreateView
 from piheatweb.ViewController import ViewControllerSupport
 from piheatweb.Controller import Controller
 from piheatweb.forms import GraphAttributesForm
 
-from .models import Motor, Rule, RuleHistory, RuleResultData_01, RuleResultData_02
+from .models import Motor, Rule, RuleHistory
 from .models import MainValveHistory, WarmwaterPumpHistory
 from .tables import MotorListTable, MainValveListTable, WarmwaterPumpListTable
 from motors.MainValveController import MainValveController
 from motors.WarmwaterPumpController import WarmwaterPumpController
 from motors.RulesController import RulesController
 from cntrl.models import ControlEvent
+from piheatweb.graphutils import GraphMixin
 
-from datetime import datetime, timedelta
+#from datetime import datetime, timedelta
 from django.utils import timezone
 now = timezone.now()
 from random import randint
 import logging
 logger = logging.getLogger(__name__)
 
-from plotly.offline import plot
-#import plotly.graph_objs as go
-from plotly.graph_objs import Scatter, Figure
-import plotly.express as px
 
 
 class MotorListView(ListView, ViewControllerSupport):
@@ -83,7 +81,8 @@ class MainValveHistoryView(ListView, ViewControllerSupport):
         self.init_ctrl()
         start_date = now - timedelta(hours=3)
         end_date = now
-        self.object_list = MainValveHistory.objects.filter(dtime__range=(start_date, end_date)).order_by('-id')
+        mvh = MainValveHistory.objects.all().order_by('-id')
+        self.object_list = mvh
 
         self.fields_noshow = []
         table = MainValveListTable(self.object_list)
@@ -114,14 +113,15 @@ class WarmwaterPumpHistoryView(ListView, ViewControllerSupport):
         return self.render()
 
 
-class MotorController(Controller):
+class MotorController(ViewControllerSupport, GraphMixin):
     def __init__(self, request):
-        Controller.__init__(self, request)
-        self.now = datetime.now()
+        self.request = request
+        self.now = timezone.now()
+        self.init_ctrl()
 
     def show(self, pk):
       self.object = Motor.objects.filter(id=pk).first()
-      self.template = 'motors/show.html'
+      self.template_name = 'motors/show.html'
       history = True
       self.context.update( {'history': history} )
 
@@ -134,107 +134,79 @@ class MotorController(Controller):
       self.context['table'] = table
       return self.render()
 
+    def graphmv(self):
+      self.graph_form()
 
-    def graph(self):
-      GET = self.request.GET
-      sincehours = int(GET.get('sincehours', default=3))
-      start_date = self.now - timedelta(hours=sincehours)
+      mvh = MainValveHistory.objects.filter(rule_event=OuterRef('id'))
+      rh = RuleHistory.objects.filter(ctrl_event=OuterRef('id'))
+      ce = ControlEvent.objects.filter(Exists(rh), dtime__range=(self.start_date, self.now)).order_by('-dtime')
+      nl = 2
 
-      logger.debug('graph start date: %s', start_date)
-      myrule = Rule.objects.get(name='CalcVorlaufSollRule')
-#      rh = RuleHistory.objects.filter(rule=myrule, dtime__range=(start_date, self.now)).order_by('dtime')[30:]
-      ### query all CE, I guess those without corresponding RH
-      # we need to skip later
-      ce = ControlEvent.objects.filter(dtime__range=(start_date, self.now)).order_by('dtime')
+      self.setup_graph(nl)
+
+      logger.debug(len(ce))
+      for obj in ce:
+        for i in range(nl):
+          self.timedict[i].append(obj.dtime)
+        #val = obj.rulehistory_set.first().mainvalvehistory_set.first()
+        rh = obj.rulehistory_set.first()
+        if hasattr(rh, 'warmwaterpumphistory_set'):
+          val = rh.warmwaterpumphistory_set.first()
+          if val:
+            self.tempdict[0].append(val.change_status)
+        if hasattr(rh, 'mainvalvehistory_set'):
+          val = rh.mainvalvehistory_set.first()
+          if val:
+            self.tempdict[1].append(val.result_openingdegree)
+
+      self.plotter(nl)
+
+      self.template_name = 'motors/graph.html'
+      return self.render()
+
+
+    def graph_results(self):
+      self.graph_form()
+
+      rules = Rule.objects.filter(active=True).all()
+      rh = RuleHistory.objects.filter(ctrl_event=OuterRef('id')).order_by('-id')
+      ce = ControlEvent.objects.filter(Exists(rh), dtime__range=(start_date, self.now)).order_by('-dtime')
+
       logger.debug('CE len: %s', len(ce))
       # init graph data dict
-      tempdict = {}
-      timedict = {}
-      rrd = {}
-      l = 2
-      nl = 5
+      nl = len(rules)
+      self.setup_graph(nl)
+
       for i in range(nl):
-        tempdict[i] = []
-        timedict[i] = []
+        self.info[i] = rules[i].name
 
       tz = timezone.get_current_timezone()
-      rule0 = Rule.objects.filter(name='CalcVorlaufSollRule').first()
-      rule1 = Rule.objects.filter(name='CalcPI_ControlRule').first()
-
-      ce = []
-      logger.debug('ce', ce)
       for obj in ce:
-        #time = obj.dtime.astimezone(tz=tz)
-        #logger.debug('X')
-        #logger.debug('time', type(time))
-        """
-        rhs = obj.rulehistory_set
-        logger.debug('rhs', rhs)
-        skipped = 0
-        if rhs.count() == 0:
-          skipped += 1
-          continue
-        """
         for i in range(nl):
-          timedict[i].append(time)
+          self.timedict[i].append(obj.dtime)
 
-        val = 13 #dummy
-        rh = rhs.filter(rule=rule0).first()
-        #logger.debug(rh)
-        if rh:
-          rrd = rh.ruleresultdata_01_set.first()
-          if rrd:
-            val = rrd.value
-        tempdict[0].append(val)
+        c = 0
+        rhs = obj.rulehistory_set.all().order_by('rule')
+        if len(rhs) == nl:    # all expected rh entries available
+          for i in range(nl):
+            rh = rhs[i]
+            self.tempdict[c].append(rh.result)
+            c+=1
 
-        val = 0
-        rh = rhs.filter(rule=rule1).first()
-        logger.debug('rh', rh)
-        if rh:
-          for i in range(1,5):
-            si = '0'+str(i+1)
-            evalstr = 'rh.ruleresultdata_'+si+'_set.first()'
-            rrd = eval(evalstr)
-            if rrd:
-              logger.debug('rrd.value', rrd.value)
-              tempdict[i].append(rrd.value)
+        else:
+          for i in range(nl):
+            if not i >= len(rhs):
+              rh = rhs[i]
+              self.tempdict[c].append(rh.result)
+            else:
+              logger.debug('RH entry missing at ')
+              logger.debug(obj.dtime)
+              self.tempdict[c].append(None)
+            c+=1
 
-      logger.debug('Rhs count==0 so skipped  %s events', skipped)
-
-      logger.debug('len tempdict: %s', len(tempdict[i]))
-      logger.debug('tempdict: %s', tempdict[i])
-      logger.debug('len timedict: %s', len(timedict[i]))
-
-      sc = {}
-      col = {0:'green', 1:'blue', 2:'red', 3:'orange', 4:'black'}
-      info = {
-        0: 'RRD1 / CalcSoll', 
-        1: 'PID output ---------', 
-        2: 'P-faktor',
-        3: 'I-faktor',
-        4: 'D-faktor',
-      }
-
-      fig = Figure()
-      for i in range(5):
-        sc[i] = Scatter(
-                    #title = 'PID values',
-                    x=timedict[i], y=tempdict[i],
-                    mode='lines+markers', 
-                    name=info[i],
-                    opacity=0.99, 
-                    #marker_color=col[i],
-                    #marker=dict(size=[40, 60], color=[0, 1,])
-        )
-      fig.add_trace(sc[1])
-
-      plt_div = plot([ sc[1], sc[2], sc[3], sc[4]], output_type='div')
-      #plt_div = plot(sc, output_type='div')
-      self.context['plt_div'] = plt_div
-
-      form = GraphAttributesForm()
-      self.context['form'] = form
-      self.template = 'motors/graph.html'
+      #self.plotter(nl)
+      self.pl2()
+      self.template_name = 'motors/graph.html'
       return self.render()
 
 
@@ -277,7 +249,10 @@ def show(request, pk):
   ctrl = MotorController(request)
   return ctrl.show(pk)
 
-def graph(request):
+def graph_results(request):
   ctrl = MotorController(request)
-  return ctrl.graph()
+  return ctrl.graph_results()
 
+def graphmv(request):
+  ctrl = MotorController(request)
+  return ctrl.graphmv()
