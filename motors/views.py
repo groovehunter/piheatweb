@@ -168,9 +168,10 @@ class MotorController(ViewControllerSupport, GraphMixin):
     def graph_results(self):
       self.graph_form()
 
+#      rules = Rule.objects.filter(active=True, with_result=True).all()
       rules = Rule.objects.filter(active=True).all()
       rh = RuleHistory.objects.filter(ctrl_event=OuterRef('id')).order_by('-id')
-      ce = ControlEvent.objects.filter(Exists(rh), dtime__range=(start_date, self.now)).order_by('-dtime')
+      ce = ControlEvent.objects.filter(Exists(rh), dtime__range=(self.start_date, self.now)).order_by('-dtime')
 
       logger.debug('CE len: %s', len(ce))
       # init graph data dict
@@ -205,7 +206,7 @@ class MotorController(ViewControllerSupport, GraphMixin):
             c+=1
 
       #self.plotter(nl)
-      self.pl2()
+      self.pl2(nl)
       self.template_name = 'motors/graph.html'
       return self.render()
 

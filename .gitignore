@@ -17,9 +17,6 @@ env/
 build/
 var/
 
-# Installer logs
-pip-log.txt
-
 # Unit test / coverage reports
 # Django stuff:
 *.log
@@ -50,3 +47,5 @@ nohup.out
 index.css
 djflow/
 output.html
+test_*
+tmp/

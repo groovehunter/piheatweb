@@ -28,6 +28,6 @@ urlpatterns = [
 #    path('rules/<int:pk>', rule_show, name='ruleShow'),
 #    path('rules/(?P<pk>\d+)/delete/', rule_delete, name='ruleDelete'),
     path('rules/delete', rule_delete),
-    path('view/graph', views.graph_results),
+    path('view/graph_results', views.graph_results),
     path('view/<str:method>', views.action),
 ]

@@ -11,7 +11,7 @@ class SensorBase:
   def adc_out_to_resistance(self):
     vsense = (3.3 * self.adc_out) / STEPS332
     r = vsense / ((3.3 - vsense) / 18000 )
-    return r
+    return int(r)
 
 
 class SensorInfo(models.Model):

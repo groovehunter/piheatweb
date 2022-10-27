@@ -5,128 +5,77 @@
 """
 
 import os
-import logging
 from time import sleep
-fn = os.environ['HOME'] + '/log/piheat.log'
-logging.basicConfig(
-  filename=fn,
-  level=logging.INFO,
-)
-# create console handler and set level to debug
-logger = logging.getLogger()
-
+import time, math
+from decimal import Decimal
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
 from django.utils import timezone 
+from django.db.utils import IntegrityError
+import logging
+logger = logging.getLogger()
 
-#import Adafruit_ADS1x15
 from sensors.models import *
 from sensors.Thermistor import *
 from sensors.TempCalc import TempCalc
 from cntrl.models import ControlEvent
 
-#adc = Adafruit_ADS1x15.ADS1115()
-from random import randint
 
-smin = {}
-smax = {}
-smin = {
-  0: 6000,
-  1: 7000,
-  2: 6000,
-  3: 12000,
+def out2(zahl_1, phasendiff):
+    sinus = math.sin((zahl_1) + math.degrees(phasendiff))
+    sinus_color = int((sinus + 1) * 127.5)   # Wertebereich 0 ... 255 für Farbcode
+    sinus_graphic = sinus * 12 + 13          # Wertebereich für Darstellung mit Zeichen
+    sinus_str = (int(sinus_graphic) * '=')
+    return (sinus_color, sinus_graphic, sinus_str)
+
+
+g = globals()
+th = {
+  0: 'ThermistorNT10',
+  1: 'ThermistorNT10',
+  2: 'ThermistorNT20',
+  3: 'ThermistorVF20',
 }
-smax = {
-  0: 8000,
-  1: 9000,
-  2: 8000,
-  3: 14000,
-}
-
-
-def sensor_data_around(d1, diff, smin, smax):
-  # switch tendency, probability = 1:10
-  tendkeep = randint(0,10)
-  # random change between 0 and 100
-  change = randint(3, 100) + abs(diff)
-
-  # tendency
-  if diff > 0:
-    change = -change
-  else:
-    pass
-
-  if tendkeep == 0:
-    logger.debug('tendkeep is 0: %s', tendkeep)
-    change = -change
-
-  #logger.debug('change : %s', change)
-  newd = d1 + change
-
-  # keep between a min and max  
-  if newd < smin: newd = smin
-  if newd > smax: newd = smax
-  return newd
-
+t = {}
+for i in range(4):
+  t[i] = g[th[i]]()
 
 def read_adc():
-  last = ControlEvent.objects.all().order_by('-id')[:4]
-  last_ce     = last[0]
-  secondlast_ce  = last[1]
-  logger.debug("last ce: %s", last_ce.id)
-  logger.debug("secondlast ce: %s", secondlast_ce.id)
+  last_ce = ControlEvent.objects.latest('id')
+  logger.debug("START READER ====================== last ce: %s", last_ce.id)
   tz_now = timezone.now() # TZ aware :)
-
-  ctrl_event = ControlEvent(dtime=tz_now)
-  ctrl_event.save()
-
+  c = time.time()
   for i in range(4):
     sid = '0'+str(i+1)
+    t[i].set_RTvalues()
+    t[i].prep_abc()
 
-    evalstr = 'sd = ctrl_event.sensordata_'+sid
-    try:
-      last_adc_out = sd.adc_out
-    except:
-      last_adc_out = (smax[i] + smin[i]) / 2
-      #logger.debug("last[1] ### using mean value")
-
-    evalstr = 'sd = ctrl_event.sensordata_'+sid
-    try:
-      seclast_adc_out = eval(evalstr).first().adc_out
-    except:
-      seclast_adc_out = last_adc_out
-      #logger.debug("last[2] ### using last[1]")
-
-    #logger.debug(" last: %s", last_adc_out)
-    #logger.debug("slast: %s", seclast_adc_out)
-    diff = seclast_adc_out - last_adc_out 
-    #logger.debug('diff : %s', diff)
-    value = sensor_data_around(last_adc_out, diff, smin[i], smax[i])
-    #logger.debug('NEW: %s', value)
-    #logger.debug('-----------------------------')
-
-    obj = eval('SensorData_'+sid+'()')
-    obj.adc_out = value
+    sdstr = 'SensorData_'+sid
+    obj = g[sdstr]()
+    obj.ctrl_event = last_ce
+    value, ret, sinstr = out2(c, 60*i)
     obj.temperature = 0
     obj.resistance = 0
-    obj.ctrl_event = last_ce
+    obj.adc_out = value 
+    try:
+      obj.save()
+    except IntegrityError:
+      logger.debug('saving FAILED, probably control_event already used')
+
+    r = obj.adc_out_to_resistance()
+    f = t[i].resistance_to_temp(r)
+    while f > 100:
+      f -= 100
+    obj.temperature = round(f, 2)
+    obj.resistance = r
     obj.save()
-    #evalstr = 'event.sid'+sid+'=obj'
-    #logger.debug(evalstr)
-    #eval(evalstr)
- 
-  ctrl_event.save()
 
-
-
-# cron version
-from calc_temp_latest_daemon import tempcalc
 if __name__ == '__main__':
   sleep(3)
-  logger.debug('START READER ======================')
   read_adc()
-  tempcalc()
+
+
 
 
 

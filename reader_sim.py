@@ -9,7 +9,8 @@ from time import sleep
 import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('')
+#logger = logging.getLogger('__name__')
 from django.utils import timezone
 from sensors.models import *
 from sensors.TempCalc import TempCalc

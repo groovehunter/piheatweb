@@ -32,7 +32,7 @@ class RulesCliCtrl(KlassLoader, Calc):
       self.mode = m
     else:
       self.mode = Mode.objects.get(name=DEFAULT_MODE)
-    logger.debug('Mode was loaded: %s', self.mode.name)
+    #logger.debug('Mode was loaded: %s', self.mode.name)
 
   def initiate_klasses_obj(self):
     """ initiate all classes of Rules.py module """
@@ -46,12 +46,11 @@ class RulesCliCtrl(KlassLoader, Calc):
     rules = Rule.objects.all()
     for rule in rules:
       self.rules_list_db[rule.name] = rule
-    logger.debug(self.rules_list_db)
+    #logger.debug(self.rules_list_db)
 
   def loop_rules(self):
     """ load all rules from db and loop them """
     for rule_name, rule_db in self.rules_list_db.items():
-      logger.debug('checking rule: %s ', rule_name)
       if rule_db.active:
         self.check_rule(rule_db)
       else:

@@ -67,7 +67,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'motors.rules': {
+        'readersim': {
             'handlers': ['file_piheat'],
             'level': 'DEBUG',
             'propagate': False,

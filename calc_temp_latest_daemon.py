@@ -20,7 +20,4 @@ def tempcalc():
     updater.latest(s.id)
 
 
-### cron version
-if __name__ == '__main__':
-  tempcalc()
 

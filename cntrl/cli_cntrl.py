@@ -8,12 +8,12 @@ import django
 os.environ["DJANGO_SETTINGS_MODULE"] = 'piheatweb.settings'
 django.setup()
 
-from motors.models import *
-from motors.rules import *
-from motors.RulesCtrl import RulesCliCtrl
-from cntrl.models import *
+#from motors.models import *
+#from motors.rules import *
+#from motors.RulesCtrl import RulesCliCtrl
+#from cntrl.models import *
 from cntrl.CntrlCliCtrl import CntrlCliCtrl
-import piheatweb.util
+#import piheatweb.util
 
 import logging
 # create console handler and set level to debug

@@ -33,6 +33,9 @@ class CntrlController(ViewControllerSupport, GraphMixin):
     self.template_name = 'motors/graph.html'
     return self.render()
 
+  def graph(self):
+    return self.combined_graph()
+    
   # combo plot. for sensors, actors
   # Needs same timedict for all Scatters
   # so use only ControlEvents which have rule_event associated
