@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import time, os
 import logging
 logger = logging.getLogger(__name__)
-from piheatweb.settings import BASE_DIR
+from django.conf import settings
 from datetime import datetime
 
 class MainValveCtrl(object):
@@ -13,7 +13,7 @@ class MainValveCtrl(object):
         self.speed = 100
         self.openingdegree_minimum = 3000
         self.openingdegree_maximum = 32000
-        self.lock_fn = BASE_DIR+'/valve.lock'
+        self.lock_fn = settings.BASE_DIR+'/valve.lock'
 
     def setup(self):
         GPIO.setmode(GPIO.BCM)

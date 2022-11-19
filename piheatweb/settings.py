@@ -111,6 +111,7 @@ INSTALLED_APPS = [
     'theme',
     'djflow',
     'py_yaml_fixtures',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

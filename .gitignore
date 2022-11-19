@@ -50,3 +50,6 @@ output.html
 test_*
 tmp/
 env.py
+*.pdf
+uml/
+
