@@ -5,13 +5,14 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 
 from piheatweb.forms import GraphAttributesForm
+from django.conf import settings
 import datetime
 
 
 class GraphMixin:
 
   def graph_form(self):
-    sincehours = 3
+    sincehours = 1
     self.resolution = False
     if self.request.GET.get('go'):
       form = GraphAttributesForm(self.request.GET)
@@ -55,7 +56,7 @@ class GraphMixin:
     fig['layout']['yaxis2'].update(domain=[0.3, 0.7])
     fig['layout']['yaxis3'].update(domain=[0.8, 1])
     """
-    plot(fig, filename='output.html')
+    plot(fig, filename=settings.STATIC_ROOT+'/out/output.html')
 
   def create_scatter(self, timedict, tempdict, info):
     sc = Scatter(
@@ -70,7 +71,7 @@ class GraphMixin:
 
   def plotter(self, nl):
     sc = {}
-    col = {0:'green', 1:'blue', 2:'red', 3:'orange', 4:'black'}
+    col = {0:'red', 1:'blue', 2:'green', 3:'black', 4:'orange'}
     #fig = Figure()
 
     plotlist = []
@@ -85,3 +86,4 @@ class GraphMixin:
     #fig.add_trace(sc[1])
     plt_div = plot(plotlist, output_type='div')
     self.context['plt_div'] = plt_div
+

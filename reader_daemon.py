@@ -15,6 +15,7 @@ from sensors.models import *
 from sensors.Thermistor import *
 from sensors.TempCalc import TempCalc
 from cntrl.models import ControlEvent
+from time import sleep
 
 adc = Adafruit_ADS1x15.ADS1115()
 logging.getLogger("Adafruit_I2C").setLevel(logging.WARNING)
@@ -37,11 +38,13 @@ def read_adc():
     obj.resistance = 0
     obj.ctrl_event = ctrl_event
     obj.save()
-    logger.debug(obj.ctrl_event.id)
+    #logger.debug(obj.ctrl_event.id)
 
 
 # cron version
 from calc_temp_latest_daemon import tempcalc
 if __name__ == '__main__':
+  sleep(1)
   read_adc()
   tempcalc()
+

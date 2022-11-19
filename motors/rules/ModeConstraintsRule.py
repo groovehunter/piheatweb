@@ -8,7 +8,7 @@ if IS_PC:   #
   from motors.HeatPumpDummy import HeatPumpCtrlDummy
   from motors.WarmwaterPumpDummy import WarmwaterPumpCtrlDummy
 if IS_RPi:
-  from motors.HeatPumpCtrl import HeatPumpCtrl
+  #from motors.HeatPumpCtrl import HeatPumpCtrl
   from motors.HeatPump import HeatPumpCtrl
   from motors.WarmwaterPump import WarmwaterPumpCtrl
 

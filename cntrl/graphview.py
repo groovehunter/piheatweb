@@ -1,6 +1,6 @@
 #from django.db.models.query import prefetch_related_objects
 
-from piheatweb.ViewController import ViewControllerSupport
+from djflow.ViewController import ViewControllerSupport
 #from piheatweb.forms import GraphAttributesForm
 
 #from cntrl.models import ControlEvent

@@ -66,11 +66,11 @@ class MainValveCtrl(object):
         steps = int(amount)*100
 
         if direction == 'up':
-            logger.debug('direction up: warmer')
+            #logger.debug('direction up: warmer')
             GPIO.output(DIR, DIR_Right)
             self.count += steps
         if direction == 'dn':
-            logger.debug('direction dn: colder')
+            #logger.debug('direction dn: colder')
             GPIO.output(DIR, DIR_Left)
             self.count -= steps
 

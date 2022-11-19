@@ -2,13 +2,12 @@ from motors.models import RuleHistory
 from motors.BaseRule import BaseRule
 from piheatweb.util import *
 import logging
-from os import environ
 logger = logging.getLogger(__name__)
 from random import random
 
 
 class DummyRule(BaseRule):
-  """ does nothing """
+  """ does nothing / Random results """
 
   def setup(self):
     logic = self.rule.logic
@@ -17,11 +16,19 @@ class DummyRule(BaseRule):
     return None
 
   def check(self):
-    return int(random())
+    matched = int(random())
+    #logger.debug("matched %s", matched)
+    self.ctrl.rule_event.rule_matched = matched
+    self.ctrl.rule_event.save()
+
+    return matched
+
 
   def action(self):
     """ act because rule was not fulfilled """
-    self.ctrl.rule_event.result = 1
+    result = int(100*random())
+    self.ctrl.rule_event.result = result
+    self.ctrl.rule_event.save()
 
     return True
 

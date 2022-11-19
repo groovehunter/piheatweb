@@ -61,7 +61,7 @@ class FixedGoalAdjustableActuator(BaseRule):
   def check(self):
     """ always False -> always calculate some adjustment 
         maybe it is too small for the actuator """
-    self.ctrl.rule_event.result = 1
+    self.ctrl.rule_event.rule_matched = 1
     self.ctrl.rule_event.save()
     return False
 
@@ -69,11 +69,11 @@ class FixedGoalAdjustableActuator(BaseRule):
     otherwise adjust in some way """
     if self.diff < 0.5:
       logger.debug("conditions are OKAY - no action needed")
-      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.rule_matched = 0
       self.ctrl.rule_event.save()
       return True
     else:
-      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.rule_matched = 1
       self.ctrl.rule_event.save()
       return False
 
@@ -94,13 +94,13 @@ class ThresholdRule(BaseRule):
     cur = self.cur
     if (cur > self.lower and cur < self.upper):
       logger.debug("conditions are OKAY - no action needed")
-      self.ctrl.rule_event.result = 0
+      self.ctrl.rule_event.rule_matched = 0
       self.ctrl.rule_event.save()
       return True
 
     elif (cur < self.lower or cur > self.upper):
       logger.debug("--> action needed")
-      self.ctrl.rule_event.result = 1
+      self.ctrl.rule_event.rule_matched = 1
       self.ctrl.rule_event.save()
       return False
 

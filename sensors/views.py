@@ -10,8 +10,8 @@ from cntrl.models import ControlEvent
 from .models import SensorInfo
 from .tables import SensorDetailTable, SensorListTable, \
 SensorDataTable, AllSensorTable
-from piheatweb.ViewController import ViewControllerSupport
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
+from djflow.Controller import Controller
 from piheatweb.forms import GraphAttributesForm
 from piheatweb.graphutils import GraphMixin
 
@@ -141,19 +141,20 @@ class SensorDataView(Controller, GraphMixin):
             self.tempdict[i].append(temp)
             self.timedict[i].append(time)
 
+
     def graph(self):
       self.graph_form()
 
       if self.resolution:
-        logger.debug('resolution of graph: %s', self.resolution)
-        revents = ControlEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(start_date, self.now))
+        #logger.debug('resolution of graph: %s', self.resolution)
+        revents = ControlEvent.objects.filter(dtime__minute__endswith=0, dtime__range=(self.start_date, self.now))
       else:
         revents = ControlEvent.objects.filter(dtime__range=(self.start_date, self.now))
 
-      sinfo = SensorInfo.objects.order_by('id').all()
       tz = timezone.get_current_timezone()
-      li = 3              # number of graphs
+      li = 3             # number of graphs
       self.setup_graph(li)
+      self.info = [s.name for s in SensorInfo.objects.order_by('id').all()]
 
       for obj in revents:
         time = obj.dtime.astimezone(tz=tz)
@@ -168,8 +169,9 @@ class SensorDataView(Controller, GraphMixin):
 
       self.plotter(li)
 
-      self.template = 'sensors/graph.html'
+      self.template_name = 'sensors/graph.html'
       return self.render()
+
 
     def list(self, sid):
         sensorinfo = SensorInfo.objects.get(pk=sid)
@@ -190,7 +192,7 @@ class SensorDataView(Controller, GraphMixin):
         table = SensorDataTable(object_list)
         self.context['table'] = table
 
-        self.template = 'sensors/data.html'
+        self.template_name = 'sensors/data.html'
         #self.context['object_list'] = object_list
         #self.context['data'] = object_list
         keys = ['dtime', 'temp', 'resistance']

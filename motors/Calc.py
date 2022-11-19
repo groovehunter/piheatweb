@@ -28,7 +28,7 @@ class Calc:
     # daily average temp
     start_date = self.now - timedelta(hours=24)
     h24 = SensorData_04.objects.filter(ctrl_event__dtime__minute=0, ctrl_event__dtime__range=(start_date, self.now))
-    logger.debug("h24 %s", h24)
+    #logger.debug("h24 %s", h24)
     if h24:
       avg24 = h24.aggregate(Avg('temperature'))['temperature__avg']
       avg = float(avg24)

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView
 
-from piheatweb.ViewController import ViewControllerSupport
+from djflow.ViewController import ViewControllerSupport
 
 class DashboardView(DetailView, ViewControllerSupport):
 

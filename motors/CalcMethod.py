@@ -8,11 +8,13 @@ class CalcMethod:
     self.load_sensordata()
   def check(self):
     """ always execute calculations """
-    self.ctrl.rule_event.result = 1
+    self.ctrl.rule_event.rule_matched = 1
     self.ctrl.rule_event.save()
     return False # always do action because rule "not fulfilled"
+
   def report(self):
     pass
+
   def set_rule(self, rule):
     """ just need to set rule obj as a member of the subclass
         so we can access it;

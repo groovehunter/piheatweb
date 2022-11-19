@@ -56,7 +56,6 @@ class WarmwaterRangeRule(ThresholdRule):
     # also vllt, eine rule fuer pumpe an und aus wie hier schon 
     # und eine andere rule für vorlauf, wenn mode fuer nur warmwater
 
-    self.ctrl.rule_event.result = 1
 
     entry = self.history_entry()
 
@@ -88,6 +87,10 @@ class WarmwaterRangeRule(ThresholdRule):
       return False
 
     entry.save()
+    result = entry.change_status
+    self.ctrl.rule_event.result = result
+    self.ctrl.rule_event.save()
+
     return True
 
 

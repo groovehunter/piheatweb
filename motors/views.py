@@ -6,8 +6,8 @@ from django.db.models.query import prefetch_related_objects
 from django.db.models import Exists, OuterRef
 
 from django.views.generic import ListView, DetailView, CreateView
-from piheatweb.ViewController import ViewControllerSupport
-from piheatweb.Controller import Controller
+from djflow.ViewController import ViewControllerSupport
+from djflow.Controller import Controller
 from piheatweb.forms import GraphAttributesForm
 
 from .models import Motor, Rule, RuleHistory
@@ -176,12 +176,15 @@ class MotorController(ViewControllerSupport, GraphMixin):
       logger.debug('CE len: %s', len(ce))
       # init graph data dict
       nl = len(rules)
+      logger.debug('len rules: %d', nl)
+
       self.setup_graph(nl)
 
       for i in range(nl):
         self.info[i] = rules[i].name
 
       tz = timezone.get_current_timezone()
+      some_missing = False
       for obj in ce:
         for i in range(nl):
           self.timedict[i].append(obj.dtime)
@@ -195,15 +198,20 @@ class MotorController(ViewControllerSupport, GraphMixin):
             c+=1
 
         else:
+          logger.debug('RH len %d', len(rhs))
           for i in range(nl):
             if not i >= len(rhs):
               rh = rhs[i]
               self.tempdict[c].append(rh.result)
             else:
-              logger.debug('RH entry missing at ')
-              logger.debug(obj.dtime)
+              some_missing = True
+              #logger.debug('RH entry missing at ')
+              #logger.debug(obj.dtime)
               self.tempdict[c].append(None)
             c+=1
+
+      if some_missing:
+        logger.debug('SOME RH entry missing')
 
       #self.plotter(nl)
       self.pl2(nl)

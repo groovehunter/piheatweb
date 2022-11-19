@@ -1,5 +1,7 @@
 import os
 from piheatweb.util import *
+from env import *
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = BASE_DIR + '/log'
 TMPPATH = BASE_DIR + '/tmp/'
@@ -67,7 +69,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'readersim': {
+        'sensors.TempCalc': {
             'handlers': ['file_piheat'],
             'level': 'DEBUG',
             'propagate': False,
@@ -84,13 +86,11 @@ LOGGING = {
 """
 """
 
-SECRET_KEY = '&a1h1h2+=m(l34j40z#_!e$4p2qdw4jy%-zv3s@hna0(*7$civ'
 
 #AUTH_USER_MODEL = "users.CustomUser"
 TAILWIND_APP_NAME = 'theme'
 DJANGO_TABLES2_TEMPLATE = "table.html"
 
-ALLOWED_HOSTS = ['raspberrypi', 'piheat', 'localhost', 'piheatdev', 'groove.selfhost.eu']
 
 # Application definition
 
@@ -158,8 +158,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'piheat_db',
-        'USER': 'piheat',
-        'PASSWORD': 'ppp',
+        'USER': DB_USER,
+        'PASSWORD': DB_PASS,
         'HOST': '127.0.0.1',
         'PORT': '3306'
     }
@@ -177,4 +177,5 @@ USE_TZ = True
 LOGIN_URL = '/users/login'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), )
-#STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+

@@ -1,4 +1,4 @@
-from piheatweb.FlowBaseTable import FlowBaseTable
+from djflow.FlowBaseTable import FlowBaseTable
 from .models import Motor, MainValveHistory, WarmwaterPumpHistory
 from .models import Rule, RuleHistory
 

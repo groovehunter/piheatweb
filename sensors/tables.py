@@ -1,4 +1,4 @@
-from piheatweb.FlowBaseTable import FlowBaseTable
+from djflow.FlowBaseTable import FlowBaseTable
 from .models import SensorData_01
 from .models import SensorInfo
 import django_tables2 as tables

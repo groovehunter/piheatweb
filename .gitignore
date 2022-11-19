@@ -49,3 +49,4 @@ djflow/
 output.html
 test_*
 tmp/
+env.py

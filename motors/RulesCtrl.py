@@ -25,14 +25,14 @@ class RulesCliCtrl(KlassLoader, Calc):
 
   def setup(self):
     self.klass_list = self.get_klasslist(motors.rules)
-    logger.debug(self.klass_list)
+    #logger.debug(self.klass_list)
     self.load_sensordata()
     m = Mode.objects.filter(active=True).first()
     if m:
       self.mode = m
     else:
       self.mode = Mode.objects.get(name=DEFAULT_MODE)
-    #logger.debug('Mode was loaded: %s', self.mode.name)
+    logger.debug('Mode was loaded: %s', self.mode.name)
 
   def initiate_klasses_obj(self):
     """ initiate all classes of Rules.py module """
@@ -84,7 +84,6 @@ class RulesCliCtrl(KlassLoader, Calc):
   # XXX create OR get existing rule_event
   def create_rule_event(self, rule_db):
     rule_event = RuleHistory()
-    rule_event.dtime = self.now
     rule_event.rule = rule_db
     rule_event.ctrl_event = self.ctrl_event
     self.rule_event = rule_event
@@ -106,3 +105,4 @@ class RulesCliCtrl(KlassLoader, Calc):
     rule_klass_obj.report()
     if not rule_klass_obj.check():
       rule_klass_obj.action()
+

@@ -96,6 +96,10 @@ class VorlaufRule(FixedGoalAdjustableActuator):
 
     entry.result_openingdegree = tmp
     entry.save()
+
+    self.ctrl.rule_event.result = tmp
+    self.ctrl.rule_event.save()
+
     ### the actual work
     sa = str(amount)
     logger.info("mainvalve amount %s (total:%s)- %s", sa, tmp, direction)
