@@ -17,9 +17,6 @@ env/
 build/
 var/
 
-# Installer logs
-pip-log.txt
-
 # Unit test / coverage reports
 # Django stuff:
 *.log
@@ -48,3 +45,14 @@ nohup.out
 
 # tailwind master generated css
 index.css
+djflow/
+output.html
+test_*
+tmp/
+env.py
+*.pdf
+uml/
+
+# IDE
+.idea/
+.vs/

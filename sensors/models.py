@@ -1,5 +1,5 @@
 from django.db import models
-
+from cntrl.models import ControlEvent, DEFAULT_EVENT
 
 
 UNIT_AVAIL = (
@@ -11,7 +11,7 @@ class SensorBase:
   def adc_out_to_resistance(self):
     vsense = (3.3 * self.adc_out) / STEPS332
     r = vsense / ((3.3 - vsense) / 18000 )
-    return r
+    return int(r)
 
 
 class SensorInfo(models.Model):
@@ -25,33 +25,33 @@ class SensorInfo(models.Model):
       return self.name
 
 class SensorData_01(models.Model, SensorBase):
-    dtime   = models.DateTimeField('datetime of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.OneToOneField(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_02(models.Model, SensorBase):
-    dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.OneToOneField(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_03(models.Model, SensorBase):
-    dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
+    ctrl_event = models.OneToOneField(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
 
 class SensorData_04(models.Model, SensorBase):
-    dtime   = models.DateTimeField('date of measurement')
     temperature = models.DecimalField(max_digits=4, decimal_places=2)
     resistance  = models.IntegerField()
     adc_out = models.IntegerField(null=True)
-
-
-class ReadingEvent(models.Model):
-  dtime   = models.DateTimeField('date of measurement')
-  sid01 = models.ForeignKey(SensorData_01, on_delete=models.CASCADE, null=True)
-  sid02 = models.ForeignKey(SensorData_02, on_delete=models.CASCADE, null=True)
-  sid03 = models.ForeignKey(SensorData_03, on_delete=models.CASCADE, null=True)
-  sid04 = models.ForeignKey(SensorData_04, on_delete=models.CASCADE, null=True)
+    ctrl_event = models.OneToOneField(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)

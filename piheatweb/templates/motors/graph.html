@@ -1,0 +1,27 @@
+{% extends "base-mini.html" %}
+
+{% block menu %}
+   {% include "menu.html" %}
+{% endblock %}
+
+{% block content %}
+{% include "sensors/somedata.html" %}
+
+<div class="m-2 p-4 bg-orange">
+<form action="/actors/view/graph" method="get">
+{{form.as_table}}
+  <p>
+    <input type="submit" name="go" value="Update graph" />
+  </p>
+</form>
+</div>
+{{debug}}
+
+<p><a href="/static/out/output.html">OUT file</a></p>
+
+{% autoescape off %}
+  {{ plt_div }}
+{% endautoescape %}
+
+
+{% endblock %}

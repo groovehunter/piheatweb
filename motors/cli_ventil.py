@@ -18,17 +18,20 @@ if __name__=='__main__':
     print(sys.argv)
     direction   = sys.argv[1]
     amount      = int(sys.argv[2])   
+    speed = 50.0
+    if len(sys.argv) > 3:
+      speed = int(sys.argv[3])
     if amount > 1000:
       input("So MUCH, are you sure?")
-    speed = 50
     vt = MainValveCtrl()
     vt.setup()
-    vt.speed = 50
+    vt.speed = speed
     ### WORK
-    vt.work(direction, amount)
+    success = vt.work(direction, amount)
 
-    # Motor freigeben
-    vt.release_motor()
+    if not success:
+      print("ERROR occurred, valve work not done")
+      sys.exit()
     cur = MainValveHistory.objects.latest('id')
 
     change2db(direction, amount, cur)

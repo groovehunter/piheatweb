@@ -1,4 +1,5 @@
 from django.db import models
+from cntrl.models import ControlEvent, DEFAULT_EVENT
 from django.utils.translation import gettext_lazy as _
 
 # default Rule
@@ -32,13 +33,19 @@ sensoren und aktoren erzeugt werden.
 #class ActionEvent(models.Model):
 #  dtime   = models.DateTimeField('datetime of rule check and actions')
 
-
-class Rule(models.Model):
-  """ Regel in der Gesamtlogik des Regelunssystems """
+class Mode(models.Model):
   name = models.CharField(max_length=32)
   descr= models.CharField(max_length=255)
+  active = models.BooleanField(default=False)
+
+
+class Rule(models.Model):
+  """ Regel in der Gesamtlogik des Regelungssystems """
+  name = models.CharField(max_length=32, unique=True)
+  descr= models.CharField(max_length=255)
   logic= models.CharField(max_length=255)
-  count= models.PositiveIntegerField()
+  #count= models.PositiveIntegerField()
+  with_result = models.BooleanField(default=True)
   active = models.BooleanField(default=True)
   def get_absolute_url(self):
     return self.id
@@ -47,19 +54,16 @@ class Rule(models.Model):
 
 class RuleHistory(models.Model):
   """ Angewandte Regel """ # XXX wie gliedert sich dies ein??
-  dtime   = models.DateTimeField('rule check and action dtime', null=True)
+  ctrl_event = models.ForeignKey(ControlEvent,
+      on_delete=models.CASCADE,
+      default = DEFAULT_EVENT)
   rule = models.ForeignKey(Rule, on_delete=models.CASCADE, default=DEFAULT_RULE)
   result = models.CharField(max_length=20, null=True)
+  rule_matched = models.BooleanField(null=True)
   def get_absolute_url(self):
     return self.id
   def __str__(self):
-    return self.rule.name + ' - ' + self.dtime.strftime('%H-%M-%S')
-
-class RuleResultData_01(models.Model):
-  """ calculated Vorlauf-Soll """
-  rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
-  dtime      = models.DateTimeField('action dtime', null=True)
-  value      = models.FloatField()
+    return self.rule.name + ' - ' + self.ctrl_event.dtime.strftime('%H-%M-%S')
 
 
 # XXX rename to AktorInfo ?
@@ -77,7 +81,6 @@ class Motor(models.Model):
 
 
 class WarmwaterPumpHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_status = models.CharField(null=True, max_length=40,
     choices=PumpStatus.choices,
     default=PumpStatus.UNDEFINED,
@@ -86,7 +89,6 @@ class WarmwaterPumpHistory(models.Model):
   rule_event = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
 class HeatPumpHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_status = models.CharField(null=True, max_length=40,
     choices=PumpStatus.choices,
     default=PumpStatus.UNDEFINED,
@@ -94,9 +96,7 @@ class HeatPumpHistory(models.Model):
   change_descr  = models.CharField(max_length=255)
   rule_event    = models.ForeignKey(RuleHistory, on_delete=models.CASCADE, default=DEFAULT_TOGGLE_RULE)
 
-
 class MainValveHistory(models.Model):
-  dtime         = models.DateTimeField('datetime of change')
   change_amount = models.IntegerField(null=True)
   change_dir    = models.CharField(
     max_length=12,

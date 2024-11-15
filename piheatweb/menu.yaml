@@ -1,6 +1,14 @@
 # used for init. of menu
 # and permission system
 
+- cntrl:
+    id: cntrl
+    name: Control HQ
+    href: cntrl/
+    links:
+      - name: Graphen und controlling
+        href: /cntrl/view/graph
+
 - actors:
     id:     actors
     name:   Aktoren
@@ -16,6 +24,10 @@
         href:   /actors/ww
       - name:   Warmwasserpumpe steuern
         href:   /actors/ww/control
+      - name:   RulesResultData Graph
+        href:   /actors/view/graph_results
+      - name:   Graph der Aktoren
+        href:   /actors/view/graphmv
 
 - sensors:
     id:     sensors

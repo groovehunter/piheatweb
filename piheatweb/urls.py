@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import include, path
 from piheatweb import views
-from django.contrib.auth.decorators import login_required, permission_required
+#from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
 #    path('', views.index, name='index'),
@@ -14,4 +14,7 @@ urlpatterns = [
     path('motors/', include('motors.urls')),
 #    path('rules/', include('rules.urls')),
     path('users/', include('users.urls')),
+    path('cntrl/', include('cntrl.urls')),
+
 ]
+#urlpatterns += staticfiles_urlpatterns()

@@ -1,0 +1,16 @@
+heating_only:
+  name: HeatingOnlyMode
+  descr: Heating only, no warm usage water
+
+heating:
+  name: HeatingMode
+  descr: heating normal power plus warmwater
+
+warmwater_only:
+  name: WarmwaterOnly
+  descr: Warmwater only, heat pump disabled
+
+all_off:
+  name: All Off
+  descr: all pumps disabled, valve closed 
+

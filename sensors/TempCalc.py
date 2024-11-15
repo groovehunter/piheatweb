@@ -2,9 +2,29 @@
 from sensors.models import *
 from sensors.Thermistor import *
 import time
+import logging
+
+logger = logging.getLogger('root')
 
 
 class TempCalc:
+
+  def latest(self, sid):
+    # choose sensor table here
+    #logger.debug('sensor #%s', sid)
+    sstr = '0'+str(sid)
+    evalstr = 'SensorData_'+sstr+'.objects.'
+    evalstr += "latest('id')"
+    obj = eval(evalstr)
+    #time.sleep(1)
+
+    r = obj.adc_out_to_resistance()
+    temp = self.thermistor.resistance_to_temp(r)
+    #logger.debug('TempCalc resistance %s', r)
+    obj.resistance = r
+    obj.temperature = temp
+    obj.save()
+
 
   def loop(self, sid):
     # choose sensor table here
@@ -17,8 +37,9 @@ class TempCalc:
     evalstr += '.order_by("-dtime")'
     object_list = eval(evalstr)
     count = 0
-    print("Anzahl Datensaetze: ", len(object_list))
-    time.sleep(1)
+    logger.debug("Anzahl Datensaetze: %s", len(object_list))
+    logger.debug(__name__)
+    time.sleep(0.5)
 
     for obj in object_list:
       count +=1 
@@ -28,5 +49,4 @@ class TempCalc:
       obj.resistance = r
       obj.temperature = temp
       obj.save()
-      #print(count, r, temp)
 

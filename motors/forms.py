@@ -1,5 +1,5 @@
 from django import forms
-
+from django.db.models import CharField, TextField
 from motors.models import Rule
 
 statuslist = (
@@ -33,5 +33,8 @@ class MotorControlGenericForm(forms.Form):
 class RuleEditForm(forms.ModelForm):
   class Meta:
     model = Rule
-    fields = ['name', 'descr', 'logic', 'count']
+    fields = ['descr', 'logic', 'active']
     exclude = ['id']
+    widgets = {
+      'descr': forms.Textarea(attrs={'cols': 40, 'rows':5}),
+    }

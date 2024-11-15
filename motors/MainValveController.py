@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from piheatweb.Controller import Controller
+from django.http import HttpResponseRedirect
+from djflow.ViewController import ViewControllerSupport
 from datetime import datetime
 from motors.models import MainValveHistory
 from motors.forms import MVControlForm
@@ -24,14 +25,12 @@ def change2db(direction, amount, cur):
     'up': 'Open',
   }
   rule_event = RuleHistory(
-    dtime = now(),
     rule = rule,
     result = 1,
   )
   rule_event.save()
 
   entry = MainValveHistory(
-      dtime = now(),
       change_amount = amount,
       change_dir = db_dir[direction],
       result_openingdegree = result_openingdegree,
@@ -40,14 +39,15 @@ def change2db(direction, amount, cur):
   entry.save()
 
 
-class MainValveController(Controller):
+class MainValveController(ViewControllerSupport):
   def __init__(self, request):
-    Controller.__init__(self, request)
-    self.template = 'motors/mainvalvectrl.html'
+    self.request = request
+    self.init_ctrl()
+    self.template_name = 'motors/mainvalvectrl.html'
 
   def control_input(self):
     request = self.request
-    cur = MainValveHistory.objects.latest('dtime')
+    cur = MainValveHistory.objects.latest('id')
 
     if request.method == 'POST':
         form = MVControlForm(request.POST)
@@ -78,5 +78,4 @@ class MainValveController(Controller):
 
     self.context['cur'] = cur
     self.context['form'] = form
-    return render(self.request, self.template, self.context)
-
+    return render(self.request, self.template_name, self.context)

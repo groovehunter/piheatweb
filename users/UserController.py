@@ -1,4 +1,4 @@
-from piheatweb.Controller import Controller
+from djflow.Controller import Controller
 from django.contrib.auth.forms import AuthenticationForm
 
 from django.contrib.auth import login, logout
@@ -19,7 +19,7 @@ class UserController(Controller):
         else:
             form = AuthenticationForm()
         self.context['form'] = form
-        self.template = 'users/login.html'
+        self.template_name = 'users/login.html'
         return self.render()
 
 

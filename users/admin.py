@@ -4,9 +4,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 #from import_export.admin import ImportExportModelAdmin
 
-from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser
-
+#from .forms import CustomUserCreationForm, CustomUserChangeForm
+#from .models import CustomUser
+"""
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
@@ -15,3 +15,4 @@ class CustomUserAdmin(UserAdmin):
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
+"""
