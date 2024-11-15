@@ -18,7 +18,7 @@ from cntrl.models import ControlEvent
 from time import sleep
 
 adc = Adafruit_ADS1x15.ADS1115()
-logging.getLogger("Adafruit_I2C").setLevel(logging.WARNING)
+logging.getLogger("root").setLevel(logging.DEBUG)
 
 def read_adc():
   from django.utils import timezone

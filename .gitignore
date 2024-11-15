@@ -53,3 +53,6 @@ env.py
 *.pdf
 uml/
 
+# IDE
+.idea/
+.vs/
