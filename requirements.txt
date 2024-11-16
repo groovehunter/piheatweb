@@ -4,11 +4,11 @@ django-tables2
 mysqlclient
 numpy
 pandas
-plotly
-py-yaml-fixture
+# plotly
+# py-yaml-fixture
 pytz
 PyYAML
-RPi.GPIO
+# RPi.GPIO
 sqlparse
-adafruit-circuitpython-ads1x15
+# adafruit-circuitpython-ads1x15
 sympy
