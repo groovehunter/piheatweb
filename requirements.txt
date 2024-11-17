@@ -12,3 +12,4 @@ PyYAML
 sqlparse
 # adafruit-circuitpython-ads1x15
 sympy
+mod_wsgi
