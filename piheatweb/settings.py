@@ -88,7 +88,7 @@ LOGGING = {
 
 
 #AUTH_USER_MODEL = "users.CustomUser"
-TAILWIND_APP_NAME = 'theme'
+#TAILWIND_APP_NAME = 'theme'
 DJANGO_TABLES2_TEMPLATE = "table.html"
 
 
@@ -107,8 +107,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_tables2',
-    'tailwind',
-    'theme',
+#    'tailwind',
+#    'theme',
     'djflow',
     'py_yaml_fixtures',
     'django_extensions',
